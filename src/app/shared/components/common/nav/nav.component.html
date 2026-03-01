@@ -1,0 +1,218 @@
+<div class="flex h-full">
+  <!-- ============================================================
+       SIDEBAR PRINCIPAL
+  ============================================================ -->
+  <div
+    [ngClass]="{
+      'w-64': !nav.isCollapsed() && !nav.isMobile(),
+      'w-20': nav.isCollapsed() && !nav.isMobile(),
+      'w-full h-full': nav.isMobile(),
+      'absolute inset-0 -translate-x-full': nav.isMobile() && nav.isSubNav(),
+    }"
+    class="flex flex-col bg-green-900 text-slate-300 transition-all duration-300 ease-in-out shrink-0 relative z-40"
+  >
+    <!-- Botón collapse (solo desktop) -->
+    <button
+      (click)="nav.toggleSidebar()"
+      class="hidden md:flex absolute -right-3 top-4 size-7 bg-green-600 rounded-full items-center justify-center text-white shadow-lg hover:bg-green-500 transition-colors z-50 cursor-pointer"
+    >
+      <lucide-icon
+        [name]="nav.isCollapsed() ? 'chevron-right' : 'chevron-left'"
+        class="size-4"
+      ></lucide-icon>
+    </button>
+
+    <!-- Logo / Brand -->
+    <div
+      class="flex items-center justify-between h-16 px-3 border-b border-white/10 shrink-0"
+    >
+      <div class="flex items-center text-white">
+        <div
+          class="min-w-[40px] w-10 h-10 flex items-center justify-center rounded-lg bg-green-700 shrink-0"
+        >
+          <span class="text-xl font-semibold">W</span>
+        </div>
+        <h2
+          class="ml-3 text-base font-semibold whitespace-nowrap transition-all duration-300 overflow-hidden"
+          [class.md:w-0]="nav.isCollapsed()"
+          [class.md:opacity-0]="nav.isCollapsed()"
+          [class.md:ml-0]="nav.isCollapsed()"
+        >
+          ERD 1.0
+        </h2>
+      </div>
+      <button (click)="nav.isMobileVisible.set(false)">
+        <lucide-icon name="x" class="md:hidden size-6"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Nav items -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden pb-20 md:pb-0">
+      <nav class="p-4 space-y-1 border-b border-white/10">
+        @for (item of navItems; track item.label) {
+          @if (item.children) {
+            <button
+              (click)="getChildren(item)"
+              [class.active]="isRouteActive(item.route)"
+              [pTooltip]="
+                nav.isCollapsed() && !nav.isMobile() ? item.label : ''
+              "
+              tooltipPosition="right"
+              class="flex items-center justify-between h-11 px-3 rounded-xl hover:bg-white/10 transition-colors w-full text-left [.active]:bg-green-700 [.active]:text-white"
+            >
+              <div class="flex items-center">
+                <lucide-icon
+                  [name]="item.icon"
+                  class="size-6 shrink-0"
+                ></lucide-icon>
+                <span
+                  class="ml-3 whitespace-nowrap transition-all duration-300 overflow-hidden"
+                  [class.md:w-0]="nav.isCollapsed() && !nav.isMobile()"
+                  [class.md:opacity-0]="nav.isCollapsed() && !nav.isMobile()"
+                  [class.md:ml-0]="nav.isCollapsed() && !nav.isMobile()"
+                  >{{ item.label }}</span
+                >
+              </div>
+              <lucide-icon
+                name="chevron-right"
+                class="size-4 shrink-0"
+                [class.md:hidden]="nav.isCollapsed() && !nav.isMobile()"
+              ></lucide-icon>
+            </button>
+          } @else {
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="!bg-green-700 !text-white"
+              [pTooltip]="
+                nav.isCollapsed() && !nav.isMobile() ? item.label : ''
+              "
+              tooltipPosition="right"
+              class="flex items-center h-11 px-3 rounded-xl hover:bg-white/10 transition-colors"
+            >
+              <lucide-icon
+                [name]="item.icon"
+                class="size-6 shrink-0"
+              ></lucide-icon>
+              <span
+                class="ml-3 whitespace-nowrap transition-all duration-300 overflow-hidden"
+                [class.md:w-0]="nav.isCollapsed() && !nav.isMobile()"
+                [class.md:opacity-0]="nav.isCollapsed() && !nav.isMobile()"
+                [class.md:ml-0]="nav.isCollapsed() && !nav.isMobile()"
+                >{{ item.label }}</span
+              >
+            </a>
+          }
+        }
+      </nav>
+
+      <nav class="p-3 space-y-0.5">
+        @for (item of navItemsConfig; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="!bg-green-700 !text-white"
+            [pTooltip]="nav.isCollapsed() && !nav.isMobile() ? item.label : ''"
+            tooltipPosition="right"
+            class="flex items-center h-11 px-3 rounded-xl hover:bg-white/10 transition-colors"
+          >
+            <lucide-icon
+              [name]="item.icon"
+              class="size-5 shrink-0"
+            ></lucide-icon>
+            <span
+              class="ml-3 font-medium whitespace-nowrap text-sm transition-all duration-300 overflow-hidden"
+              [class.md:w-0]="nav.isCollapsed() && !nav.isMobile()"
+              [class.md:opacity-0]="nav.isCollapsed() && !nav.isMobile()"
+              [class.md:ml-0]="nav.isCollapsed() && !nav.isMobile()"
+              >{{ item.label }}</span
+            >
+          </a>
+        }
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SUBNAV DESKTOP
+       En el flujo del flex → empuja el main con slide (width)
+  ============================================================ -->
+  <div
+    [ngClass]="nav.isSubNav() ? 'w-56' : 'w-0'"
+    class="hidden md:flex flex-col bg-white border-r border-slate-200 overflow-hidden transition-all duration-300 ease-in-out shrink-0"
+  >
+    <div
+      class="h-16 pe-1 ps-5 flex items-center justify-between border-b border-slate-200 shrink-0"
+    >
+      <h2
+        class="font-semibold text-green-700 uppercase tracking-widest truncate"
+      >
+        {{ titleSubnav }}
+      </h2>
+      <button
+        (click)="closeSubNav()"
+        class="p-1.5 hover:bg-slate-100 rounded-full text-slate-500 hover:text-green-700 transition-colors shrink-0 ml-2"
+      >
+        <lucide-icon name="x" class="size-5"></lucide-icon>
+      </button>
+    </div>
+
+    <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+      @for (item of children; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active-sub"
+          class="flex items-center h-11 px-3 rounded-xl hover:bg-slate-50 transition-all text-slate-600 [.active-sub]:bg-green-700 [.active-sub]:text-white group"
+        >
+          <lucide-icon
+            [name]="item.icon"
+            class="size-5 shrink-0 text-green-600 group-[.active-sub]:text-white"
+          ></lucide-icon>
+          <span class="ml-3 font-semibold whitespace-nowrap">{{
+            item.label
+          }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+
+  <!-- ============================================================
+       SUBNAV MOBILE
+       Fixed fullscreen, slide desde la izquierda (translate)
+  ============================================================ -->
+  <div
+    [ngClass]="nav.isSubNav() ? 'translate-x-0' : '-translate-x-full'"
+    class="md:hidden fixed inset-0 z-50 w-full bg-slate-50 flex flex-col transition-transform duration-300 ease-in-out"
+  >
+    <div
+      class="h-16 px-4 flex items-center justify-between border-b border-slate-200 bg-white shrink-0"
+    >
+      <div class="flex items-center gap-2">
+        <button
+          (click)="closeSubNav()"
+          class="p-1.5 -ml-1 text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+        >
+          <lucide-icon name="arrow-left" class="size-5"></lucide-icon>
+        </button>
+        <h2 class="font-semibold text-green-700 uppercase tracking-widest">
+          {{ titleSubnav }}
+        </h2>
+      </div>
+    </div>
+
+    <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+      @for (item of children; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active-sub"
+          (click)="closeSubNav()"
+          class="flex items-center h-12 px-4 rounded-xl hover:bg-white transition-all text-slate-600 [.active-sub]:bg-green-700 [.active-sub]:text-white group"
+        >
+          <lucide-icon
+            [name]="item.icon"
+            class="size-5 shrink-0 text-green-600 group-[.active-sub]:text-white"
+          ></lucide-icon>
+          <span class="ml-3 font-semibold">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+</div>

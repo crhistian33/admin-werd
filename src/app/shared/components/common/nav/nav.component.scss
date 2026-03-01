@@ -1,0 +1,31 @@
+@reference "tailwindcss";
+
+::ng-deep .sidebar-tooltip {
+    .p-tooltip-text {
+        @apply bg-black;
+    }
+    &.p-tooltip-right .p-tooltip-arrow {
+        display: none;
+    }
+}
+
+:host { display: block; height: 100%; }
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+// Para evitar parpadeos en los paneles que se ocultan
+.overflow-hidden {
+  backface-visibility: hidden;
+}
+  
+  ::ng-deep .p-drawer-header {
+    display: none !important;
+  }
+  ::ng-deep .p-drawer-content {
+      padding: 0 !important; // Esto quita los espacios en blanco laterales
+      height: 100%;
+  }
