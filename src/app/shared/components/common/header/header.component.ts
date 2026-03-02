@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { NavToggleService } from '../../../services/ui/nav-toggle.service';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { PageTitleService } from '../../../services/ui/page-title.service';
 
 @Component({
   selector: 'app-header',
@@ -11,4 +12,5 @@ import { LucideAngularModule } from 'lucide-angular';
 })
 export class HeaderComponent {
   nav = inject(NavToggleService);
+  pageTitle = inject(PageTitleService);
 }

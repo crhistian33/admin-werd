@@ -12,6 +12,7 @@ export const routes: Routes = [
           import('./features/dashboard/pages/home/home.component').then(
             (m) => m.HomeComponent,
           ),
+        data: { title: 'Dashboard' },
       },
       {
         path: 'ventas',
@@ -22,6 +23,7 @@ export const routes: Routes = [
               import('./features/sales/orders/orders.routes').then(
                 (m) => m.routes,
               ),
+            data: { title: 'Pedidos' },
           },
           {
             path: 'clientes',
@@ -29,6 +31,7 @@ export const routes: Routes = [
               import('./features/sales/customers/customers.routes').then(
                 (m) => m.routes,
               ),
+            data: { title: 'Clientes' },
           },
           {
             path: '',
