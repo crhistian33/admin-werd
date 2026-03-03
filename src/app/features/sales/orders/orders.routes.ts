@@ -5,5 +5,7 @@ export const routes: Routes = [
   {
     path: '',
     component: ListComponent,
+    title: 'Pedidos',
+    data: { breadcrumb: 'Pedidos' },
   },
 ];

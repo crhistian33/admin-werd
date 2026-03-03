@@ -24,6 +24,6 @@ export class PageTitleService {
     while (current.firstChild) {
       current = current.firstChild;
     }
-    return current.snapshot.data?.['title'] ?? '';
+    return current.snapshot.title ?? '';
   }
 }

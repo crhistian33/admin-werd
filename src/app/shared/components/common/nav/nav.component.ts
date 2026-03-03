@@ -4,7 +4,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { NavToggleService } from '../../../services/ui/nav-toggle.service';
 import { TooltipModule } from 'primeng/tooltip';
-import { NavItem } from '../../../interfaces/nav-item.interface';
+import { NavItem } from '../../../types/nav-item.type';
 
 @Component({
   selector: 'app-nav',
