@@ -40,11 +40,14 @@ import {
   Wallet,
   X,
 } from 'lucide-angular';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { mockInterceptor } from './core/interceptors/mock.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withViewTransitions()),
+    provideHttpClient(withInterceptors([mockInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {

@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { NavToggleService } from '../../../services/ui/nav-toggle.service';
 import { TooltipModule } from 'primeng/tooltip';
+
+import { NavToggleService } from '../../../services/ui/nav-toggle.service';
 import { NavItem } from '../../../types/nav-item.type';
 
 @Component({

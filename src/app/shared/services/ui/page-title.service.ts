@@ -1,7 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
-import { inject } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class PageTitleService {

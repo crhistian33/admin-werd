@@ -1,0 +1,20 @@
+<h2 class="text-xl md:text-2xl font-semibold text-green-600 mb-4">
+  LISTADO DE PEDIDOS
+</h2>
+<div>
+  <app-data-table
+    [data]="orders()"
+    [config]="tableConfig"
+    [loading]="loading()"
+    [(selectedRows)]="selectedOrders"
+  >
+    <!-- Slot para acciones externas -->
+    <ng-container tableActions>
+      <p-button
+        label="Nuevo pedido"
+        icon="pi pi-plus"
+        (onClick)="router.navigate(['/productos/crear'])"
+      />
+    </ng-container>
+  </app-data-table>
+</div>
