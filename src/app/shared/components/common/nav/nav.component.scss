@@ -22,9 +22,9 @@
   backface-visibility: hidden;
 }
   
-  ::ng-deep .p-drawer-header {
-    display: none !important;
-  }
+  // ::ng-deep .p-drawer-header {
+  //   display: none !important;
+  // }
   ::ng-deep .p-drawer-content {
       padding: 0 !important; // Esto quita los espacios en blanco laterales
       height: 100%;

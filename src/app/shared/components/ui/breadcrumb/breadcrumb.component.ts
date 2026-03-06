@@ -2,10 +2,11 @@ import { Component, computed, inject } from '@angular/core';
 import { BreadcrumbService } from '../../../services/ui/breadcrumb.service';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-breadcrumb',
-  imports: [BreadcrumbModule],
+  imports: [BreadcrumbModule, RouterLink],
   templateUrl: './breadcrumb.component.html',
   styleUrl: './breadcrumb.component.scss',
 })

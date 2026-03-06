@@ -1,58 +1,74 @@
-import { Injectable, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { BreadcrumbItem } from '../../types/breadcrumb.type';
 
 @Injectable({ providedIn: 'root' })
 export class BreadcrumbService {
   private readonly router = inject(Router);
-  private readonly activatedRoute = inject(ActivatedRoute);
+  readonly breadcrumbs = signal<BreadcrumbItem[]>([]);
 
-  readonly breadcrumbs = toSignal(
-    this.router.events.pipe(
-      filter((e) => e instanceof NavigationEnd),
-      // Usamos el snapshot para asegurar que la construcción sea limpia
-      map(() => this.build(this.activatedRoute.root)),
-    ),
-    { initialValue: [] as BreadcrumbItem[] },
-  );
+  constructor() {
+    // Construye en el siguiente tick para rutas lazy
+    Promise.resolve().then(() => this.breadcrumbs.set(this.build()));
 
-  private build(
-    route: ActivatedRoute,
-    url = '',
-    crumbs: BreadcrumbItem[] = [],
-  ): BreadcrumbItem[] {
-    const children: ActivatedRoute[] = route.children;
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.breadcrumbs.set(this.build()));
+  }
 
-    if (children.length === 0) {
-      return crumbs;
-    }
+  private build(): BreadcrumbItem[] {
+    const crumbs: BreadcrumbItem[] = [];
+    let route: ActivatedRouteSnapshot | null =
+      this.router.routerState.snapshot.root;
+    let url = '';
 
-    for (const child of children) {
-      const routeURL: string = child.snapshot.url
-        .map((segment) => segment.path)
-        .join('/');
+    while (route) {
+      const segment = route.url.map((s) => s.path).join('/');
+      if (segment) url += `/${segment}`;
 
-      // Actualizamos la URL solo si hay segmento, evitando slashes dobles
-      const nextUrl = routeURL ? `${url}/${routeURL}` : url;
+      // routeConfig.data evita heredar data de rutas padre
+      const data = route.routeConfig?.data ?? {};
+      const label: string | undefined = data['breadcrumb'];
+      const isGroup: boolean = data['breadcrumbGroup'] ?? false;
+      const lastLabel = crumbs.at(-1)?.label;
 
-      const label = child.snapshot.data['breadcrumb'];
-      // Solo agregamos si hay label y no es el mismo que el anterior (evita duplicados de redirección)
-      if (
-        label &&
-        (!crumbs.length || crumbs[crumbs.length - 1].label !== label)
-      ) {
+      if (label && label !== lastLabel) {
         crumbs.push({
           label,
-          // Si es breadcrumbGroup no le ponemos ruta para que el componente lo deshabilite
-          route: child.snapshot.data['breadcrumbGroup'] ? undefined : nextUrl,
+          route: isGroup ? undefined : url || '/',
         });
       }
 
-      return this.build(child, nextUrl, crumbs);
+      route = route.children.find((c) => c.outlet === 'primary') ?? null;
     }
 
+    // Sin breadcrumbs en dashboard o raíz
+    if (crumbs.length <= 1) return [];
+
+    // Último item sin ruta — es la página activa
+    crumbs[crumbs.length - 1] = {
+      label: crumbs.at(-1)!.label,
+      route: undefined,
+    };
+
     return crumbs;
+  }
+
+  setLastLabel(label: string): void {
+    const current = this.breadcrumbs();
+    if (!current.length) return;
+
+    const updated = [...current];
+    updated[updated.length - 1] = {
+      ...updated[updated.length - 1],
+      label,
+    };
+
+    this.breadcrumbs.set(updated);
   }
 }

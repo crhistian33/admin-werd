@@ -16,8 +16,21 @@
     }
 
     <!-- Slot para acciones externas (botón Nuevo, exportar, etc.) -->
-    <div class="flex items-center gap-2 ml-auto">
-      <ng-content select="[tableActions]" />
+    <div class="flex items-center ml-auto gap-2">
+      <!-- <ng-content select="[tableActions]" /> -->
+      <p-button
+        icon="pi pi-filter"
+        [severity]="hasFilters() ? 'warn' : 'secondary'"
+        [outlined]="!hasFilters()"
+        (onClick)="filterDrawer.emit()"
+      />
+      <div class="h-6 w-px bg-slate-300 mx-1"></div>
+      <p-button
+        label="Eliminar selección"
+        icon="pi pi-trash"
+        severity="danger"
+      />
+      <p-button label="Nuevo" icon="pi pi-plus" routerLink="nuevo" />
     </div>
   </div>
 
@@ -34,7 +47,6 @@
       [showCurrentPageReport]="true"
       currentPageReportTemplate="{first} - {last} de {totalRecords} registros"
       [sortMode]="'single'"
-      [globalFilterFields]="filterFields()"
       [selection]="selectedRows"
       (selectionChange)="onSelectionChange($event)"
       [tableStyle]="{ 'min-width': '100%' }"
@@ -177,3 +189,4 @@
     </p-table>
   </div>
 </div>
+<ng-content select="[tableDrawer]" />

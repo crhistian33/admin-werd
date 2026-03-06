@@ -1,7 +1,9 @@
 @if (items().length) {
-  <p-breadcrumb
-    [model]="items()"
-    [home]="home"
-    styleClass="!bg-transparent !border-0 !p-0 !shadow-none mb-2"
-  />
+  <div class="border-b border-slate-200 pb-2 mb-3">
+    <p-breadcrumb
+      [model]="items()"
+      [home]="home"
+      styleClass="!bg-transparent !border-0 !p-0 !shadow-none"
+    />
+  </div>
 }

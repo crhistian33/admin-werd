@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  inject,
   input,
   model,
   output,
@@ -25,6 +26,7 @@ import type {
   TableColumn,
   BadgeConfig,
 } from '../../../types/data-table.type';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-data-table',
@@ -41,15 +43,22 @@ import type {
     CurrencyPipe,
     DatePipe,
     DecimalPipe,
+    RouterLink,
   ],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',
 })
 export class DataTableComponent<T extends Record<string, any>> {
+  readonly router = inject(Router);
+  // ── Outputs ─────────────────────────────────────────────────
+  readonly searchChange = output<string>();
+  readonly filterDrawer = output<void>();
   // ── Inputs ──────────────────────────────────────────────────
   readonly data = input.required<T[]>();
   readonly config = input.required<DataTableConfig<T>>();
   readonly loading = input<boolean>(false);
+  readonly hasFilters = input<boolean>(false); // ← controla el color del botón
+  readonly showFilter = input<boolean>(false);
 
   // ── Two-way binding para selección ──────────────────────────
   readonly selectedRows = model<T[]>([]);
@@ -61,11 +70,11 @@ export class DataTableComponent<T extends Record<string, any>> {
   private readonly table = viewChild<Table>('dt');
 
   // ── Computed ────────────────────────────────────────────────
-  readonly filterFields = computed(() =>
-    this.config()
-      .columns.filter((c) => c.type !== 'actions' && c.type !== 'image')
-      .map((c) => c.field.toString()),
-  );
+  // readonly filterFields = computed(() =>
+  //   this.config()
+  //     .columns.filter((c) => c.type !== 'actions' && c.type !== 'image')
+  //     .map((c) => c.field.toString()),
+  // );
 
   readonly totalColumns = computed(() => {
     const base = this.config().columns.length;
@@ -93,8 +102,10 @@ export class DataTableComponent<T extends Record<string, any>> {
 
   /** Filtra la tabla globalmente */
   onGlobalFilter(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.table()?.filterGlobal(input.value, 'contains');
+    const value = (event.target as HTMLInputElement).value;
+    console.log('Value', value);
+    this.searchChange.emit(value);
+    //this.table()?.filterGlobal(input.value, 'contains');
   }
 
   /** Emite cambios de selección */

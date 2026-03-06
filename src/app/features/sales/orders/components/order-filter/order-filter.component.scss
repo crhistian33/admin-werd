@@ -1,0 +1,15 @@
+::ng-deep p-datepicker.p-datepicker {
+  width: 100% !important;
+
+  .p-datepicker-input {
+    width: 100% !important;
+    padding-right: 2rem !important; // ← espacio para el X sin empujar el input
+  }
+
+  .p-datepicker-clear-icon {
+    position: absolute !important;
+    right: 0.75rem !important;
+    top: 1.75rem !important;
+    transform: translateY(-50%) !important;
+  }
+}

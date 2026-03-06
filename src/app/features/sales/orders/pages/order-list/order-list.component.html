@@ -3,18 +3,14 @@
 </h2>
 <div>
   <app-data-table
-    [data]="orders()"
+    [data]="store.filteredItems()"
     [config]="tableConfig"
-    [loading]="loading()"
-    [(selectedRows)]="selectedOrders"
+    [loading]="store.loading()"
+    (searchChange)="store.setFilter({ search: $event })"
+    (filterDrawer)="drawerVisible.set(true)"
   >
-    <!-- Slot para acciones externas -->
-    <ng-container tableActions>
-      <p-button
-        label="Nuevo pedido"
-        icon="pi pi-plus"
-        (onClick)="router.navigate(['/productos/crear'])"
-      />
+    <ng-container tableDrawer>
+      <app-order-filter [(visible)]="drawerVisible" />
     </ng-container>
   </app-data-table>
 </div>

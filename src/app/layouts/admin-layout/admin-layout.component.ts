@@ -8,6 +8,8 @@ import { NavComponent } from '@shared/components/common/nav/nav.component';
 import { NavToggleService } from '@shared/services/ui/nav-toggle.service';
 import { HeaderComponent } from '@shared/components/common/header/header.component';
 import { BreadcrumbComponent } from '@shared/components/ui/breadcrumb/breadcrumb.component';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-admin-layout',
@@ -20,6 +22,8 @@ import { BreadcrumbComponent } from '@shared/components/ui/breadcrumb/breadcrumb
     NavComponent,
     HeaderComponent,
     BreadcrumbComponent,
+    ConfirmDialogModule,
+    ToastModule,
   ],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.scss',

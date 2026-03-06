@@ -23,6 +23,7 @@ export const routes: Routes = [
         children: [
           {
             path: 'pedidos',
+            data: { breadcrumb: 'Pedidos' },
             loadChildren: () =>
               import('./features/sales/orders/orders.routes').then(
                 (m) => m.routes,
