@@ -30,59 +30,151 @@ export class NavComponent {
   navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'layout-dashboard', route: '/dashboard' },
 
-    // Grupo Ventas: Gestión de transacciones y base de datos
+    // Ventas
     {
       label: 'Ventas',
-      icon: 'shopping-bag',
+      icon: 'shopping-cart',
       route: '/ventas',
       children: [
-        { label: 'Pedidos', icon: 'clipboard-list', route: '/ventas/pedidos' }, // Cambiado: ícono de gestión
-        { label: 'Clientes', icon: 'users', route: '/ventas/clientes' }, // El original de tu captura
+        { label: 'Pedidos', icon: 'file-text', route: '/ventas/pedidos' },
+        { label: 'Clientes', icon: 'users', route: '/ventas/clientes' },
       ],
     },
 
-    // Grupo Catálogo: Gestión de inventario
+    // Catálogo
     {
       label: 'Catálogo',
-      icon: 'book-open',
+      icon: 'layout-grid',
+      route: '/catalogos',
       children: [
-        { label: 'Productos', icon: 'package', route: '/products' },
-        { label: 'Categorías', icon: 'layers', route: '/categories' },
-        { label: 'Marcas', icon: 'tag', route: '/brands' },
+        { label: 'Productos', icon: 'package', route: '/catalogos/productos' },
+        {
+          label: 'Categorías',
+          icon: 'folder-tree',
+          route: '/catalogos/categorias',
+        },
+        { label: 'Marcas', icon: 'badge-check', route: '/catalogos/marcas' },
+        { label: 'Reseñas', icon: 'star', route: '/catalogos/resenas' },
       ],
     },
 
-    // Grupo Marketing/Contenido: Lo que el cliente ve en la web
+    // Inventario
+    {
+      label: 'Inventario',
+      icon: 'warehouse',
+      route: '/inventario',
+      children: [
+        {
+          label: 'Control de stocks',
+          icon: 'boxes',
+          route: '/inventario/stocks',
+        },
+        {
+          label: 'Movimientos',
+          icon: 'arrow-left-right',
+          route: '/inventario/movimientos',
+        },
+      ],
+    },
+
+    // Marketing
     {
       label: 'Marketing',
       icon: 'megaphone',
+      route: '/marketing',
       children: [
-        { label: 'Promociones', icon: 'ticket-percent', route: '/promotions' },
-        { label: 'Novedades', icon: 'monitor-smartphone', route: '/news' },
-        { label: 'Reseñas', icon: 'message-square-quote', route: '/reviews' },
+        {
+          label: 'Promociones',
+          icon: 'ticket-percent',
+          route: '/marketing/promociones',
+        },
+        { label: 'Cupones', icon: 'ticket', route: '/marketing/cupones' },
+      ],
+    },
+
+    // Contenidos
+    {
+      label: 'Contenidos',
+      icon: 'book-open',
+      route: '/contenidos',
+      children: [
+        { label: 'Destacados', icon: 'zap', route: '/contenidos/destacados' },
+        {
+          label: 'Páginas internas',
+          icon: 'file-code',
+          route: '/contenidos/paginas-internas',
+        },
+        {
+          label: 'Preguntas frecuentes',
+          icon: 'help-circle',
+          route: '/contenidos/preguntas-frecuentes',
+        },
+      ],
+    },
+
+    // Reportes
+    {
+      label: 'Reportes',
+      icon: 'chart-bar-stacked',
+      route: '/reportes',
+      children: [
+        { label: 'Ventas', icon: 'trending-up', route: '/reportes/ventas' },
+        {
+          label: 'Inventario',
+          icon: 'pie-chart',
+          route: '/reportes/inventario',
+        },
+        { label: 'Clientes', icon: 'user-search', route: '/reportes/clientes' },
+        {
+          label: 'Productos',
+          icon: 'package-search',
+          route: '/reportes/productos',
+        },
       ],
     },
   ];
 
   navItemsConfig: NavItem[] = [
-    { label: 'Usuarios', icon: 'user-cog', route: '/usuarios' },
-    { label: 'Roles', icon: 'shield-check', route: '/roles' },
-    { label: 'Tipos de pago', icon: 'wallet', route: '/tipos-pago' },
-    { label: 'Zonas de envío', icon: 'truck', route: '/zonas-envio' },
-    { label: 'Configuración', icon: 'settings', route: '/configuracion' },
+    {
+      label: 'Usuarios',
+      icon: 'users',
+      route: '/usuarios',
+      children: [
+        { label: 'Cuentas', icon: 'user-cog', route: '/usuarios/cuentas' },
+        { label: 'Roles', icon: 'shield-check', route: '/usuarios/roles' },
+      ],
+    },
+    {
+      label: 'Configuraciones',
+      icon: 'settings',
+      route: '/configuraciones',
+      children: [
+        {
+          label: 'General',
+          icon: 'sliders-horizontal',
+          route: '/configuraciones/general',
+        },
+        {
+          label: 'Métodos de pago',
+          icon: 'wallet',
+          route: '/configuraciones/pagos',
+        },
+        {
+          label: 'Despacho',
+          icon: 'truck',
+          route: '/configuraciones/despacho',
+        },
+      ],
+    },
   ];
 
   getChildren(item: NavItem) {
-    // if (item.label === this.titleSubnav || !this.nav.isSubNav())
-    //   this.nav.toggleSubNav();
     if (item.route) {
       this.nav.activeParentRoute.set(item.route);
     }
 
     this.nav.isSubNav.set(true);
-
     this.nav.isCollapsed.set(true);
-
     this.titleSubnav = item.label;
     this.children = item.children ?? [];
   }

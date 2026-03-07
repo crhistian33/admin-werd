@@ -1,7 +1,4 @@
 import { Routes } from '@angular/router';
-import { OrderListComponent } from './pages/order-list/order-list.component';
-import { OrderFormComponent } from './pages/order-form/order-form.component';
-import { OrderDetailComponent } from './pages/order-detail/order-detail.component';
 
 export const routes: Routes = [
   {
@@ -10,26 +7,38 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        component: OrderListComponent,
+        loadComponent: () =>
+          import('./pages/order-list/order-list.component').then(
+            (m) => m.OrderListComponent,
+          ),
         title: 'Pedidos',
       },
       {
-        path: ':id',
-        component: OrderDetailComponent,
-        title: 'Detalle del pedido',
-        data: { breadcrumb: 'Detalle' },
-      },
-      {
         path: 'nuevo',
-        component: OrderFormComponent,
+        loadComponent: () =>
+          import('./pages/order-form/order-form.component').then(
+            (m) => m.OrderFormComponent,
+          ),
         title: 'Nueva orden',
         data: { breadcrumb: 'Nuevo' },
       },
       {
         path: ':id/editar',
-        component: OrderFormComponent,
+        loadComponent: () =>
+          import('./pages/order-form/order-form.component').then(
+            (m) => m.OrderFormComponent,
+          ),
         title: 'Editar orden',
         data: { breadcrumb: 'Editar' },
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/order-detail/order-detail.component').then(
+            (m) => m.OrderDetailComponent,
+          ),
+        title: 'Detalle del pedido',
+        data: { breadcrumb: 'Detalle' },
       },
     ],
   },
