@@ -1,5 +1,7 @@
 import { ORDERS_MOCK } from './data/orders.mock';
+import { CATEGORIES_MOCK } from './data/categories.mock';
 
 export const MOCK_HANDLERS = [
   { url: '/api/orders', method: 'GET', data: ORDERS_MOCK },
+  { url: '/api/categories', method: 'GET', data: CATEGORIES_MOCK },
 ];

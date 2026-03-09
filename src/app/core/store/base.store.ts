@@ -4,7 +4,10 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import type { BaseFilter } from '@shared/models/base-filter.model';
 import type { BaseService } from '../services/base.service';
 
-export abstract class BaseStore<T extends object, F extends BaseFilter> {
+export abstract class BaseStore<
+  T extends object,
+  F extends BaseFilter = BaseFilter,
+> {
   private readonly http = inject(HttpClient);
   private readonly destroy = inject(DestroyRef);
 
@@ -12,7 +15,7 @@ export abstract class BaseStore<T extends object, F extends BaseFilter> {
   protected abstract readonly service: BaseService<T>;
 
   // ── Filtro — cada feature define el suyo ────────────────────
-  abstract readonly filter: ReturnType<typeof signal<F>>;
+  readonly filter = signal<F>({ search: '' } as F);
 
   // ── filteredItems — cada feature implementa su lógica ────────
   abstract readonly filteredItems: ReturnType<typeof computed<T[]>>;

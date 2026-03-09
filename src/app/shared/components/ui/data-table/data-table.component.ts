@@ -103,7 +103,6 @@ export class DataTableComponent<T extends Record<string, any>> {
   /** Filtra la tabla globalmente */
   onGlobalFilter(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
-    console.log('Value', value);
     this.searchChange.emit(value);
     //this.table()?.filterGlobal(input.value, 'contains');
   }

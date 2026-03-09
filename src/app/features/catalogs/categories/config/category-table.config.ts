@@ -1,0 +1,58 @@
+import { Router } from '@angular/router';
+import { DataTableConfig } from '@shared/types/data-table.type';
+import { Category } from '../models/category.model';
+
+type CategoryTableCallbacks = {
+  onDelete: (category: Category) => void;
+};
+
+export const categoryTableConfig = (
+  router: Router,
+  callback: CategoryTableCallbacks,
+): DataTableConfig<Category> => ({
+  dataKey: 'id',
+  globalFilter: true,
+  showFilter: false,
+  columns: [
+    {
+      field: 'name',
+      header: 'Nombre',
+      type: 'text',
+      sortable: true,
+      width: '120px',
+    },
+    {
+      field: 'description',
+      header: 'Descripción',
+      type: 'text',
+      sortable: true,
+    },
+    {
+      field: 'actions',
+      header: '',
+      type: 'actions',
+      width: '80px',
+    },
+  ],
+  actions: [
+    {
+      icon: 'pi pi-eye',
+      tooltip: 'Ver pedido',
+      severity: 'info',
+      action: (row) => router.navigate(['/catalogos/categorias', row.id]),
+    },
+    {
+      icon: 'pi pi-pencil',
+      tooltip: 'Editar',
+      severity: 'warn',
+      action: (row) =>
+        router.navigate(['/catalogos/categorias', row.id, 'editar']),
+    },
+    {
+      icon: 'pi pi-trash',
+      tooltip: 'Eliminar',
+      severity: 'danger',
+      action: (row) => callback.onDelete(row),
+    },
+  ],
+});

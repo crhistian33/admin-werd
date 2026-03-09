@@ -37,6 +37,7 @@ export type DataTableConfig<T = any> = {
   pageSize?: number; // default: 10
   pageSizeOptions?: number[]; // default: [10, 25, 50]
   globalFilter?: boolean; // default: true
+  showFilter?: boolean; // default: true
   selectable?: boolean; // default: false
   dataKey?: string; // default: 'id'
 };

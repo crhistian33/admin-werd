@@ -11,7 +11,7 @@ import { Order } from '../models/order.model';
 export class OrderStore extends BaseStore<Order, OrderFilter> {
   protected readonly service = inject(OrderService);
 
-  readonly filter = signal<OrderFilter>(orderFilterDefaults());
+  override readonly filter = signal<OrderFilter>(orderFilterDefaults());
 
   readonly filteredItems = computed(() => {
     let items = this.items();

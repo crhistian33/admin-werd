@@ -18,13 +18,15 @@
     <!-- Slot para acciones externas (botón Nuevo, exportar, etc.) -->
     <div class="flex items-center ml-auto gap-2">
       <!-- <ng-content select="[tableActions]" /> -->
-      <p-button
-        icon="pi pi-filter"
-        [severity]="hasFilters() ? 'warn' : 'secondary'"
-        [outlined]="!hasFilters()"
-        (onClick)="filterDrawer.emit()"
-      />
-      <div class="h-6 w-px bg-slate-300 mx-1"></div>
+      @if (config().showFilter) {
+        <p-button
+          icon="pi pi-filter"
+          [severity]="hasFilters() ? 'warn' : 'secondary'"
+          [outlined]="!hasFilters()"
+          (onClick)="filterDrawer.emit()"
+        />
+        <div class="h-6 w-px bg-slate-300 mx-1"></div>
+      }
       <p-button
         label="Eliminar selección"
         icon="pi pi-trash"
