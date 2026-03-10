@@ -178,7 +178,7 @@
 
       <!-- Loading -->
       <ng-template #loadingbody>
-        @for (_ of skeletonRows; track $index) {
+        @for (_ of [1, 2]; track $index) {
           <tr>
             @for (col of config().columns; track col.field) {
               <td>
@@ -191,4 +191,6 @@
     </p-table>
   </div>
 </div>
-<ng-content select="[tableDrawer]" />
+@if (!config().showFilter) {
+  <ng-content select="[tableDrawer]" />
+}

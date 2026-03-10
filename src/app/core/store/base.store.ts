@@ -1,4 +1,11 @@
-import { computed, signal, inject, DestroyRef, Injector, linkedSignal } from '@angular/core';
+import {
+  computed,
+  signal,
+  inject,
+  DestroyRef,
+  Injector,
+  linkedSignal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient, httpResource } from '@angular/common/http';
 import type { BaseFilter } from '@shared/models/base-filter.model';
@@ -8,9 +15,7 @@ export abstract class BaseStore<
   T extends object,
   F extends BaseFilter = BaseFilter,
 > {
-  private readonly http = inject(HttpClient);
   private readonly destroy = inject(DestroyRef);
-  private readonly injector = inject(Injector);
 
   // ── Cada feature define su URL via su service ────────────────
   protected abstract readonly service: BaseService<T>;
@@ -38,15 +43,22 @@ export abstract class BaseStore<
   });
 
   // ── Estado público ───────────────────────────────────────────
-  readonly loading = computed(() => this.resource.isLoading() || this.detailResource.isLoading());
+  readonly loading = computed(
+    () => this.resource.isLoading() || this.detailResource.isLoading(),
+  );
   readonly items = computed(() => this.resource.value() ?? []);
   readonly error = computed(() => {
-    if (this.resource.status() === 'error' || this.detailResource.status() === 'error') {
+    if (
+      this.resource.status() === 'error' ||
+      this.detailResource.status() === 'error'
+    ) {
       return 'Error al cargar los datos';
     }
     return null;
   });
-  readonly selected = linkedSignal<T | null>(() => this.detailResource.value() ?? null);
+  readonly selected = linkedSignal<T | null>(
+    () => this.detailResource.value() ?? null,
+  );
 
   // ── Mutaciones — recarga el resource al completar ────────────
   create(payload: Partial<T>): void {
@@ -64,10 +76,7 @@ export abstract class BaseStore<
   }
 
   delete(id: number): void {
-    this.service
-      .delete(id)
-      .pipe(takeUntilDestroyed(this.destroy))
-      .subscribe(() => this.reload());
+    this.service.delete(id).pipe(takeUntilDestroyed(this.destroy)).subscribe();
   }
 
   // ── Métodos de filtro y selección ────────────────────────────

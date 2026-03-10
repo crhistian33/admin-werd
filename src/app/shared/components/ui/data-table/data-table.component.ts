@@ -82,7 +82,7 @@ export class DataTableComponent<T extends Record<string, any>> {
   });
 
   // Filas skeleton durante loading
-  readonly skeletonRows = Array(5);
+  readonly skeletonRows = Array(3);
 
   // ── Métodos ─────────────────────────────────────────────────
 

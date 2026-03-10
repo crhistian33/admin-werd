@@ -193,6 +193,7 @@
         <a
           [routerLink]="item.route"
           routerLinkActive="active-sub"
+          (click)="closeSubNav()"
           class="flex items-center h-11 px-3 rounded-xl hover:bg-slate-50 transition-all text-slate-600 [.active-sub]:bg-green-700 [.active-sub]:text-white group"
         >
           <lucide-icon

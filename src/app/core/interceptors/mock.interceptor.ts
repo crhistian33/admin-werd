@@ -6,28 +6,46 @@ import { MOCK_HANDLERS } from '@core/mocks/mock-handlers';
 export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   if (!environment.useMocks) return next(req);
 
-  // Encontrar el handler que coincida con la base de la URL
-  const handler = MOCK_HANDLERS.find((h) => req.url.includes(h.url) && req.method === h.method);
+  const path = new URL(req.url).pathname; // → '/api/categories/2'
+
+  const handler = MOCK_HANDLERS.find((h) => {
+    const samePath = path === h.url || path.startsWith(h.url + '/');
+    const sameMethod = req.method === h.method;
+    return samePath && sameMethod;
+  });
 
   if (!handler) return next(req);
 
-  let body = handler.data;
+  // DELETE
+  if (req.method === 'DELETE') {
+    const deletePattern = new RegExp(`${handler.url}/(\\d+)$`);
+    const deleteMatch = path.match(deletePattern);
 
-  // Si la petición es para un detalle (ej: /api/categories/1)
-  const isDetailPattern = new RegExp(`${handler.url}/(\\d+)$`);
-  const match = req.url.match(isDetailPattern);
+    if (deleteMatch) {
+      const id = parseInt(deleteMatch[1], 10);
+      const list = handler.data as any[];
+      const index = list.findIndex((i) => i.id === id);
 
-  if (match && match[1]) {
-    const id = parseInt(match[1], 10);
-    // Asumimos que handler.data es un array y buscamos por id
-    const item = (handler.data as any[]).find((i) => i.id === id);
-    if (!item) {
-      return of(new HttpResponse({ status: 404, statusText: 'Not Found' })).pipe(delay(400));
+      if (index === -1) {
+        return of(new HttpResponse({ status: 404 })).pipe(delay(400));
+      }
+
+      list.splice(index, 1);
+      return of(new HttpResponse({ status: 204, body: null })).pipe(delay(400));
     }
+  }
+
+  // GET detalle
+  let body = handler.data;
+  const detailPattern = new RegExp(`${handler.url}/(\\d+)$`);
+  const match = path.match(detailPattern);
+
+  if (match) {
+    const id = parseInt(match[1], 10);
+    const item = (handler.data as any[]).find((i) => i.id === id);
+    if (!item) return of(new HttpResponse({ status: 404 })).pipe(delay(400));
     body = item;
   }
 
-  return of(new HttpResponse({ status: 200, body })).pipe(
-    delay(400), // simula latencia real
-  );
+  return of(new HttpResponse({ status: 200, body })).pipe(delay(400));
 };
