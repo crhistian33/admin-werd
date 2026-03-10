@@ -10,6 +10,7 @@ import { HeaderComponent } from '@shared/components/common/header/header.compone
 import { BreadcrumbComponent } from '@shared/components/ui/breadcrumb/breadcrumb.component';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { PageTitleService } from '@shared/services/ui/page-title.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -30,6 +31,7 @@ import { ToastModule } from 'primeng/toast';
 })
 export class AdminLayoutComponent {
   private readonly nav = inject(NavToggleService);
+  readonly pageTitle = inject(PageTitleService);
 
   isCollapsed = this.nav.isCollapsed;
   isMobileVisible = this.nav.isMobileVisible;

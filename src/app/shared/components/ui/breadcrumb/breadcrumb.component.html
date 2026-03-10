@@ -1,5 +1,7 @@
 @if (items().length) {
-  <div class="border-b border-slate-200 pb-2 mb-3">
+  <div
+    class="[&_.p-breadcrumb-item-label]:text-xs! [&_.p-breadcrumb-item-icon]:text-xs! [&_.p-breadcrumb-separator]:text-xs! [&_.pi]:text-[10px]! [&_svg]:w-3! [&_svg]:h-3! [&_.p-breadcrumb]:text-xs! [&_.p-menuitem-link]:py-0.5!"
+  >
     <p-breadcrumb
       [model]="items()"
       [home]="home"

@@ -5,12 +5,12 @@ export const CATEGORIES_MOCK: Category[] = [
     id: 1,
     name: 'Tecnología',
     description: 'Descripción de la categoría Tecnología',
-    image: 'https://via.placeholder.com/150',
+    image: '/images/categories/category3.jpg',
   },
   {
     id: 2,
-    name: 'Ropa',
-    description: 'Descripción de la categoría Ropa variada',
-    image: 'https://via.placeholder.com/150',
+    name: 'Calzados',
+    description: 'Descripción de la categoría calzado',
+    image: '/images/categories/category2.jpg',
   },
 ];

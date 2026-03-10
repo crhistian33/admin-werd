@@ -1,4 +1,4 @@
-import { computed, signal, inject, DestroyRef } from '@angular/core';
+import { computed, signal, inject, DestroyRef, Injector, linkedSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient, httpResource } from '@angular/common/http';
 import type { BaseFilter } from '@shared/models/base-filter.model';
@@ -10,6 +10,7 @@ export abstract class BaseStore<
 > {
   private readonly http = inject(HttpClient);
   private readonly destroy = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   // ── Cada feature define su URL via su service ────────────────
   protected abstract readonly service: BaseService<T>;
@@ -21,16 +22,31 @@ export abstract class BaseStore<
   abstract readonly filteredItems: ReturnType<typeof computed<T[]>>;
 
   // ── httpResource — GET automático al instanciar ──────────────
-  private readonly resource = httpResource<T[]>(() => this.service.url);
+  private readonly resource = httpResource<T[]>(() => this.service?.url);
+
+  // ── Estado individual ──────────────────────────────────────────
+  readonly selectedId = signal<number | null>(null);
+
+  // ── httpResource — GET automático del detalle ──────────────────
+  private readonly detailResource = httpResource<T>(() => {
+    const id = this.selectedId();
+    console.log('[BaseStore] detailResource evaluate id:', id);
+    if (!id || !this.service) return undefined;
+    const url = `${this.service.url}/${id}`;
+    console.log('[BaseStore] detailResource evaluate url:', url);
+    return url;
+  });
 
   // ── Estado público ───────────────────────────────────────────
-  readonly loading = this.resource.isLoading;
+  readonly loading = computed(() => this.resource.isLoading() || this.detailResource.isLoading());
   readonly items = computed(() => this.resource.value() ?? []);
   readonly error = computed(() => {
-    const status = this.resource.status();
-    return status === 'error' ? 'Error al cargar los datos' : null;
+    if (this.resource.status() === 'error' || this.detailResource.status() === 'error') {
+      return 'Error al cargar los datos';
+    }
+    return null;
   });
-  readonly selected = signal<T | null>(null);
+  readonly selected = linkedSignal<T | null>(() => this.detailResource.value() ?? null);
 
   // ── Mutaciones — recarga el resource al completar ────────────
   create(payload: Partial<T>): void {
@@ -69,6 +85,12 @@ export abstract class BaseStore<
 
   reload(): void {
     this.resource.reload();
+  }
+
+  // ── Método para obtener el detalle ───────────────────────────
+  getById(id: number) {
+    console.log('[BaseStore] getById called with id:', id);
+    this.selectedId.set(id);
   }
 
   // ── Helper de búsqueda por campos de texto ───────────────────
