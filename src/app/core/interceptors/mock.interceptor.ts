@@ -1,5 +1,6 @@
-import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
-import { of, delay } from 'rxjs';
+import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { of, throwError, timer } from 'rxjs';
+import { delay, switchMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { MOCK_HANDLERS } from '@core/mocks/mock-handlers';
 
@@ -35,7 +36,7 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
       const index = list.findIndex((i) => i.id === id);
 
       if (index === -1) {
-        return of(new HttpResponse({ status: 404 })).pipe(delay(400));
+        return timer(400).pipe(switchMap(() => throwError(() => new HttpErrorResponse({ status: 404, statusText: 'Not Found', url: req.url }))));
       }
 
       list[index] =
@@ -61,7 +62,7 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
       const index = list.findIndex((i) => i.id === id);
 
       if (index === -1) {
-        return of(new HttpResponse({ status: 404 })).pipe(delay(400));
+        return timer(400).pipe(switchMap(() => throwError(() => new HttpErrorResponse({ status: 404, statusText: 'Not Found', url: req.url }))));
       }
 
       list.splice(index, 1);
@@ -90,7 +91,9 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   if (match) {
     const id = parseInt(match[1], 10);
     const item = (handler.data as any[]).find((i) => i.id === id);
-    if (!item) return of(new HttpResponse({ status: 404 })).pipe(delay(400));
+    if (!item) {
+      return timer(400).pipe(switchMap(() => throwError(() => new HttpErrorResponse({ status: 404, statusText: 'Not Found', url: req.url }))));
+    }
     body = item;
   }
 

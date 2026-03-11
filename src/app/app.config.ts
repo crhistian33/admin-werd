@@ -62,13 +62,17 @@ import {
 } from 'lucide-angular';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { mockInterceptor } from './core/interceptors/mock.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { ErrorHandler } from '@angular/core';
+import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withViewTransitions(), withComponentInputBinding()),
-    provideHttpClient(withInterceptors([mockInterceptor])),
+    provideHttpClient(withInterceptors([errorInterceptor, mockInterceptor])),
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideAnimations(),
     providePrimeNG({
       theme: {

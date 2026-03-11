@@ -49,7 +49,10 @@ export abstract class BaseStore<
   readonly loading = computed(
     () => this.resource.isLoading() || this.detailResource.isLoading(),
   );
-  readonly items = computed(() => this.resource.value() ?? []);
+  readonly items = computed(() => {
+    if (this.resource.status() === 'error') return [];
+    return this.resource.value() ?? [];
+  });
   readonly error = computed(() => {
     if (
       this.resource.status() === 'error' ||
@@ -59,9 +62,10 @@ export abstract class BaseStore<
     }
     return null;
   });
-  readonly selected = linkedSignal<T | null>(
-    () => this.detailResource.value() ?? null,
-  );
+  readonly selected = linkedSignal<T | null>(() => {
+    if (this.detailResource.status() === 'error') return null;
+    return this.detailResource.value() ?? null;
+  });
 
   // ── Mutaciones — recarga el resource al completar ────────────
   create(payload: Partial<T>, onSuccess?: () => void): void {
@@ -81,7 +85,6 @@ export abstract class BaseStore<
         },
         error: () => {
           this.isSaving.set(false);
-          this.dialog.error('Ocurrió un error al intentar crear el registro');
         },
       });
   }
@@ -103,9 +106,6 @@ export abstract class BaseStore<
         },
         error: () => {
           this.isSaving.set(false);
-          this.dialog.error(
-            'Ocurrió un error al intentar actualizar el registro',
-          );
         },
       });
   }
@@ -126,9 +126,6 @@ export abstract class BaseStore<
         },
         error: () => {
           this.isSaving.set(false);
-          this.dialog.error(
-            'Ocurrió un error al intentar eliminar el registro',
-          );
         },
       });
   }
@@ -154,9 +151,6 @@ export abstract class BaseStore<
         },
         error: () => {
           this.isSaving.set(false);
-          this.dialog.error(
-            'Ocurrió un error al intentar eliminar los registros',
-          );
         },
       });
   }
