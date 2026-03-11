@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { BaseStore } from '@core/store/base.store';
 import { CategoryService } from '../services/category.service';
 import { Category } from '../models/category.model';

@@ -1,1 +1,9 @@
-<p>brand-list works!</p>
+<app-data-table
+  [data]="store.filteredItems()"
+  [config]="tableConfig"
+  [loading]="store.loading()"
+  [isSaving]="store.isSaving()"
+  (searchChange)="store.setFilter({ search: $event })"
+  (deleteAll)="onDeleteAll($event)"
+>
+</app-data-table>
