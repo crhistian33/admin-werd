@@ -13,13 +13,14 @@ export const categoryTableConfig = (
   dataKey: 'id',
   globalFilter: true,
   showFilter: false,
+  selectable: true,
   columns: [
     {
       field: 'name',
       header: 'Nombre',
       type: 'text',
       sortable: true,
-      width: '120px',
+      width: '250px',
     },
     {
       field: 'description',

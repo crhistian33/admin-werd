@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CategoryStore } from '../../store/category.store';
 import { DialogService } from '@shared/services/ui/dialog.service';
@@ -21,15 +21,33 @@ export class CategoryListComponent {
     onDelete: (category) => this.onDelete(category),
   });
 
+  readonly table = viewChild(DataTableComponent);
+
   onDelete(category: Category): void {
     this.dialog.delete({
       message: `¿Está seguro de eliminar la categoría <strong>${category.name}</strong>?. <br>No se podrá reestablecer la acción`,
       onAccept: () => {
-        this.store.delete(category.id);
-        this.dialog.success(
-          `Categoría ${category.name} eliminada`,
-          'Eliminación exitosa',
-        );
+        this.store.delete(category.id, () => {
+          this.table()?.selectedRows.update((rows: any[]) =>
+            rows.filter((r) => r.id !== category.id),
+          );
+          this.dialog.success(
+            `Categoría ${category.name} eliminada`,
+            'Eliminación exitosa',
+          );
+        });
+      },
+    });
+  }
+
+  onDeleteAll(categories: Category[]): void {
+    this.dialog.delete({
+      message: `¿Está seguro de eliminar <strong>${categories.length}</strong> ${categories.length === 1 ? 'categoría seleccionada' : 'categorías seleccionadas'}. <br>No se podrá reestablecer la acción`,
+      onAccept: () => {
+        const ids = categories.map((c) => c.id);
+        this.store.deleteAll(ids, () => {
+          this.table()?.selectedRows.set([]);
+        });
       },
     });
   }

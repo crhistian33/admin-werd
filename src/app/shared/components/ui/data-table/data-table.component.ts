@@ -57,6 +57,7 @@ export class DataTableComponent<T extends Record<string, any>> {
   readonly data = input.required<T[]>();
   readonly config = input.required<DataTableConfig<T>>();
   readonly loading = input<boolean>(false);
+  readonly isSaving = input<boolean>(false); // ← controla el skeleton por mutaciones
   readonly hasFilters = input<boolean>(false); // ← controla el color del botón
   readonly showFilter = input<boolean>(false);
 
@@ -65,6 +66,7 @@ export class DataTableComponent<T extends Record<string, any>> {
 
   // ── Outputs ─────────────────────────────────────────────────
   readonly selectionChange = output<T[]>();
+  readonly deleteAll = output<T[]>();
 
   // ── ViewChild ───────────────────────────────────────────────
   private readonly table = viewChild<Table>('dt');
@@ -111,5 +113,12 @@ export class DataTableComponent<T extends Record<string, any>> {
   onSelectionChange(rows: T[]): void {
     this.selectedRows.set(rows);
     this.selectionChange.emit(rows);
+  }
+
+  /** Emite evento para eliminar selección */
+  onDeleteAll(): void {
+    if (this.selectedRows().length > 0) {
+      this.deleteAll.emit(this.selectedRows());
+    }
   }
 }

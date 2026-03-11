@@ -4,5 +4,7 @@ import { CATEGORIES_MOCK } from './data/categories.mock';
 export const MOCK_HANDLERS = [
   { url: '/api/orders', method: 'GET', data: ORDERS_MOCK },
   { url: '/api/categories', method: 'GET', data: CATEGORIES_MOCK },
+  { url: '/api/categories', method: 'POST', data: CATEGORIES_MOCK },
+  { url: '/api/categories', method: 'PATCH', data: CATEGORIES_MOCK },
   { url: '/api/categories', method: 'DELETE', data: CATEGORIES_MOCK },
 ];

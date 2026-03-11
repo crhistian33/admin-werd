@@ -31,6 +31,8 @@
         label="Eliminar selección"
         icon="pi pi-trash"
         severity="danger"
+        [disabled]="!selectedRows().length"
+        (onClick)="onDeleteAll()"
       />
       <p-button label="Nuevo" icon="pi pi-plus" routerLink="nuevo" />
     </div>
@@ -40,7 +42,7 @@
     <!-- Tabla -->
     <p-table
       #dt
-      [value]="loading() ? skeletonRows : data()"
+      [value]="(loading() || isSaving()) ? skeletonRows : data()"
       [columns]="config().columns"
       [dataKey]="config().dataKey ?? 'id'"
       [rows]="config().pageSize ?? 10"
@@ -49,15 +51,14 @@
       [showCurrentPageReport]="true"
       currentPageReportTemplate="{first} - {last} de {totalRecords} registros"
       [sortMode]="'single'"
-      [selection]="selectedRows"
-      (selectionChange)="onSelectionChange($event)"
+      [(selection)]="selectedRows"
       [tableStyle]="{ 'min-width': '100%' }"
     >
       <!-- Header -->
       <ng-template #header>
         <tr class="bg-slate-200 border-b border-slate-300">
           @if (config().selectable) {
-            <th class="py-3! px-4! border-0! w-12">
+            <th class="py-3! px-4! border-0! bg-transparent! w-12">
               <p-tableHeaderCheckbox />
             </th>
           }
@@ -181,6 +182,11 @@
         @for (_ of [1, 2]; track $index) {
           <tr>
             @for (col of config().columns; track col.field) {
+              <td>
+                <p-skeleton height="1.5rem" />
+              </td>
+            }
+            @if (config().selectable) {
               <td>
                 <p-skeleton height="1.5rem" />
               </td>

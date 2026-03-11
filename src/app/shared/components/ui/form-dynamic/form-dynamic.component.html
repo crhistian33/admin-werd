@@ -1,0 +1,305 @@
+<div [class]="layoutClass().container">
+  <div class="min-h-screen bg-slate-50">
+    <div class="">
+      <div class="mb-4 animate-[fadeUp_.3s_ease_both]">
+        @if (fetching()) {
+          <p-skeleton width="30%" height="2rem" />
+        } @else if (title()) {
+          <h1 class="text-2xl font-semibold text-slate-800">{{ title() }}</h1>
+        }
+      </div>
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 animate-[fadeUp_.35s_ease_both]"
+      >
+        @if (fetching()) {
+          <div class="flex flex-col gap-6">
+            <div [class]="layoutClass().grid">
+              @for (field of fields(); track field.key) {
+                <div
+                  [class]="
+                    size() === 'full' && field.cols === 2 ? 'md:col-span-2' : ''
+                  "
+                >
+                  <p-skeleton width="40%" height="1rem" styleClass="mb-2" />
+                  <p-skeleton
+                    width="100%"
+                    [height]="
+                      field.type === 'textarea' || field.type === 'file-image'
+                        ? '6rem'
+                        : '3rem'
+                    "
+                  />
+                </div>
+              }
+            </div>
+            <div
+              class="flex justify-end gap-3 pt-2 border-t border-slate-100 mt-2"
+            >
+              <p-skeleton width="6rem" height="2.5rem" />
+              <p-skeleton width="8rem" height="2.5rem" />
+            </div>
+          </div>
+        } @else {
+          <form
+            [formGroup]="form()"
+            (ngSubmit)="onSubmit()"
+            class="flex flex-col gap-6"
+          >
+            <div [class]="layoutClass().grid">
+              @for (field of fields(); track field.key) {
+                <div
+                  [class]="
+                    size() === 'full' && field.cols === 2 ? 'md:col-span-2' : ''
+                  "
+                >
+                  <label
+                    [for]="field.key"
+                    class="block text-sm font-medium text-slate-600 mb-1.5"
+                  >
+                    {{ field.label }}
+                    @if (isRequired(field)) {
+                      <span class="text-red-400 ml-0.5">*</span>
+                    }
+                  </label>
+
+                  @switch (field.type) {
+                    @case ("text") {
+                      <input
+                        pInputText
+                        [id]="field.key"
+                        [formControlName]="field.key"
+                        [placeholder]="field.placeholder ?? ''"
+                        class="w-full"
+                      />
+                    }
+
+                    @case ("email") {
+                      <input
+                        pInputText
+                        type="email"
+                        [id]="field.key"
+                        [formControlName]="field.key"
+                        [placeholder]="field.placeholder ?? ''"
+                        class="w-full"
+                      />
+                    }
+
+                    @case ("url") {
+                      <input
+                        pInputText
+                        type="url"
+                        [id]="field.key"
+                        [formControlName]="field.key"
+                        [placeholder]="field.placeholder ?? ''"
+                        class="w-full"
+                      />
+                    }
+
+                    @case ("textarea") {
+                      <textarea
+                        pTextarea
+                        [id]="field.key"
+                        [formControlName]="field.key"
+                        [placeholder]="field.placeholder ?? ''"
+                        rows="3"
+                        class="w-full resize-none"
+                      ></textarea>
+                    }
+
+                    @case ("number") {
+                      <p-inputnumber
+                        [inputId]="field.key"
+                        [formControlName]="field.key"
+                        [placeholder]="field.placeholder ?? ''"
+                        styleClass="w-full"
+                      />
+                    }
+
+                    @case ("select") {
+                      <p-select
+                        [inputId]="field.key"
+                        [formControlName]="field.key"
+                        [options]="field.options ?? []"
+                        optionLabel="label"
+                        optionValue="value"
+                        [placeholder]="field.placeholder ?? 'Selecciona...'"
+                        styleClass="w-full"
+                      />
+                    }
+
+                    @case ("file-image") {
+                      <div class="flex flex-col gap-2">
+                        @if (getPreview(field.key); as preview) {
+                          <div
+                            class="relative w-full h-auto rounded-xl overflow-hidden border border-slate-200 bg-slate-50 cursor-pointer group"
+                            (click)="fileupload.choose()"
+                            (dragover)="onDragOver($event)"
+                            (dragleave)="onDragLeave($event)"
+                            (drop)="onDrop($event, field.key, fileupload)"
+                          >
+                            <img
+                              [src]="preview"
+                              alt="preview"
+                              class="w-full h-full object-cover transition-all duration-300 group-hover:opacity-75"
+                            />
+                            <div
+                              class="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/40"
+                            ></div>
+
+                            <div
+                              class="absolute inset-0 z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                            >
+                              <div class="flex flex-col items-center gap-2">
+                                <div
+                                  class="w-10 h-10 rounded-full flex items-center justify-center"
+                                >
+                                  <i
+                                    class="pi pi-pencil text-white text-3xl font-bold"
+                                  ></i>
+                                </div>
+                                <span
+                                  class="text-white font-medium text-base tracking-wide uppercase px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm"
+                                >
+                                  Cambiar imagen
+                                </span>
+                              </div>
+                            </div>
+
+                            @if (isDragging) {
+                              <div
+                                class="absolute inset-0 z-20 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+                              >
+                                <div
+                                  class="border-2 border-dashed border-white/60 p-6 rounded-lg flex flex-col items-center"
+                                >
+                                  <i
+                                    class="pi pi-refresh text-white text-3xl animate-spin-slow"
+                                  ></i>
+                                  <p class="text-white font-medium mt-2">
+                                    Suelta para reemplazar
+                                  </p>
+                                </div>
+                              </div>
+                            }
+
+                            <button
+                              type="button"
+                              (click)="
+                                $event.stopPropagation(); clearFile(field.key)
+                              "
+                              class="z-30 w-8 h-8 absolute top-3 right-3 bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-red-700 transition-colors"
+                            >
+                              <lucide-icon name="X" class="size-5" />
+                            </button>
+                          </div>
+                        }
+                        <div [class.hidden]="getPreview(field.key)">
+                          <p-fileupload
+                            #fileupload
+                            mode="advanced"
+                            chooseLabel="Seleccionar imagen"
+                            [accept]="field.accept ?? 'image/*'"
+                            [maxFileSize]="field.maxFileSize ?? 5000000"
+                            [customUpload]="true"
+                            (onSelect)="onFileSelect($event, field.key)"
+                            [showUploadButton]="false"
+                            [showCancelButton]="false"
+                            styleClass="w-full"
+                          >
+                            <ng-template #content>
+                              <div
+                                (click)="fileupload.choose()"
+                                class="flex flex-col items-center justify-center gap-3 py-8 px-4 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
+                              >
+                                <div
+                                  class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center"
+                                >
+                                  <i
+                                    class="pi pi-image text-xl text-slate-400"
+                                  ></i>
+                                </div>
+                                <div class="text-center">
+                                  <p class="text-sm font-medium text-slate-600">
+                                    Arrastra tu imagen aquí
+                                  </p>
+                                  <p class="text-xs text-slate-400 mt-0.5">
+                                    o haz clic para seleccionar
+                                  </p>
+                                </div>
+                              </div>
+                            </ng-template>
+                          </p-fileupload>
+                        </div>
+                      </div>
+                    }
+
+                    <!-- @case ('file-document') {
+                        <div class="flex flex-col gap-2">
+                          @if (getFileName(field.key); as fileName) {
+                            <div class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50">
+                              <i [class]="getDocumentIcon(field.key) + ' text-lg text-red-400'"></i>
+                              <span class="text-sm text-slate-600 truncate flex-1">{{ fileName }}</span>
+                              <button type="button" (click)="clearFile(field.key)"
+                                class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+                                <i class="pi pi-times text-xs"></i>
+                              </button>
+                            </div>
+                          }
+                          @if (!getFileName(field.key)) {
+                            <p-fileupload mode="advanced" [accept]="field.accept ?? '.pdf,.doc,.docx'"
+                              [maxFileSize]="field.maxFileSize ?? 10000000" [customUpload]="true"
+                              (onSelect)="onFileSelect($event, field.key)"
+                              [showUploadButton]="false" [showCancelButton]="false" styleClass="w-full">
+                              <ng-template #content>
+                                <div class="flex flex-col items-center justify-center gap-3 py-8 px-4
+                                  border-2 border-dashed border-slate-200 rounded-xl bg-slate-50
+                                  hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer">
+                                  <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center">
+                                    <i class="pi pi-file text-xl text-slate-400"></i>
+                                  </div>
+                                  <div class="text-center">
+                                    <p class="text-sm font-medium text-slate-600">Arrastra tu documento aquí</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">o haz clic para seleccionar</p>
+                                  </div>
+                                  <p class="text-xs text-slate-300">
+                                    {{ field.accept ?? '.pdf, .doc, .docx' }} · máx {{ (field.maxFileSize ?? 10000000) / 1000000 }}MB
+                                  </p>
+                                </div>
+                              </ng-template>
+                            </p-fileupload>
+                          }
+                        </div>
+                      } -->
+                  }
+
+                  @if (showError(field.key)) {
+                    <p class="text-xs text-red-500 mt-1">
+                      {{ getError(field.key) }}
+                    </p>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+              <p-button
+                type="button"
+                label="Cancelar"
+                [outlined]="true"
+                severity="secondary"
+                (onClick)="cancelled.emit()"
+              />
+              <p-button
+                type="submit"
+                [label]="submitLabel()"
+                [loading]="loading()"
+                [disabled]="form().invalid"
+                icon="pi pi-check"
+              />
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  </div>
+</div>
