@@ -9,8 +9,10 @@ import { NavToggleService } from '@shared/services/ui/nav-toggle.service';
 import { HeaderComponent } from '@shared/components/common/header/header.component';
 import { BreadcrumbComponent } from '@shared/components/ui/breadcrumb/breadcrumb.component';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { PageTitleService } from '@shared/services/ui/page-title.service';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { Store } from '@ngxs/store';
+import { AuthState } from '@core/auth/store/auth.state';
 
 @Component({
   selector: 'app-admin-layout',
@@ -24,7 +26,7 @@ import { PageTitleService } from '@shared/services/ui/page-title.service';
     HeaderComponent,
     BreadcrumbComponent,
     ConfirmDialogModule,
-    ToastModule,
+    ProgressBarModule,
   ],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.scss',
@@ -32,7 +34,10 @@ import { PageTitleService } from '@shared/services/ui/page-title.service';
 export class AdminLayoutComponent {
   private readonly nav = inject(NavToggleService);
   readonly pageTitle = inject(PageTitleService);
+  readonly store = inject(Store);
 
   isCollapsed = this.nav.isCollapsed;
   isMobileVisible = this.nav.isMobileVisible;
+
+  readonly isLoading = this.store.selectSignal(AuthState.isLoading);
 }

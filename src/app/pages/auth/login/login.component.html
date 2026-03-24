@@ -1,0 +1,70 @@
+<div
+  class="w-full sm:max-w-md min-h-screen sm:min-h-0 bg-white sm:rounded-2xl sm:shadow-md flex flex-col justify-center px-8 py-12 sm:px-10 sm:py-12"
+>
+  <!-- Logo / Marca -->
+  <div class="flex flex-col items-center gap-3 mb-10">
+    <!-- <lucide-icon name="box" class="text-green-600 size-12"></lucide-icon> -->
+    <img src="/logo-admin.png" alt="Logo" class="w-22" />
+    <div class="text-center">
+      <h1 class="text-2xl font-semibold text-surface-900 tracking-tight">
+        WERD ADMIN
+      </h1>
+      <p class="mt-1 text-slate-500">Ingresa tus credenciales</p>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+    <div class="flex flex-col gap-1">
+      <p-floatlabel variant="on">
+        <input
+          pInputText
+          id="email"
+          formControlName="email"
+          class="w-full"
+          [class.ng-invalid]="emailError()"
+          [class.ng-dirty]="emailError()"
+          autocomplete="email"
+        />
+        <label for="email">Correo electrónico</label>
+      </p-floatlabel>
+
+      @if (emailError()) {
+        <small class="text-red-500 text-xs">
+          {{ emailError() }}
+        </small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <p-floatlabel variant="on">
+        <p-password
+          inputId="password"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          [inputStyleClass]="
+            passwordError() ? 'ng-invalid ng-dirty w-full' : 'w-full'
+          "
+          autocomplete="current-password"
+        />
+        <label for="password">Contraseña</label>
+      </p-floatlabel>
+
+      @if (passwordError()) {
+        <small class="text-red-500 text-xs">
+          {{ passwordError() }}
+        </small>
+      }
+    </div>
+
+    <p-button
+      type="submit"
+      label="Iniciar sesión"
+      styleClass="w-full mt-2"
+      [loading]="isLoading()"
+      [disabled]="isLoading()"
+    />
+  </form>
+</div>

@@ -8,7 +8,7 @@ export abstract class BaseService<T> {
   protected abstract readonly endpoint: string;
 
   get url(): string {
-    return `${environment.apiUrl}/api/${this.endpoint}`;
+    return `${environment.apiUrl}/${this.endpoint}`;
   }
 
   create(payload: Partial<T>): Observable<T> {

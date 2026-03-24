@@ -1,1 +1,11 @@
-<p>product-list works!</p>
+<app-data-table
+  [data]="store.filteredItems()"
+  [config]="tableConfig"
+  [loading]="store.loading()"
+  (searchChange)="store.setFilter({ search: $event })"
+  (filterDrawer)="drawerVisible.set(true)"
+>
+  <ng-container tableDrawer>
+    <app-product-filter [(visible)]="drawerVisible" />
+  </ng-container>
+</app-data-table>

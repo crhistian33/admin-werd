@@ -121,7 +121,7 @@ export class NavComponent {
         { label: 'Ventas', icon: 'trending-up', route: '/reportes/ventas' },
         {
           label: 'Inventario',
-          icon: 'pie-chart',
+          icon: 'chart-bar',
           route: '/reportes/inventario',
         },
         { label: 'Clientes', icon: 'user-search', route: '/reportes/clientes' },

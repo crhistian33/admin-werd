@@ -1,18 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { environment } from '../environments/environment';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-root',
-  imports: [ButtonModule, RouterOutlet],
+  imports: [ButtonModule, RouterOutlet, ToastModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'admin-werd';
-
-  ngOnInit(): void {
-    console.log('environment:', environment);
-  }
 }

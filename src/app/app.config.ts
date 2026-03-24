@@ -17,6 +17,7 @@ import {
   ArrowLeftRight,
   BadgeCheck,
   BookOpen,
+  Box,
   Boxes,
   ChartBar,
   ChartBarStacked,
@@ -43,6 +44,7 @@ import {
   MoveLeft,
   MoveRight,
   Package,
+  PackageSearch,
   Settings,
   ShieldCheck,
   ShoppingBag,
@@ -52,9 +54,11 @@ import {
   Tag,
   Ticket,
   TicketPercent,
+  TrendingUp,
   Truck,
   UserCog,
   Users,
+  UserSearch,
   Wallet,
   Warehouse,
   X,
@@ -66,12 +70,21 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { ErrorHandler } from '@angular/core';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { authInterceptor } from '@core/auth/interceptors/auth.interceptor';
+import { provideStore } from '@ngxs/store';
+import { withNgxsStoragePlugin, StorageOption } from '@ngxs/storage-plugin';
+import { withNgxsReduxDevtoolsPlugin } from '@ngxs/devtools-plugin';
+import { withNgxsLoggerPlugin } from '@ngxs/logger-plugin';
+import { environment } from '@env/environment';
+import { AuthState } from '@core/auth/store/auth.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withViewTransitions(), withComponentInputBinding()),
-    provideHttpClient(withInterceptors([errorInterceptor, mockInterceptor])),
+    provideHttpClient(
+      withInterceptors([errorInterceptor, mockInterceptor, authInterceptor]),
+    ),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideAnimations(),
     providePrimeNG({
@@ -177,7 +190,20 @@ export const appConfig: ApplicationConfig = {
         Zap,
         SlidersHorizontal,
         ChartBarStacked,
+        TrendingUp,
+        UserSearch,
+        PackageSearch,
+        Box,
       }),
+    ),
+    provideStore(
+      [AuthState],
+      withNgxsStoragePlugin({
+        keys: ['adminAuth'], // solo persiste el objeto admin (nombre, email, rol)
+        storage: StorageOption.SessionStorage, // sessionStorage: se limpia al cerrar el tab
+      }),
+      ...(environment.production ? [] : [withNgxsReduxDevtoolsPlugin()]),
+      withNgxsLoggerPlugin(),
     ),
     ConfirmationService,
     MessageService,
