@@ -10,12 +10,13 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthState } from '../store/auth.state';
 import { AuthActions } from '../store/auth.actions';
 import { AuthService } from '../services/auth.service';
+import { IS_PUBLIC } from '../context/auth.context';
 
 // Rutas que no necesitan el token de autorización
-const PUBLIC_URLS = ['/auth/admin/login', '/auth/admin/refresh'];
+// const PUBLIC_URLS = ['/auth/admin/login', '/auth/admin/refresh'];
 
-const isPublicUrl = (url: string): boolean =>
-  PUBLIC_URLS.some((publicUrl) => url.includes(publicUrl));
+// const isPublicUrl = (url: string): boolean =>
+//   PUBLIC_URLS.some((publicUrl) => url.includes(publicUrl));
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -24,9 +25,13 @@ export const authInterceptor: HttpInterceptorFn = (
   const store = inject(Store);
   const authService = inject(AuthService);
 
-  if (isPublicUrl(req.url)) {
+  if (req.context.get(IS_PUBLIC)) {
     return next(req);
   }
+
+  // if (isPublicUrl(req.url)) {
+  //   return next(req);
+  // }
 
   const accessToken = store.selectSnapshot(AuthState.accessToken);
 
@@ -39,7 +44,7 @@ export const authInterceptor: HttpInterceptorFn = (
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // 401 → intenta renovar el token con el refresh token (httpOnly cookie)
-      if (error.status === 401 && !isPublicUrl(req.url)) {
+      if (error.status === 401 && !req.context.get(IS_PUBLIC)) {
         return authService.refreshToken().pipe(
           switchMap((response) => {
             store.dispatch(

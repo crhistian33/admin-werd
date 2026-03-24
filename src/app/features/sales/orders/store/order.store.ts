@@ -18,33 +18,33 @@ export class OrderStore extends BaseStore<Order, OrderFilter> {
     const { status, dateRange } = this.filter();
 
     if (status) {
-      items = items.filter((o) => o.status === status);
+      items = items.filter((o: OrderFilter) => o.status === status);
     }
 
-    if (dateRange) {
-      const [from, to] = dateRange;
+    // if (dateRange) {
+    //   const [from, to] = dateRange;
 
-      items = items.filter((o) => {
-        const [year, month, day] = o.createdAt.split('-').map(Number);
-        const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+    //   items = items.filter((o: OrderFilter) => {
+    //     const [year, month, day] = o.createdAt.split('-').map(Number);
+    //     const date = new Date(year, month - 1, day, 0, 0, 0, 0);
 
-        if (from && to) {
-          const fromStart = new Date(from);
-          fromStart.setHours(0, 0, 0, 0);
-          const toEnd = new Date(to);
-          toEnd.setHours(23, 59, 59, 999);
-          return date >= fromStart && date <= toEnd;
-        }
+    //     if (from && to) {
+    //       const fromStart = new Date(from);
+    //       fromStart.setHours(0, 0, 0, 0);
+    //       const toEnd = new Date(to);
+    //       toEnd.setHours(23, 59, 59, 999);
+    //       return date >= fromStart && date <= toEnd;
+    //     }
 
-        if (from && !to) {
-          const fromStart = new Date(from);
-          fromStart.setHours(0, 0, 0, 0);
-          return date >= fromStart;
-        }
+    //     if (from && !to) {
+    //       const fromStart = new Date(from);
+    //       fromStart.setHours(0, 0, 0, 0);
+    //       return date >= fromStart;
+    //     }
 
-        return true;
-      });
-    }
+    //     return true;
+    //   });
+    // }
 
     return this.applySearch(items, ['code', 'customerName']);
   });

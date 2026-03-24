@@ -7,10 +7,12 @@ import {
   linkedSignal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpClient, httpResource } from '@angular/common/http';
+import { HttpClient, HttpContext, httpResource } from '@angular/common/http';
 import type { BaseFilter } from '@shared/models/base-filter.model';
 import type { BaseService } from '../services/base.service';
 import { DialogService } from '@shared/services/ui/dialog.service';
+import { ApiResponse } from '@shared/models/api-response.model';
+import { IS_PUBLIC } from '@core/auth/context/auth.context';
 
 export abstract class BaseStore<
   T extends object,
@@ -23,13 +25,33 @@ export abstract class BaseStore<
   protected abstract readonly service: BaseService<T>;
 
   // ── Filtro — cada feature define el suyo ────────────────────
-  readonly filter = signal<F>({ search: '' } as F);
+  readonly filter = signal<F>({
+    page: 1,
+    limit: 10,
+    search: '',
+    isActive: true,
+  } as F);
 
   // ── filteredItems — cada feature implementa su lógica ────────
   abstract readonly filteredItems: ReturnType<typeof computed<T[]>>;
 
   // ── httpResource — GET automático al instanciar ──────────────
-  private readonly resource = httpResource<T[]>(() => this.service?.url);
+  private readonly resource = httpResource<T[]>(() => {
+    const currentFilter = this.filter();
+    const page = 1;
+    const limit = 10;
+
+    return {
+      url: this.service?.url,
+      context: new HttpContext().set(IS_PUBLIC, false),
+      params: {
+        page: page.toString(),
+        limit: limit.toString(),
+        search: currentFilter.search,
+        isActive: String(currentFilter.isActive),
+      },
+    };
+  });
 
   // ── Estado individual ──────────────────────────────────────────
   readonly selectedId = signal<number | null>(null);
@@ -38,10 +60,11 @@ export abstract class BaseStore<
   // ── httpResource — GET automático del detalle ──────────────────
   private readonly detailResource = httpResource<T>(() => {
     const id = this.selectedId();
-    console.log('[BaseStore] detailResource evaluate id:', id);
+
     if (!id || !this.service) return undefined;
+
     const url = `${this.service.url}/${id}`;
-    console.log('[BaseStore] detailResource evaluate url:', url);
+
     return url;
   });
 
@@ -49,10 +72,19 @@ export abstract class BaseStore<
   readonly loading = computed(
     () => this.resource.isLoading() || this.detailResource.isLoading(),
   );
+
   readonly items = computed(() => {
     if (this.resource.status() === 'error') return [];
-    return this.resource.value() ?? [];
+
+    const res = this.resource.value() as any;
+    console.log('[BaseStore] Resource response:', res);
+    return res?.data ?? [];
   });
+
+  readonly totalItems = computed(
+    () => (this.resource.value() as any)?.total ?? 0,
+  );
+
   readonly error = computed(() => {
     if (
       this.resource.status() === 'error' ||
@@ -62,6 +94,7 @@ export abstract class BaseStore<
     }
     return null;
   });
+
   readonly selected = linkedSignal<T | null>(() => {
     if (this.detailResource.status() === 'error') return null;
     return this.detailResource.value() ?? null;
@@ -145,7 +178,7 @@ export abstract class BaseStore<
           this.reload();
           // Limpiar la selección si alguno de los eliminados estaba seleccionado (opcional, pero buena práctica)
           if (this.selectedId() && ids.includes(this.selectedId()!)) {
-             this.selectedId.set(null);
+            this.selectedId.set(null);
           }
           onSuccess?.();
         },
@@ -188,5 +221,9 @@ export abstract class BaseStore<
         .map((f) => String(item[f] ?? '').toLowerCase())
         .some((val) => val.includes(q)),
     );
+  }
+
+  setPage(page: number) {
+    this.setFilter({ page } as Partial<F>);
   }
 }

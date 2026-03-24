@@ -18,7 +18,7 @@ export class ProductStore extends BaseStore<Product, ProductFilter> {
     const { status } = this.filter();
 
     if (status) {
-      items = items.filter((o) => o.status === status);
+      items = items.filter((o: ProductFilter) => o.status === status);
     }
 
     return this.applySearch(items, ['sku', 'name']);
