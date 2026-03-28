@@ -14,6 +14,8 @@ export const brandTableConfig = (
   globalFilter: true,
   showFilter: false,
   selectable: true,
+  pageSize: 10,
+  pageSizeOptions: [10, 25, 50],
   columns: [
     {
       field: 'name',

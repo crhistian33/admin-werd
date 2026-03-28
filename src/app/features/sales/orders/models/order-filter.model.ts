@@ -7,6 +7,8 @@ export interface OrderFilter extends BaseFilter {
 }
 
 export const orderFilterDefaults = (): OrderFilter => ({
+  page: 1,
+  limit: 10,
   search: '',
   status: null,
   dateRange: null,

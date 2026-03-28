@@ -16,7 +16,7 @@ export class BrandFormComponent {
   readonly store = inject(BrandStore);
   readonly fields = BRAND_FORM_CONFIG;
 
-  id = input.required<number>();
+  id = input.required<string>();
   isEdit = false;
 
   ngOnInit(): void {
@@ -30,9 +30,7 @@ export class BrandFormComponent {
 
   onSubmit(data: Record<string, any>): void {
     if (this.isEdit) {
-      this.store.update(Number(this.store.selected()?.id), data, () =>
-        this.goBack(),
-      );
+      this.store.update(this.id(), data, () => this.goBack());
     } else {
       this.store.create(data, () => this.goBack());
     }

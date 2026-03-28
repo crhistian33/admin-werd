@@ -2,15 +2,17 @@ import { Category } from '@features/catalogs/categories/models/category.model';
 
 export const CATEGORIES_MOCK: Category[] = [
   {
-    id: 1,
+    id: 'aghghg67687687dsad',
     name: 'Tecnología',
     description: 'Descripción de la categoría Tecnología',
-    image: '/images/categories/category3.jpg',
+    images: [],
+    isActive: true,
   },
   {
-    id: 2,
+    id: 'bghghg67687687dsad',
     name: 'Calzados',
     description: 'Descripción de la categoría calzado',
-    image: '/images/categories/category2.jpg',
+    images: [],
+    isActive: false,
   },
 ];

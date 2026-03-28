@@ -26,14 +26,16 @@ export class OrderListComponent {
 
   readonly drawerVisible = signal(false);
 
-  readonly hasActiveFilters = computed(() => {
-    const { status, dateRange } = this.store.filter();
-    return !!status || !!dateRange;
+  // --- Paginación sincronizada ---
+  readonly firstRowIndex = computed(() => {
+    const { page = 1, limit = 10 } = this.store.filter();
+    return (page - 1) * limit;
   });
 
+  // --- Acciones ---
   onDelete(order: Order): void {
     this.dialog.delete({
-      message: `¿Está seguro de eliminar el pedido <strong>${order.code}</strong>?. <br>No se podrá reestablecer la acción`,
+      message: `¿Está seguro de eliminar el pedido <strong>${order.code}</strong>?<br>No se podrá reestablecer la acción`,
       onAccept: () => {
         this.store.delete(order.id);
         this.dialog.success(
@@ -42,5 +44,16 @@ export class OrderListComponent {
         );
       },
     });
+  }
+
+  // --- Eventos tabla ---
+  handlePagination(event: any): void {
+    const page = Math.floor(event.first / event.rows) + 1;
+    const limit = event.rows;
+    this.store.setFilter({ page, limit } as any);
+  }
+
+  handleSearch(query: string): void {
+    this.store.setFilter({ search: query, page: 1 } as any);
   }
 }

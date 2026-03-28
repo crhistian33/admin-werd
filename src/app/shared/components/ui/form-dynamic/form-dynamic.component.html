@@ -116,7 +116,7 @@
                     [inputId]="field.key"
                     [formControlName]="field.key"
                     [placeholder]="field.placeholder ?? ''"
-                    styleClass="w-full"
+                    class="w-full"
                   />
                 }
 
@@ -128,11 +128,144 @@
                     optionLabel="label"
                     optionValue="value"
                     [placeholder]="field.placeholder ?? 'Selecciona...'"
-                    styleClass="w-full"
+                    class="w-full"
                   />
                 }
 
+                @case ("checkbox") {
+                  <p-checkbox
+                    [binary]="true"
+                    [inputId]="field.key"
+                    [formControlName]="field.key"
+                    class="flex items-center gap-2"
+                  >
+                    <span>{{ field.placeholder }}</span>
+                  </p-checkbox>
+                }
+
                 @case ("file-image") {
+                  <div class="flex flex-col gap-2">
+                    @if (isUploadingField(field.key)) {
+                      <div
+                        class="flex items-center justify-center gap-3 py-8 px-4 border-2 border-dashed border-primary-200 rounded-xl bg-primary-50"
+                      >
+                        <i
+                          class="pi pi-spin pi-spinner text-primary-500 text-xl"
+                        ></i>
+                        <span class="text-sm text-primary-600 font-medium"
+                          >Subiendo imagen...</span
+                        >
+                      </div>
+                    }
+
+                    @if (!isUploadingField(field.key)) {
+                      @if (previews()[field.key]) {
+                        <div
+                          class="relative group overflow-hidden rounded-xl flex items-center justify-center border border-slate-200 bg-slate-50 cursor-pointer h-64"
+                          (click)="fileupload.choose()"
+                          (dragover)="onDragOver($event)"
+                          (dragleave)="onDragLeave($event)"
+                          (drop)="onDrop($event, field.key, fileupload)"
+                        >
+                          <img
+                            [src]="previews()[field.key]"
+                            alt="preview"
+                            class="w-full h-full object-cover transition-all duration-300 group-hover:opacity-75"
+                          />
+
+                          <div
+                            class="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/40"
+                          ></div>
+
+                          <div
+                            class="absolute inset-0 z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                          >
+                            <div class="flex flex-col items-center gap-2">
+                              <i
+                                class="pi pi-pencil text-white text-3xl font-bold"
+                              ></i>
+                              <span
+                                class="text-white font-medium text-base tracking-wide uppercase px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm"
+                              >
+                                Cambiar imagen
+                              </span>
+                            </div>
+                          </div>
+
+                          @if (isDragging) {
+                            <div
+                              class="absolute inset-0 z-20 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+                            >
+                              <div
+                                class="border-2 border-dashed border-white/60 p-6 rounded-lg flex flex-col items-center"
+                              >
+                                <i
+                                  class="pi pi-refresh text-white text-3xl animate-spin-slow"
+                                ></i>
+                                <p class="text-white font-medium mt-2">
+                                  Suelta para reemplazar
+                                </p>
+                              </div>
+                            </div>
+                          }
+
+                          <button
+                            type="button"
+                            (click)="
+                              $event.stopPropagation(); clearFile(field.key)
+                            "
+                            class="z-30 w-8 h-8 absolute top-3 right-3 bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all"
+                          >
+                            <lucide-icon name="X" class="size-4" />
+                          </button>
+                        </div>
+                      }
+
+                      <div [class.hidden]="previews()[field.key]">
+                        <p-fileupload
+                          #fileupload
+                          mode="advanced"
+                          chooseLabel="Seleccionar imagen"
+                          [accept]="field.accept ?? 'image/*'"
+                          [maxFileSize]="field.maxFileSize ?? 5000000"
+                          [customUpload]="true"
+                          (onSelect)="onFileSelect($event, field.key)"
+                          [showUploadButton]="false"
+                          [showCancelButton]="false"
+                          styleClass="w-full"
+                        >
+                          <ng-template #content>
+                            <div
+                              (click)="fileupload.choose()"
+                              (dragover)="onDragOver($event)"
+                              (dragleave)="onDragLeave($event)"
+                              (drop)="onDrop($event, field.key, fileupload)"
+                              class="flex flex-col items-center justify-center gap-3 py-8 px-4 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
+                            >
+                              <div
+                                class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center"
+                              >
+                                <i
+                                  class="pi pi-image text-xl text-slate-400"
+                                ></i>
+                              </div>
+                              <div class="text-center">
+                                <p class="text-sm font-medium text-slate-600">
+                                  Arrastra tu imagen aquí
+                                </p>
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                  o haz clic para seleccionar
+                                </p>
+                              </div>
+                            </div>
+                          </ng-template>
+                        </p-fileupload>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- @case ("file-image") {
                   <div class="flex flex-col gap-2">
                     @if (getPreview(field.key); as preview) {
                       <div
@@ -234,7 +367,7 @@
                       </p-fileupload>
                     </div>
                   </div>
-                }
+                } -->
 
                 <!-- @case ('file-document') {
                     <div class="flex flex-col gap-2">
@@ -294,9 +427,9 @@
           />
           <p-button
             type="submit"
-            [label]="submitLabel()"
-            [loading]="loading()"
-            [disabled]="form().invalid"
+            [label]="isUploading() ? 'Subiendo imagen...' : submitLabel()"
+            [loading]="loading() || isUploading()"
+            [disabled]="form().invalid || isUploading()"
             icon="pi pi-check"
           />
         </div>

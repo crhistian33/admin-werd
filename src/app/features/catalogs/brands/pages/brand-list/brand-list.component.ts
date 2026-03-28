@@ -1,4 +1,4 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { Component, computed, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DialogService } from '@shared/services/ui/dialog.service';
 import { BrandStore } from '../../store/brand.store';
@@ -23,9 +23,16 @@ export class BrandListComponent {
 
   readonly table = viewChild(DataTableComponent);
 
+  // --- Paginación sincronizada ---
+  readonly firstRowIndex = computed(() => {
+    const { page = 1, limit = 10 } = this.store.filter();
+    return (page - 1) * limit;
+  });
+
+  // --- Acciones ---
   onDelete(brand: Brand): void {
     this.dialog.delete({
-      message: `¿Está seguro de eliminar la marca <strong>${brand.name}</strong>?. <br>No se podrá reestablecer la acción`,
+      message: `¿Está seguro de eliminar la marca <strong>${brand.name}</strong>?<br>No se podrá reestablecer la acción`,
       onAccept: () => {
         this.store.delete(brand.id, () => {
           this.table()?.selectedRows.update((rows: any[]) =>
@@ -42,7 +49,7 @@ export class BrandListComponent {
 
   onDeleteAll(brands: Brand[]): void {
     this.dialog.delete({
-      message: `¿Está seguro de eliminar <strong>${brands.length}</strong> ${brands.length === 1 ? 'marca seleccionada' : 'marcas seleccionadas'}. <br>No se podrá reestablecer la acción`,
+      message: `¿Está seguro de eliminar <strong>${brands.length}</strong> ${brands.length === 1 ? 'marca seleccionada' : 'marcas seleccionadas'}?<br>No se podrá reestablecer la acción`,
       onAccept: () => {
         const ids = brands.map((b) => b.id);
         this.store.deleteAll(ids, () => {
@@ -50,5 +57,16 @@ export class BrandListComponent {
         });
       },
     });
+  }
+
+  // --- Eventos tabla ---
+  handlePagination(event: any): void {
+    const page = Math.floor(event.first / event.rows) + 1;
+    const limit = event.rows;
+    this.store.setFilter({ page, limit } as any);
+  }
+
+  handleSearch(query: string): void {
+    this.store.setFilter({ search: query, page: 1 } as any);
   }
 }

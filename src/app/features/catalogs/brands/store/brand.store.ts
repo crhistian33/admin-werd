@@ -7,7 +7,5 @@ import { Brand } from '../models/brand.model';
 export class BrandStore extends BaseStore<Brand> {
   protected readonly service = inject(BrandService);
 
-  readonly filteredItems = computed(() => {
-    return this.applySearch(this.items(), ['name']);
-  });
+  // Si necesitas búsqueda local adicional, implementa aquí, pero la tabla ahora usa items() directamente.
 }

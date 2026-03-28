@@ -1,3 +1,5 @@
+import { BaseModel } from '@core/models/base.model';
+
 export type OrderStatus =
   | 'pending'
   | 'processing'
@@ -5,11 +7,9 @@ export type OrderStatus =
   | 'delivered'
   | 'cancelled';
 
-export interface Order {
-  id: number;
+export interface Order extends BaseModel {
   code: string;
   customerName: string;
   total: number;
-  createdAt: string;
   status: OrderStatus;
 }

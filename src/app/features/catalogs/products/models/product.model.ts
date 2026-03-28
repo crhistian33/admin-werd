@@ -1,7 +1,8 @@
+import { BaseModel } from '@core/models/base.model';
+
 export type ProductStatus = 'success' | 'warning';
 
-export interface Product {
-  id: number;
+export interface Product extends BaseModel {
   sku: string;
   name: string;
   slug: string;
@@ -9,9 +10,7 @@ export interface Product {
   price: number;
   stock: number;
   images?: string[];
-  categoryId: number;
-  brandId: number;
+  categoryId: string;
+  brandId: string;
   status: ProductStatus;
-  createdAt?: Date;
-  updatedAt?: Date;
 }

@@ -13,14 +13,5 @@ export class ProductStore extends BaseStore<Product, ProductFilter> {
 
   override readonly filter = signal<ProductFilter>(productFilterDefaults());
 
-  readonly filteredItems = computed(() => {
-    let items = this.items();
-    const { status } = this.filter();
-
-    if (status) {
-      items = items.filter((o: ProductFilter) => o.status === status);
-    }
-
-    return this.applySearch(items, ['sku', 'name']);
-  });
+  // Si necesitas búsqueda local adicional, implementa aquí, pero la tabla ahora usa items() directamente.
 }

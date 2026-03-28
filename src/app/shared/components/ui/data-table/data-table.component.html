@@ -2,7 +2,7 @@
   <!-- Toolbar -->
   <div class="flex items-center justify-between gap-3">
     <!-- Búsqueda global -->
-    @if (config().globalFilter !== false) {
+    @if (config().globalFilter) {
       <p-iconfield class="w-full max-w-xs">
         <p-inputicon class="pi pi-search" />
         <input
@@ -15,14 +15,13 @@
       </p-iconfield>
     }
 
-    <!-- Slot para acciones externas (botón Nuevo, exportar, etc.) -->
+    <!-- Acciones de la tabla -->
     <div class="flex items-center ml-auto gap-2">
-      <!-- <ng-content select="[tableActions]" /> -->
       @if (config().showFilter) {
         <p-button
           icon="pi pi-filter"
-          [severity]="hasFilters() ? 'warn' : 'secondary'"
-          [outlined]="!hasFilters()"
+          [outlined]="true"
+          severity="secondary"
           (onClick)="filterDrawer.emit()"
         />
         <div class="h-6 w-px bg-slate-300 mx-1"></div>
@@ -31,6 +30,7 @@
         label="Eliminar selección"
         icon="pi pi-trash"
         severity="danger"
+        [loading]="isSaving()"
         [disabled]="!selectedRows().length"
         (onClick)="onDeleteAll()"
       />
@@ -38,22 +38,42 @@
     </div>
   </div>
 
-  <div class="rounded-md border border-slate-200 g-white">
-    <!-- Tabla -->
+  <!-- Tabla PrimeNG -->
+  <div class="rounded-md border border-slate-200 bg-white">
     <p-table
       #dt
-      [value]="(loading() || isSaving()) ? skeletonRows : data()"
+      [value]="loading() ? skeletonRows : data()"
       [columns]="config().columns"
       [dataKey]="config().dataKey ?? 'id'"
       [rows]="config().pageSize ?? 10"
+      [totalRecords]="totalItems()"
       [rowsPerPageOptions]="config().pageSizeOptions ?? [10, 25, 50]"
       [paginator]="true"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="{first} - {last} de {totalRecords} registros"
       [sortMode]="'single'"
       [(selection)]="selectedRows"
       [tableStyle]="{ 'min-width': '100%' }"
     >
+      <!-- [emptyMessage] eliminado, volvemos a usar emptymessage template -->
+      <!-- Empty state: solo mostrar si NO está cargando y no hay datos -->
+      <ng-template #emptymessage>
+        <tr>
+          <td [attr.colspan]="totalColumns()" class="text-center py-16">
+            @if (!loading() && !isUpdating() && data().length === 0) {
+              <div
+                class="flex items-center justify-center gap-2 text-slate-500"
+              >
+                <i class="pi pi-inbox text-4xl"></i>
+                <span>Sin registros</span>
+              </div>
+            }
+          </td>
+        </tr>
+      </ng-template>
+      >
       <!-- Header -->
       <ng-template #header>
         <tr class="bg-slate-200 border-b border-slate-300">
@@ -150,6 +170,7 @@
                           [severity]="action.severity ?? 'secondary'"
                           [text]="true"
                           [rounded]="true"
+                          [loading]="isSaving()"
                           size="small"
                           [pTooltip]="action.tooltip"
                           tooltipPosition="top"
@@ -165,28 +186,18 @@
         </tr>
       </ng-template>
 
-      <!-- Empty state -->
-      <ng-template #emptymessage>
-        <tr>
-          <td [attr.colspan]="totalColumns()" class="text-center py-16">
-            <div class="flex flex-col items-center gap-3 text-surface-400">
-              <i class="pi pi-inbox text-4xl"></i>
-              <span class="text-sm">Sin registros</span>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
+      <!-- Empty state eliminado, ahora controlado por [emptyMessage] -->
 
-      <!-- Loading -->
+      <!-- Loading: Skeleton de placeholders -->
       <ng-template #loadingbody>
-        @for (_ of [1, 2]; track $index) {
+        @for (_ of skeletonRows; track $index) {
           <tr>
-            @for (col of config().columns; track col.field) {
+            @if (config().selectable) {
               <td>
                 <p-skeleton height="1.5rem" />
               </td>
             }
-            @if (config().selectable) {
+            @for (col of config().columns; track col.field) {
               <td>
                 <p-skeleton height="1.5rem" />
               </td>
@@ -197,6 +208,8 @@
     </p-table>
   </div>
 </div>
+
+<!-- Capa de filtros (drawer/modal) -->
 @if (!config().showFilter) {
   <ng-content select="[tableDrawer]" />
 }

@@ -25,7 +25,7 @@ export class BrandDetailComponent {
   private dialog = inject(DialogService);
   private router = inject(Router);
 
-  id = input.required<number>();
+  id = input.required<string>();
 
   goBack = () => this.router.navigate(['/catalogos/marcas']);
   edit = () => this.router.navigate(['/catalogos/marcas', this.id(), 'editar']);
@@ -35,12 +35,12 @@ export class BrandDetailComponent {
   }
 
   onDelete(): void {
-    const category = this.store.selected();
-    if (!category || !category.id) return;
+    const brand = this.store.selected();
+    if (!brand || !brand.id) return;
     this.dialog.delete({
-      message: `¿Está seguro de eliminar la marca <strong>${category.name}</strong>?. <br>No se podrá reestablecer la acción`,
+      message: `¿Está seguro de eliminar la marca <strong>${brand.name}</strong>?. <br>No se podrá reestablecer la acción`,
       onAccept: () => {
-        this.store.delete(category.id);
+        this.store.delete(brand.id);
         this.dialog.success(
           `Marca ${this.store.selected()?.name} eliminada`,
           'Eliminación exitosa',

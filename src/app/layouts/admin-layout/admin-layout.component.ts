@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, ElementRef, inject, viewChild } from '@angular/core';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
 import { LucideAngularModule } from 'lucide-angular';
@@ -13,6 +13,8 @@ import { PageTitleService } from '@shared/services/ui/page-title.service';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { Store } from '@ngxs/store';
 import { AuthState } from '@core/auth/store/auth.state';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-admin-layout',
@@ -35,9 +37,27 @@ export class AdminLayoutComponent {
   private readonly nav = inject(NavToggleService);
   readonly pageTitle = inject(PageTitleService);
   readonly store = inject(Store);
+  readonly router = inject(Router);
+
+  readonly mainContent =
+    viewChild.required<ElementRef<HTMLElement>>('mainContent');
 
   isCollapsed = this.nav.isCollapsed;
   isMobileVisible = this.nav.isMobileVisible;
 
   readonly isLoading = this.store.selectSignal(AuthState.isLoading);
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        this.mainContent().nativeElement.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      });
+  }
 }

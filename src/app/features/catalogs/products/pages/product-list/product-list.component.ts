@@ -7,10 +7,16 @@ import { Product } from '../../models/product.model';
 import { DataTableComponent } from '@shared/components/ui/data-table/data-table.component';
 import { ButtonModule } from 'primeng/button';
 import { ProductFilterComponent } from '../../components/product-filter/product-filter.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-product-list',
-  imports: [DataTableComponent, ButtonModule, ProductFilterComponent],
+  imports: [
+    CommonModule,
+    DataTableComponent,
+    ButtonModule,
+    ProductFilterComponent,
+  ],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
 })
@@ -25,14 +31,16 @@ export class ProductListComponent {
 
   readonly drawerVisible = signal(false);
 
-  readonly hasActiveFilters = computed(() => {
-    const { status } = this.store.filter();
-    return !!status;
+  // --- Paginación sincronizada ---
+  readonly firstRowIndex = computed(() => {
+    const { page = 1, limit = 10 } = this.store.filter();
+    return (page - 1) * limit;
   });
 
+  // --- Acciones ---
   onDelete(product: Product): void {
     this.dialog.delete({
-      message: `¿Está seguro de eliminar el producto <strong>${product.name}</strong>?. <br>No se podrá reestablecer la acción`,
+      message: `¿Está seguro de eliminar el producto <strong>${product.name}</strong>?<br>No se podrá reestablecer la acción`,
       onAccept: () => {
         this.store.delete(product.id);
         this.dialog.success(
@@ -41,5 +49,16 @@ export class ProductListComponent {
         );
       },
     });
+  }
+
+  // --- Eventos tabla ---
+  handlePagination(event: any): void {
+    const page = Math.floor(event.first / event.rows) + 1;
+    const limit = event.rows;
+    this.store.setFilter({ page, limit } as any);
+  }
+
+  handleSearch(query: string): void {
+    this.store.setFilter({ search: query, page: 1 } as any);
   }
 }

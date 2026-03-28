@@ -29,6 +29,16 @@ export const categoryTableConfig = (
       sortable: true,
     },
     {
+      field: 'isActive',
+      header: 'Estado',
+      type: 'badge',
+      width: '150px',
+      badges: [
+        { value: 'true', label: 'Activo', severity: 'success' },
+        { value: 'false', label: 'Inactivo', severity: 'danger' },
+      ],
+    },
+    {
       field: 'actions',
       header: '',
       type: 'actions',

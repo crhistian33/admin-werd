@@ -1,8 +1,12 @@
 <app-data-table
-  [data]="store.filteredItems()"
+  [data]="store.data()"
+  [totalItems]="store.totalItems()"
+  [first]="firstRowIndex()"
   [config]="tableConfig"
-  [loading]="store.loading()"
-  (searchChange)="store.setFilter({ search: $event })"
+  [loading]="store.loadingState().initial"
+  [isSaving]="store.loadingState().updating"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
   (filterDrawer)="drawerVisible.set(true)"
 >
   <ng-container tableDrawer>

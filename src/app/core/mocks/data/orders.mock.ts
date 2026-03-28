@@ -2,7 +2,7 @@ import { Order } from '@features/sales/orders/models/order.model';
 
 export const ORDERS_MOCK: Order[] = [
   {
-    id: 1,
+    id: '1',
     code: 'PED-0001',
     customerName: 'María García López',
     total: 3449.89,
@@ -10,7 +10,7 @@ export const ORDERS_MOCK: Order[] = [
     status: 'delivered',
   },
   {
-    id: 2,
+    id: '2',
     code: 'PED-0002',
     customerName: 'Carlos Rodríguez',
     total: 538.9,
@@ -18,7 +18,7 @@ export const ORDERS_MOCK: Order[] = [
     status: 'processing',
   },
   {
-    id: 3,
+    id: '3',
     code: 'PED-0003',
     customerName: 'Ana Torres Vega',
     total: 1899.0,
@@ -26,7 +26,7 @@ export const ORDERS_MOCK: Order[] = [
     status: 'pending',
   },
   {
-    id: 4,
+    id: '4',
     code: 'PED-0004',
     customerName: 'María García López',
     total: 799.0,
@@ -34,7 +34,7 @@ export const ORDERS_MOCK: Order[] = [
     status: 'shipped',
   },
   {
-    id: 5,
+    id: '5',
     code: 'PED-0005',
     customerName: 'María García López',
     total: 3009.89,
@@ -42,7 +42,7 @@ export const ORDERS_MOCK: Order[] = [
     status: 'processing',
   },
   {
-    id: 6,
+    id: '6',
     code: 'PED-0006',
     customerName: 'Carlos Rodríguez',
     total: 538.9,
@@ -50,7 +50,7 @@ export const ORDERS_MOCK: Order[] = [
     status: 'shipped',
   },
   {
-    id: 7,
+    id: '7',
     code: 'PED-0007',
     customerName: 'Ana Torres Vega',
     total: 189.0,
@@ -58,7 +58,7 @@ export const ORDERS_MOCK: Order[] = [
     status: 'delivered',
   },
   {
-    id: 8,
+    id: '8',
     code: 'PED-0008',
     customerName: 'María García López',
     total: 79.0,

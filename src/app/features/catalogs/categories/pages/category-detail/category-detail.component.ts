@@ -7,6 +7,8 @@ import { TagModule } from 'primeng/tag';
 import { DialogService } from '@shared/services/ui/dialog.service';
 import { CardModule } from 'primeng/card';
 import { LucideAngularModule } from 'lucide-angular';
+import { environment } from '@env/environment';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-category-detail',
@@ -16,6 +18,7 @@ import { LucideAngularModule } from 'lucide-angular';
     TagModule,
     CardModule,
     LucideAngularModule,
+    DatePipe,
   ],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.scss',
@@ -25,7 +28,9 @@ export class CategoryDetailComponent {
   private dialog = inject(DialogService);
   private router = inject(Router);
 
-  id = input.required<number>();
+  id = input.required<string>();
+
+  readonly apiURL = environment.apiImagesUrl;
 
   goBack = () => this.router.navigate(['/catalogos/categorias']);
   edit = () =>

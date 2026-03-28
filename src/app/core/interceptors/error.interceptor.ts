@@ -65,6 +65,21 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               error.error?.message ||
               'El elemento que buscas ya no existe o cambió de ubicación.';
             break;
+          case 409:
+            errorTitle = 'No se puede eliminar';
+            errorMessage = '';
+            if (typeof error.error?.details === 'object') {
+              if (error.error.details.length > 1) {
+                error.error.details.forEach((element: any) => {
+                  errorMessage += `${element.name} ${element.reason}\n`;
+                });
+              } else {
+                errorMessage =
+                  error.error?.details[0].reason ||
+                  'El elemento que buscas ya no existe o cambió de ubicación.';
+              }
+            }
+            break;
           case 422:
             errorTitle = 'Error de validación';
             errorMessage =

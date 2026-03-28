@@ -1,14 +1,15 @@
 @import url("./styles/tailwind.css");
 
 @theme {
-    --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
-    html {
-        font-size: 14px
-    }
-    button {
-        cursor: pointer;
-    }
+  html {
+    font-size: 14px;
+    scroll-behavior: smooth;
+  }
+  button {
+    cursor: pointer;
+  }
 }

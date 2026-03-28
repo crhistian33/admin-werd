@@ -2,7 +2,7 @@
   [fields]="fields"
   [initialData]="store.selected()"
   [loading]="store.isSaving()"
-  [fetching]="isEdit && store.loading()"
+  [fetching]="isEdit && store.loadingState().initial"
   [title]="isEdit ? (store.selected()?.name ?? '...') : 'Crear marca'"
   size="compact"
   [submitLabel]="isEdit ? 'Actualizar' : 'Crear'"
