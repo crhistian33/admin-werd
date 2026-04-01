@@ -1,10 +1,11 @@
+// src/app/core/store/base.store.ts
+
 import { computed, signal, inject, DestroyRef, effect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpContext, httpResource } from '@angular/common/http';
 import type { BaseFilter } from '@shared/models/base-filter.model';
 import type { BaseService } from '../services/base.service';
 import { DialogService } from '@shared/services/ui/dialog.service';
-
 import { IS_PUBLIC } from '@core/auth/context/auth.context';
 import { ApiResponse } from '@core/models/api-response.model';
 
@@ -17,81 +18,150 @@ export abstract class BaseStore<
 
   protected abstract readonly service: BaseService<T>;
 
+  // ── Filtro para la lista de activos ───────────────────────────────
   readonly filter = signal<F>({
     page: 1,
     limit: 10,
     search: '',
-    //isActive: true,
+  } as F);
+
+  // ── Filtro para la papelera — independiente del anterior ──────────
+  readonly trashFilter = signal<F>({
+    page: 1,
+    limit: 10,
+    search: '',
+    onlyTrash: true,
   } as F);
 
   private readonly hasLoadedOnce = signal(false);
+  private readonly hasTrashLoadedOnce = signal(false);
 
-  // 1. Nueva señal para persistir los datos anteriores (El "Cache")
+  readonly loadingId = signal<string | null>(null);
+  readonly isSaving = signal(false);
+
+  // ── Cache de datos ────────────────────────────────────────────────
   private readonly _lastValidData = signal<T[]>([]);
+  private readonly _lastValidTrashData = signal<T[]>([]);
 
-  private readonly resource = httpResource<ApiResponse<T[]>>(() => {
+  // ── Resource de activos ───────────────────────────────────────────
+  private readonly _activeResource = httpResource<ApiResponse<T[]>>(() => {
     if (!this.service?.url) return undefined;
-    const f = this.filter();
-
+    const f = this.filter() as Record<string, any>;
+    const params = this.buildParams(f);
     return {
       url: this.service.url,
       context: new HttpContext().set(IS_PUBLIC, false),
-      params: {
-        page: (f.page ?? 1).toString(),
-        limit: (f.limit ?? 10).toString(),
-        search: f.search ?? '',
-        //isActive: String(f.isActive ?? true),
-      },
+      params,
+    };
+  });
+
+  // ── Resource de papelera ──────────────────────────────────────────
+  private readonly _trashResource = httpResource<ApiResponse<T[]>>(() => {
+    if (!this.service?.url) return undefined;
+    const f = this.trashFilter() as Record<string, any>;
+    const params = this.buildParams(f);
+    return {
+      url: this.service.url,
+      context: new HttpContext().set(IS_PUBLIC, false),
+      params,
     };
   });
 
   constructor() {
+    // Actualiza cache de activos
     effect(() => {
-      const res = this.resource.value();
-      const status = this.resource.status();
+      const res = this._activeResource.value();
+      const status = this._activeResource.status();
 
-      // 2. Si la petición se resuelve con datos, actualizamos nuestra memoria
       if (status === 'resolved' && res?.data) {
         this._lastValidData.set(res.data);
         if (!this.hasLoadedOnce()) this.hasLoadedOnce.set(true);
       }
-
-      // 3. Si hay error, limpiamos la memoria
       if (status === 'error') {
         this._lastValidData.set([]);
       }
     });
+
+    // Actualiza cache de papelera
+    effect(() => {
+      const res = this._trashResource.value();
+      const status = this._trashResource.status();
+
+      if (status === 'resolved' && res?.data) {
+        this._lastValidTrashData.set(res.data);
+        if (!this.hasTrashLoadedOnce()) this.hasTrashLoadedOnce.set(true);
+      }
+      if (status === 'error') {
+        this._lastValidTrashData.set([]);
+      }
+    });
   }
 
-  readonly items = computed(() => {
-    return this.resource.value()?.data ?? [];
-  });
+  // ── Selectores de activos ─────────────────────────────────────────
 
-  // 4. DATA OPTIMIZADA: Nunca devuelve [] mientras carga, si ya tenía datos previos
   readonly data = computed(() => {
-    const status = this.resource.status();
-
-    // Si está cargando o refrescando, devolvemos lo que tenemos en memoria
+    const status = this._activeResource.status();
     if (status === 'loading' || status === 'reloading') {
       return this._lastValidData();
     }
+    return this._activeResource.value()?.data ?? [];
+  });
 
-    return this.resource.value()?.data ?? [];
+  readonly totalItems = computed<number>(() => {
+    return this._activeResource.value()?.meta?.total ?? 0;
   });
 
   readonly loadingState = computed(() => ({
-    initial: this.resource.isLoading() && !this.hasLoadedOnce(),
-    updating: this.resource.isLoading() && this.hasLoadedOnce(),
+    initial: this._activeResource.isLoading() && !this.hasLoadedOnce(),
+    updating: this._activeResource.isLoading() && this.hasLoadedOnce(),
   }));
 
-  readonly totalItems = computed<number>(() => {
-    return this.resource.value()?.meta?.total ?? 0;
+  // ── Selectores de papelera ────────────────────────────────────────
+
+  readonly trashData = computed(() => {
+    const status = this._trashResource.status();
+    if (status === 'loading' || status === 'reloading') {
+      return this._lastValidTrashData();
+    }
+    return this._trashResource.value()?.data ?? [];
   });
 
-  // --- RESTO DEL STORE (Igual al tuyo para no romper nada) ---
+  readonly trashTotalItems = computed<number>(() => {
+    return this._trashResource.value()?.meta?.total ?? 0;
+  });
+
+  readonly trashLoadingState = computed(() => ({
+    initial: this._trashResource.isLoading() && !this.hasTrashLoadedOnce(),
+    updating: this._trashResource.isLoading() && this.hasTrashLoadedOnce(),
+  }));
+
+  // ── Filtros ───────────────────────────────────────────────────────
+
+  readonly activeFiltersCount = computed(() => {
+    const f = this.filter() as Record<string, any>;
+    const internalKeys = ['page', 'limit', 'search'];
+    return Object.keys(f).filter((key) => {
+      const value = f[key];
+      return (
+        !internalKeys.includes(key) &&
+        value !== null &&
+        value !== undefined &&
+        value !== ''
+      );
+    }).length;
+  });
+
+  setFilter(partial: Partial<F>): void {
+    this.filter.update((f) => ({ ...f, ...partial }));
+  }
+
+  setTrashFilter(partial: Partial<F>): void {
+    this.trashFilter.update((f) => ({ ...f, ...partial }));
+  }
+
+  // ── Detail resource ───────────────────────────────────────────────
 
   readonly selectedId = signal<string | null>(null);
-  readonly isSaving = signal(false);
 
   private readonly detailResource = httpResource<ApiResponse<T>>(() => {
     const id = this.selectedId();
@@ -103,6 +173,11 @@ export abstract class BaseStore<
     return this.detailResource.value()?.data ?? null;
   });
 
+  getById(id: string): void {
+    this.selectedId.set(id);
+    this.detailResource.reload();
+  }
+
   setSelected(item: T | null): void {
     if (item && 'id' in item && item.id) {
       this.selectedId.set(item.id as string);
@@ -111,31 +186,22 @@ export abstract class BaseStore<
     }
   }
 
-  protected applySearch(items: T[], fields: (keyof T)[]): T[] {
-    const q = this.filter().search?.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((item) =>
-      fields
-        .map((f) => String(item[f] ?? '').toLowerCase())
-        .some((val) => val.includes(q)),
-    );
-  }
+  // ── Recarga ambos resources ───────────────────────────────────────
 
-  setFilter(partial: Partial<F>): void {
-    this.filter.update((f) => ({ ...f, ...partial }));
-  }
-
-  setPage(page: number) {
-    this.setFilter({ page } as Partial<F>);
-  }
-  getById(id: string) {
-    this.selectedId.set(id);
-    // Forzar recarga del detalle cada vez que se navega
-    this.detailResource.reload();
-  }
   reload(): void {
-    this.resource.reload();
+    this._activeResource.reload();
+    this._trashResource.reload();
   }
+
+  reloadActive(): void {
+    this._activeResource.reload();
+  }
+
+  reloadTrash(): void {
+    this._trashResource.reload();
+  }
+
+  // ── CRUD ──────────────────────────────────────────────────────────
 
   create(payload: Partial<T>, onSuccess?: () => void): void {
     this.isSaving.set(true);
@@ -144,10 +210,9 @@ export abstract class BaseStore<
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (res) => {
-          const message = res.message || 'Registro creado exitosamente';
           this.isSaving.set(false);
-          this.dialog.success(message, 'Creación exitosa');
-          this.reload();
+          this.dialog.success(res.message || 'Registro creado', 'Éxito');
+          this.reloadActive();
           onSuccess?.();
         },
         error: () => this.isSaving.set(false),
@@ -161,11 +226,9 @@ export abstract class BaseStore<
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (res) => {
-          const message = res.message || 'Registro actualizado exitosamente';
           this.isSaving.set(false);
-          this.dialog.success(message, 'Actualización exitosa');
-          this.reload();
-          // Forzar recarga del detalle actualizado
+          this.dialog.success(res.message || 'Registro actualizado', 'Éxito');
+          this.reloadActive();
           this.detailResource.reload();
           onSuccess?.();
         },
@@ -173,22 +236,89 @@ export abstract class BaseStore<
       });
   }
 
-  delete(id: string, onSuccess?: () => void): void {
+  // SoftDelete — recarga ambos (el item pasa de activos a papelera)
+  softDelete(id: string, onSuccess?: () => void): void {
+    this.loadingId.set(id);
+    this.service
+      .softDelete(id)
+      .pipe(takeUntilDestroyed(this.destroy))
+      .subscribe({
+        next: (res) => {
+          this.loadingId.set(null);
+          this.dialog.success(res.message || 'Movido a papelera', 'Éxito');
+          this.reload(); // ambos resources — activos pierde 1, papelera gana 1
+          onSuccess?.();
+        },
+        error: () => this.loadingId.set(null),
+      });
+  }
+
+  softDeleteAll(ids: string[], onSuccess?: () => void): void {
     this.isSaving.set(true);
+    this.service
+      .softDeleteAll(ids)
+      .pipe(takeUntilDestroyed(this.destroy))
+      .subscribe({
+        next: (res) => {
+          this.isSaving.set(false);
+          this.dialog.success(res.message || 'Movidos a papelera', 'Éxito');
+          this.reload();
+          onSuccess?.();
+        },
+        error: () => this.isSaving.set(false),
+      });
+  }
+
+  // Restore — recarga ambos (el item pasa de papelera a activos)
+  restore(id: string, onSuccess?: () => void): void {
+    this.loadingId.set(id);
+    this.service
+      .restore(id)
+      .pipe(takeUntilDestroyed(this.destroy))
+      .subscribe({
+        next: (res) => {
+          this.loadingId.set(null);
+          this.dialog.success(res.message || 'Restaurado', 'Éxito');
+          this.reload(); // ambos resources
+          onSuccess?.();
+        },
+        error: () => this.loadingId.set(null),
+      });
+  }
+
+  restoreAll(ids: string[], onSuccess?: () => void): void {
+    this.isSaving.set(true);
+    this.service
+      .restoreAll(ids)
+      .pipe(takeUntilDestroyed(this.destroy))
+      .subscribe({
+        next: (res) => {
+          this.isSaving.set(false);
+          this.dialog.success(res.message || 'Restaurados', 'Éxito');
+          this.reload();
+          onSuccess?.();
+        },
+        error: () => this.isSaving.set(false),
+      });
+  }
+
+  // Delete permanente — solo recarga papelera y activos para actualizar trashedCount
+  delete(id: string, onSuccess?: () => void): void {
+    this.loadingId.set(id);
     this.service
       .delete(id)
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (res) => {
-          const message = res.message || 'Registro eliminado exitosamente';
-          this.dialog.success(message, 'Eliminación exitosa');
+          this.loadingId.set(null);
+          this.dialog.success(
+            res.message || 'Eliminado permanentemente',
+            'Éxito',
+          );
           this.reload();
           onSuccess?.();
         },
-        error: (err) => {
-          console.log('Error al eliminar:', err);
-          this.isSaving.set(false);
-        },
+        error: () => this.loadingId.set(null),
       });
   }
 
@@ -199,15 +329,28 @@ export abstract class BaseStore<
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (res) => {
-          const message = res.message || 'Registros eliminados exitosamente';
-          this.dialog.success(message, 'Eliminación exitosa');
+          this.isSaving.set(false);
+          this.dialog.success(
+            res.message || 'Eliminados permanentemente',
+            'Éxito',
+          );
           this.reload();
           onSuccess?.();
         },
-        error: (err) => {
-          console.log('Error al eliminar:', err);
-          this.isSaving.set(false);
-        },
+        error: () => this.isSaving.set(false),
       });
+  }
+
+  // ── Helper privado ────────────────────────────────────────────────
+
+  private buildParams(f: Record<string, any>): Record<string, string> {
+    const params: Record<string, string> = {};
+    Object.keys(f).forEach((key) => {
+      const value = f[key];
+      if (value !== null && value !== undefined && value !== '') {
+        params[key] = value;
+      }
+    });
+    return params;
   }
 }

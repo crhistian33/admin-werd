@@ -33,6 +33,24 @@ export abstract class BaseService<T> {
     });
   }
 
+  softDelete(id: string): Observable<ApiResponse<T>> {
+    return this.http.patch<ApiResponse<T>>(`${this.url}/${id}/soft-delete`, {
+      context: this.context,
+    });
+  }
+
+  softDeleteAll(ids: string[]): Observable<ApiResponse<void>> {
+    return this.http.patch<ApiResponse<void>>(
+      `${this.url}/bulk/soft-delete`,
+      {
+        ids,
+      },
+      {
+        context: this.context,
+      },
+    );
+  }
+
   delete(id: string): Observable<ApiResponse<T>> {
     return this.http.delete<ApiResponse<T>>(`${this.url}/${id}`, {
       context: this.context,
@@ -44,5 +62,22 @@ export abstract class BaseService<T> {
       body: { ids },
       context: this.context,
     });
+  }
+
+  restore(id: string): Observable<ApiResponse<T>> {
+    return this.http.patch<ApiResponse<T>>(`${this.url}/${id}/restore`, {
+      context: this.context,
+    });
+  }
+
+  restoreAll(ids: string[]): Observable<ApiResponse<void>> {
+    console.log('IDS', ids, `${this.url}/bulk/restore`);
+    return this.http.patch<ApiResponse<void>>(
+      `${this.url}/bulk/restore`,
+      { ids },
+      {
+        context: this.context,
+      },
+    );
   }
 }

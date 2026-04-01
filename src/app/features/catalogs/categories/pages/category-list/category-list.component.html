@@ -1,13 +1,32 @@
-<app-data-table
-  [data]="store.data()"
-  [totalItems]="store.totalItems()"
-  [first]="firstRowIndex()"
-  [config]="tableConfig"
-  [loading]="store.loadingState().initial"
-  [isUpdating]="store.loadingState().updating"
-  [isSaving]="store.isSaving()"
-  (onPageChange)="handlePagination($event)"
-  (searchChange)="handleSearch($event)"
-  (deleteAll)="onDeleteAll($event)"
->
-</app-data-table>
+<p-tabs lazy value="0" class="bg-transparent!">
+  <p-tablist>
+    <p-tab value="0" class="flex items-center gap-2">
+      <lucide-icon name="list-check" class="w-4 h-4" />
+      <span>Activos</span>
+      @if (store.totalItems() > 0) {
+        <p-badge [value]="store.totalItems().toString()" severity="secondary" />
+      }
+    </p-tab>
+
+    <p-tab value="1" class="flex items-center gap-2">
+      <lucide-icon name="trash" class="w-4 h-4" />
+      <span>Papelera</span>
+      @if (store.trashTotalItems() > 0) {
+        <p-badge
+          [value]="store.trashTotalItems().toString()"
+          severity="danger"
+        />
+      }
+    </p-tab>
+  </p-tablist>
+
+  <p-tabpanels>
+    <p-tabpanel value="0">
+      <app-categories-active />
+    </p-tabpanel>
+
+    <p-tabpanel value="1">
+      <app-categories-trash />
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>

@@ -1,30 +1,60 @@
 <div class="flex flex-col gap-3">
   <!-- Toolbar -->
   <div class="flex items-center justify-between gap-3">
-    <!-- Búsqueda global -->
-    @if (config().globalFilter) {
-      <p-iconfield class="w-full max-w-xs">
-        <p-inputicon class="pi pi-search" />
-        <input
-          pInputText
-          type="text"
-          placeholder="Buscar..."
-          class="w-full"
-          (input)="onGlobalFilter($event)"
-        />
-      </p-iconfield>
-    }
+    <div class="flex items-center gap-2">
+      <!-- Búsqueda global -->
+      @if (config().globalFilter) {
+        <p-iconfield class="w-full max-w-xs">
+          <p-inputicon class="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            placeholder="Buscar..."
+            class="w-full"
+            (input)="onGlobalFilter($event)"
+          />
+        </p-iconfield>
+      }
+      @if (config().showFilter) {
+        <div class="h-6 w-px bg-slate-300 mx-1"></div>
+        <p-overlaybadge
+          severity="danger"
+          [badgeDisabled]="activeFiltersCount() === 0"
+        >
+          <p-button
+            icon="pi pi-filter"
+            [outlined]="activeFiltersCount() === 0"
+            [severity]="'secondary'"
+            (onClick)="filterDrawer.emit()"
+            pTooltip="Filtros"
+            tooltipPosition="bottom"
+          />
+        </p-overlaybadge>
+        @if (activeFiltersCount() > 0) {
+          <button
+            class="flex items-center gap-1 text-sm text-red-600 hover:text-red-700 disabled:text-red-300 ml-2"
+            (click)="onClear.emit()"
+            [disabled]="activeFiltersCount() === 0"
+          >
+            <lucide-icon name="trash" class="w-4 h-4" />
+            <span>Limpiar</span>
+          </button>
+        }
+      }
+    </div>
 
     <!-- Acciones de la tabla -->
     <div class="flex items-center ml-auto gap-2">
-      @if (config().showFilter) {
+      @if (isTrashView()) {
         <p-button
-          icon="pi pi-filter"
+          label="Restaurar selección"
+          icon="pi pi-refresh"
+          severity="success"
           [outlined]="true"
-          severity="secondary"
-          (onClick)="filterDrawer.emit()"
+          [loading]="isSaving()"
+          [disabled]="!selectedRows().length"
+          (onClick)="onRestoreAll()"
         />
-        <div class="h-6 w-px bg-slate-300 mx-1"></div>
       }
       <p-button
         label="Eliminar selección"
@@ -34,7 +64,9 @@
         [disabled]="!selectedRows().length"
         (onClick)="onDeleteAll()"
       />
-      <p-button label="Nuevo" icon="pi pi-plus" routerLink="nuevo" />
+      @if (!isTrashView()) {
+        <p-button label="Nuevo" icon="pi pi-plus" routerLink="nuevo" />
+      }
     </div>
   </div>
 
@@ -57,8 +89,6 @@
       [(selection)]="selectedRows"
       [tableStyle]="{ 'min-width': '100%' }"
     >
-      <!-- [emptyMessage] eliminado, volvemos a usar emptymessage template -->
-      <!-- Empty state: solo mostrar si NO está cargando y no hay datos -->
       <ng-template #emptymessage>
         <tr>
           <td [attr.colspan]="totalColumns()" class="text-center py-16">
@@ -170,7 +200,9 @@
                           [severity]="action.severity ?? 'secondary'"
                           [text]="true"
                           [rounded]="true"
-                          [loading]="isSaving()"
+                          [loading]="
+                            store.loadingId() === row.id && action.isAsync
+                          "
                           size="small"
                           [pTooltip]="action.tooltip"
                           tooltipPosition="top"
@@ -190,7 +222,7 @@
 
       <!-- Loading: Skeleton de placeholders -->
       <ng-template #loadingbody>
-        @for (_ of skeletonRows; track $index) {
+        @for (_ of [1, 2, 3]; track $index) {
           <tr>
             @if (config().selectable) {
               <td>

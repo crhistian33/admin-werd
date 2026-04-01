@@ -12,8 +12,8 @@ export const categoryTableConfig = (
 ): DataTableConfig<Category> => ({
   dataKey: 'id',
   globalFilter: true,
-  showFilter: false,
   selectable: true,
+  showFilter: true,
   columns: [
     {
       field: 'name',
@@ -37,6 +37,14 @@ export const categoryTableConfig = (
         { value: 'true', label: 'Activo', severity: 'success' },
         { value: 'false', label: 'Inactivo', severity: 'danger' },
       ],
+      filter: {
+        enabled: true,
+        type: 'boolean',
+        options: [
+          { label: 'Activo', value: true },
+          { label: 'Inactivo', value: false },
+        ],
+      },
     },
     {
       field: 'actions',
@@ -48,7 +56,7 @@ export const categoryTableConfig = (
   actions: [
     {
       icon: 'pi pi-eye',
-      tooltip: 'Ver pedido',
+      tooltip: 'Ver categoría',
       severity: 'info',
       action: (row) => router.navigate(['/catalogos/categorias', row.id]),
     },
@@ -64,6 +72,7 @@ export const categoryTableConfig = (
       tooltip: 'Eliminar',
       severity: 'danger',
       action: (row) => callback.onDelete(row),
+      isAsync: true,
     },
   ],
 });

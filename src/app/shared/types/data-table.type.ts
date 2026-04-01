@@ -1,3 +1,5 @@
+import { FilterFieldType, FilterOption } from './filter-config.type';
+
 /**
  * Tipos de columna soportados en el DataTable
  */
@@ -38,6 +40,11 @@ export type TableColumn<T = any> = {
   badges?: BadgeConfig[];
   /** Función para formatear el valor (ej: toUpperCase, custom format) */
   format?: (value: any, row: T) => string;
+  filter?: {
+    enabled: boolean;
+    type: FilterFieldType;
+    options?: FilterOption[];
+  };
 };
 
 /**
@@ -55,6 +62,7 @@ export type TableAction<T = any> = {
   visible?: (row: T) => boolean;
   /** Función ejecutada al hacer clic */
   action: (row: T) => void;
+  isAsync?: boolean;
 };
 
 /**
@@ -97,4 +105,5 @@ export type DataTableConfig<T = any> = {
   // Metadata
   /** Campo único para rastrear filas (default: 'id') */
   dataKey?: string;
+  isTrashView?: boolean;
 };

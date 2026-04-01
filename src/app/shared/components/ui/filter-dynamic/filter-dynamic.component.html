@@ -1,0 +1,32 @@
+<app-filter-drawer [(visible)]="visible" [onClear]="handleClear">
+  <div class="flex flex-col gap-6">
+    @for (field of config(); track field.key) {
+      <p-floatlabel variant="on">
+        @if (field.type === "select" || field.type === "boolean") {
+          <p-select
+            [options]="field.options || []"
+            [(ngModel)]="formValues[field.key]"
+            (ngModelChange)="onChange(field.key, $event)"
+            [showClear]="true"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+          />
+        }
+        <!-- [placeholder]="field.placeholder || 'Seleccionar'" -->
+
+        @if (field.type === "date-range") {
+          <p-datepicker
+            [(ngModel)]="formValues[field.key]"
+            (ngModelChange)="onDateChange(field.key, $event)"
+            selectionMode="range"
+            [showIcon]="true"
+            class="w-full"
+          />
+        }
+
+        <label>{{ field.label }}</label>
+      </p-floatlabel>
+    }
+  </div>
+</app-filter-drawer>

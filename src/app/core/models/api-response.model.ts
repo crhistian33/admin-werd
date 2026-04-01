@@ -20,4 +20,5 @@ export interface ApiMeta {
   page: number;
   limit: number;
   totalPages: number;
+  trashedCount?: number;
 }

@@ -37,7 +37,7 @@ export class DialogService {
     this.confirmation.confirm({
       header: options.title ?? 'Confirmar acción',
       message: options.message,
-      icon: 'pi pi-info-circle',
+      icon: 'pi pi-exclamation-circle text-slate-400!',
       acceptLabel: options.acceptLabel ?? 'Confirmar',
       rejectLabel: options.rejectLabel ?? 'Cancelar',
       acceptButtonProps: { severity: 'primary' },

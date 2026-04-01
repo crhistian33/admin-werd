@@ -25,12 +25,16 @@ import { InputIconModule } from 'primeng/inputicon';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
 import type {
   DataTableConfig,
   TableColumn,
   BadgeConfig,
 } from '../../../types/data-table.type';
+import { Store } from '@ngxs/store';
+import { CategoryStore } from '@features/catalogs/categories/store/category.store';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-data-table',
@@ -49,11 +53,14 @@ import type {
     DatePipe,
     DecimalPipe,
     RouterLink,
+    OverlayBadgeModule,
+    LucideAngularModule,
   ],
   templateUrl: './data-table.component.html',
 })
 export class DataTableComponent<T extends Record<string, any>> {
   readonly router = inject(Router);
+  readonly store = inject(CategoryStore);
 
   private readonly el = inject(ElementRef);
 
@@ -73,6 +80,8 @@ export class DataTableComponent<T extends Record<string, any>> {
   readonly rows = input<number>(10);
   readonly first = input<number>(0);
 
+  readonly activeFiltersCount = input<number>(0);
+
   // ============================================================
   // TWO-WAY BINDING & OUTPUTS
   // ============================================================
@@ -82,11 +91,14 @@ export class DataTableComponent<T extends Record<string, any>> {
   readonly filterDrawer = output<void>();
   readonly onPageChange = output<any>();
   readonly deleteAll = output<T[]>();
+  readonly restoreAll = output<T[]>();
+  readonly onClear = output<void>();
 
   // ============================================================
   // INTERNALS
   // ============================================================
   private readonly table = viewChild<Table>('dt');
+
   // skeletonRows nunca debe ser vacío para evitar que PrimeNG muestre emptymessage durante loading
   get skeletonRows(): any[] {
     const count = this.rows?.() || 10;
@@ -103,6 +115,7 @@ export class DataTableComponent<T extends Record<string, any>> {
     return this.config().selectable ? base + 1 : base;
   });
 
+  readonly isTrashView = computed(() => this.config().isTrashView ?? false);
   // ============================================================
   // MÉTODOS PÚBLICOS
   // ============================================================
@@ -138,6 +151,12 @@ export class DataTableComponent<T extends Record<string, any>> {
   onDeleteAll(): void {
     if (this.selectedRows().length > 0) {
       this.deleteAll.emit(this.selectedRows());
+    }
+  }
+
+  onRestoreAll(): void {
+    if (this.selectedRows().length > 0) {
+      this.restoreAll.emit(this.selectedRows());
     }
   }
 
