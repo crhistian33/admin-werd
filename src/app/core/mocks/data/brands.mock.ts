@@ -4,11 +4,11 @@ export const BRANDS_MOCK: Brand[] = [
   {
     id: 'hjhdskdhadsadas',
     name: 'Ohm',
-    image: '',
+    images: [],
   },
   {
     id: 'hjhdskdhadsadas',
     name: 'Vapeo',
-    image: '',
+    images: [],
   },
 ];

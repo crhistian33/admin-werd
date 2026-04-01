@@ -221,22 +221,24 @@
       <!-- Empty state eliminado, ahora controlado por [emptyMessage] -->
 
       <!-- Loading: Skeleton de placeholders -->
-      <ng-template #loadingbody>
-        @for (_ of [1, 2, 3]; track $index) {
-          <tr>
-            @if (config().selectable) {
-              <td>
-                <p-skeleton height="1.5rem" />
-              </td>
-            }
-            @for (col of config().columns; track col.field) {
-              <td>
-                <p-skeleton height="1.5rem" />
-              </td>
-            }
-          </tr>
-        }
-      </ng-template>
+      @if (loading()) {
+        <ng-template #loadingbody>
+          @for (_ of [1, 2, 3]; track $index) {
+            <tr>
+              @if (config().selectable) {
+                <td>
+                  <p-skeleton height="1.5rem" />
+                </td>
+              }
+              @for (col of config().columns; track col.field) {
+                <td>
+                  <p-skeleton height="1.5rem" />
+                </td>
+              }
+            </tr>
+          }
+        </ng-template>
+      }
     </p-table>
   </div>
 </div>

@@ -39,13 +39,10 @@ export class FilterDynamicComponent implements OnInit {
   formValues: Record<string, any> = {};
 
   constructor() {
-    effect(
-      () => {
-        const storeFilters = this.initialValues();
-        this.syncFormWithStore(storeFilters);
-      },
-      { allowSignalWrites: true },
-    );
+    effect(() => {
+      const storeFilters = this.initialValues();
+      this.syncFormWithStore(storeFilters);
+    });
   }
 
   ngOnInit(): void {

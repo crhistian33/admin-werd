@@ -1,11 +1,11 @@
 <app-form-dynamic
   [fields]="fields"
-  [initialData]="store.selected()"
+  [initialData]="initialData()"
   [loading]="store.isSaving()"
-  [fetching]="isEdit && store.loadingState().initial"
-  [title]="isEdit ? (store.selected()?.name ?? '...') : 'Crear marca'"
+  [fetching]="isEdit() && store.loadingState().initial"
+  [title]="isEdit() ? (store.selected()?.name ?? '...') : 'Crear marca'"
   size="compact"
-  [submitLabel]="isEdit ? 'Actualizar' : 'Crear'"
+  [submitLabel]="isEdit() ? 'Actualizar' : 'Crear'"
   (submitted)="onSubmit($event)"
   (cancelled)="goBack()"
 />

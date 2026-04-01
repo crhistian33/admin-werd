@@ -2,18 +2,20 @@ import { Router } from '@angular/router';
 import { DataTableConfig } from '@shared/types/data-table.type';
 import { Brand } from '../models/brand.model';
 
-type BrandTableCallbacks = {
+type TrashTableCallbacks = {
+  onRestore: (category: Brand) => void;
   onDelete: (brand: Brand) => void;
 };
 
-export const brandTableConfig = (
+export const brandTrashTableConfig = (
   router: Router,
-  callback: BrandTableCallbacks,
+  callbacks: TrashTableCallbacks,
 ): DataTableConfig<Brand> => ({
   dataKey: 'id',
   globalFilter: true,
   showFilter: false,
   selectable: true,
+  isTrashView: true,
   columns: [
     {
       field: 'name',
@@ -53,22 +55,16 @@ export const brandTableConfig = (
   ],
   actions: [
     {
-      icon: 'pi pi-eye',
-      tooltip: 'Ver marca',
-      severity: 'info',
-      action: (row) => router.navigate(['/catalogos/marcas', row.id]),
-    },
-    {
-      icon: 'pi pi-pencil',
-      tooltip: 'Editar',
-      severity: 'warn',
-      action: (row) => router.navigate(['/catalogos/marcas', row.id, 'editar']),
+      icon: 'pi pi-refresh',
+      tooltip: 'Restaurar',
+      severity: 'success',
+      action: (row) => callbacks.onRestore(row),
     },
     {
       icon: 'pi pi-trash',
-      tooltip: 'Eliminar',
+      tooltip: 'Eliminar permanentemente',
       severity: 'danger',
-      action: (row) => callback.onDelete(row),
+      action: (row) => callbacks.onDelete(row),
     },
   ],
 });

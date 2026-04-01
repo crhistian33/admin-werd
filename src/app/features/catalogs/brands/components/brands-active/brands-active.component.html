@@ -1,0 +1,21 @@
+<app-data-table
+  [data]="store.data()"
+  [totalItems]="store.totalItems()"
+  [first]="firstRowIndex()"
+  [config]="tableConfig"
+  [loading]="store.loadingState().initial"
+  [isSaving]="store.loadingState().updating"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
+  (deleteAll)="onDeleteAll($event)"
+>
+  <ng-container tableDrawer>
+    <app-filter-dynamic
+      [(visible)]="drawerVisible"
+      [config]="filterFields()"
+      [initialValues]="store.filter()"
+      (filterChange)="store.setFilter($event)"
+      (filterClear)="handleClearFilters()"
+    />
+  </ng-container>
+</app-data-table>
