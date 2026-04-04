@@ -28,6 +28,8 @@ export type BadgeConfig = {
 export type TableColumn<T = any> = {
   /** Campo del objeto (soporta ruta: 'address.city') */
   field: keyof T | string;
+  /** Campo para filtro */
+  filterField?: keyof T | string;
   /** Encabezado visible */
   header: string;
   /** Tipo de visualización (default: 'text') */
@@ -64,6 +66,13 @@ export type TableAction<T = any> = {
   action: (row: T) => void;
   isAsync?: boolean;
 };
+
+export interface BulkAction {
+  label: string;
+  icon?: string;
+  severity?: string;
+  action: (selectedRows: any[]) => void;
+}
 
 /**
  * Configuración principal de la tabla
@@ -106,4 +115,5 @@ export type DataTableConfig<T = any> = {
   /** Campo único para rastrear filas (default: 'id') */
   dataKey?: string;
   isTrashView?: boolean;
+  bulkActions?: BulkAction[];
 };

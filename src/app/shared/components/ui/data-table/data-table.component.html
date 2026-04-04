@@ -45,6 +45,17 @@
 
     <!-- Acciones de la tabla -->
     <div class="flex items-center ml-auto gap-2">
+      @if (config().bulkActions?.length && selectedRows().length) {
+        <p-splitbutton
+          [label]="config().bulkActions![0].label"
+          [icon]="config().bulkActions![0].icon ?? 'pi pi-tag'"
+          [model]="bulkMenuItems()"
+          severity="secondary"
+          [outlined]="true"
+          loading="isSaving()"
+          (onClick)="onBulkAction()"
+        />
+      }
       @if (isTrashView()) {
         <p-button
           label="Restaurar selección"

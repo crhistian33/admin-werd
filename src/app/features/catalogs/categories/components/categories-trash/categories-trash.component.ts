@@ -16,7 +16,6 @@ import { Category } from '../../models/category.model';
 })
 export class CategoriesTrashComponent {
   private readonly router = inject(Router);
-  // Mismo store que CategoriesActiveComponent — sincronización automática
   readonly store = inject(CategoryStore);
   private readonly dialog = inject(DialogService);
 

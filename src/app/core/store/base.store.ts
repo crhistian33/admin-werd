@@ -13,8 +13,8 @@ export abstract class BaseStore<
   T extends { id?: number | string },
   F extends BaseFilter = BaseFilter,
 > {
-  private readonly destroy = inject(DestroyRef);
-  private readonly dialog = inject(DialogService);
+  readonly destroy = inject(DestroyRef);
+  readonly dialog = inject(DialogService);
 
   protected abstract readonly service: BaseService<T>;
 
@@ -211,7 +211,10 @@ export abstract class BaseStore<
       .subscribe({
         next: (res) => {
           this.isSaving.set(false);
-          this.dialog.success(res.message || 'Registro creado', 'Éxito');
+          this.dialog.success(
+            res.message || 'Registro creado',
+            'Operación exitosa',
+          );
           this.reloadActive();
           onSuccess?.();
         },
@@ -227,7 +230,10 @@ export abstract class BaseStore<
       .subscribe({
         next: (res) => {
           this.isSaving.set(false);
-          this.dialog.success(res.message || 'Registro actualizado', 'Éxito');
+          this.dialog.success(
+            res.message || 'Registro actualizado',
+            'Operación exitosa',
+          );
           this.reloadActive();
           this.detailResource.reload();
           onSuccess?.();
@@ -245,7 +251,10 @@ export abstract class BaseStore<
       .subscribe({
         next: (res) => {
           this.loadingId.set(null);
-          this.dialog.success(res.message || 'Movido a papelera', 'Éxito');
+          this.dialog.success(
+            res.message || 'Movido a papelera',
+            'Operación exitosa',
+          );
           this.reload(); // ambos resources — activos pierde 1, papelera gana 1
           onSuccess?.();
         },
@@ -261,7 +270,10 @@ export abstract class BaseStore<
       .subscribe({
         next: (res) => {
           this.isSaving.set(false);
-          this.dialog.success(res.message || 'Movidos a papelera', 'Éxito');
+          this.dialog.success(
+            res.message || 'Movidos a papelera',
+            'Operación exitosa',
+          );
           this.reload();
           onSuccess?.();
         },
@@ -278,7 +290,7 @@ export abstract class BaseStore<
       .subscribe({
         next: (res) => {
           this.loadingId.set(null);
-          this.dialog.success(res.message || 'Restaurado', 'Éxito');
+          this.dialog.success(res.message || 'Restaurado', 'Operación exitosa');
           this.reload(); // ambos resources
           onSuccess?.();
         },
@@ -294,7 +306,10 @@ export abstract class BaseStore<
       .subscribe({
         next: (res) => {
           this.isSaving.set(false);
-          this.dialog.success(res.message || 'Restaurados', 'Éxito');
+          this.dialog.success(
+            res.message || 'Restaurados',
+            'Operación exitosa',
+          );
           this.reload();
           onSuccess?.();
         },
@@ -313,7 +328,7 @@ export abstract class BaseStore<
           this.loadingId.set(null);
           this.dialog.success(
             res.message || 'Eliminado permanentemente',
-            'Éxito',
+            'Operación exitosa',
           );
           this.reload();
           onSuccess?.();
@@ -332,7 +347,7 @@ export abstract class BaseStore<
           this.isSaving.set(false);
           this.dialog.success(
             res.message || 'Eliminados permanentemente',
-            'Éxito',
+            'Operación exitosa',
           );
           this.reload();
           onSuccess?.();

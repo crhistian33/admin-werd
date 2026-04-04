@@ -7,7 +7,10 @@ import { DataTableComponent } from '@shared/components/ui/data-table/data-table.
 import { FilterDynamicComponent } from '@shared/components/ui/filter-dynamic/filter-dynamic.component';
 import { FilterFieldConfig } from '@shared/types/filter-config.type';
 import { Category } from '../../models/category.model';
-import { CategoryFilter } from '../../models/category-filter.model';
+import {
+  CategoryFilter,
+  categoryFilterDefaults,
+} from '../../models/category-filter.model';
 
 @Component({
   selector: 'app-categories-active',
@@ -31,7 +34,7 @@ export class CategoriesActiveComponent {
     this.tableConfig.columns
       .filter((col) => col.filter?.enabled)
       .map((col) => ({
-        key: col.field as string,
+        key: (col.filterField ?? col.field) as string,
         label: col.header,
         type: col.filter!.type,
         options: col.filter!.options,
@@ -74,11 +77,7 @@ export class CategoriesActiveComponent {
   }
 
   handleClearFilters(): void {
-    this.store.setFilter({
-      isActive: null,
-      search: null,
-      page: 1,
-    } as unknown as CategoryFilter);
+    this.store.setFilter(categoryFilterDefaults());
   }
 
   handlePagination(event: any): void {

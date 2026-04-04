@@ -13,10 +13,12 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-filter-dynamic',
   imports: [
+    CommonModule,
     FilterDrawerComponent,
     FloatLabel,
     SelectModule,
@@ -41,6 +43,10 @@ export class FilterDynamicComponent implements OnInit {
   constructor() {
     effect(() => {
       const storeFilters = this.initialValues();
+      console.log(
+        'Effect triggered, syncing form with store filters:',
+        storeFilters,
+      );
       this.syncFormWithStore(storeFilters);
     });
   }

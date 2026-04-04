@@ -32,9 +32,10 @@ import type {
   TableColumn,
   BadgeConfig,
 } from '../../../types/data-table.type';
-import { Store } from '@ngxs/store';
 import { CategoryStore } from '@features/catalogs/categories/store/category.store';
 import { LucideAngularModule } from 'lucide-angular';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-data-table',
@@ -55,6 +56,7 @@ import { LucideAngularModule } from 'lucide-angular';
     RouterLink,
     OverlayBadgeModule,
     LucideAngularModule,
+    SplitButtonModule,
   ],
   templateUrl: './data-table.component.html',
 })
@@ -92,6 +94,7 @@ export class DataTableComponent<T extends Record<string, any>> {
   readonly onPageChange = output<any>();
   readonly deleteAll = output<T[]>();
   readonly restoreAll = output<T[]>();
+  readonly changesAll = output<{ action: string; items: T[] }>();
   readonly onClear = output<void>();
 
   // ============================================================
@@ -116,6 +119,24 @@ export class DataTableComponent<T extends Record<string, any>> {
   });
 
   readonly isTrashView = computed(() => this.config().isTrashView ?? false);
+
+  readonly bulkMenuItems = computed<MenuItem[]>(() => {
+    const actions = this.config().bulkActions ?? [];
+    const selected = this.selectedRows();
+    // El primer item es el botón principal del SplitButton
+    // El resto van en el dropdown
+    return actions.slice(1).map((a) => ({
+      label: a.label,
+      icon: a.icon,
+      command: () => a.action(selected),
+    }));
+  });
+
+  onBulkAction(): void {
+    const first = this.config().bulkActions?.[0];
+    if (first) first.action(this.selectedRows());
+  }
+
   // ============================================================
   // MÉTODOS PÚBLICOS
   // ============================================================

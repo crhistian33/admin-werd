@@ -19,8 +19,8 @@ export class ProductFilterComponent {
   selectedStatus: ProductStatus | null = null;
 
   readonly statusOptions: { label: string; value: ProductStatus }[] = [
-    { label: 'Activo', value: 'success' },
-    { label: 'Inactivo', value: 'warning' },
+    { label: 'Activo', value: 'active' },
+    { label: 'Inactivo', value: 'inactive' },
   ];
 
   readonly clearFilters = (): void => {
