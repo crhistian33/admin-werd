@@ -3,6 +3,8 @@ import { Brand } from '@features/catalogs/brands/models/brand.model';
 import { Category } from '@features/catalogs/categories/models/category.model';
 import { ImageRecord } from '@shared/images/interfaces/image.interface';
 import { ProductPrice } from './product-price.model';
+import { ProductFeatures } from './product-features.model';
+import { ProductSpecs } from './product-specs.model';
 
 export type ProductStatus = 'draft' | 'active' | 'inactive' | 'out_of_stock';
 
@@ -24,5 +26,7 @@ export interface Product extends BaseModel {
   category?: Category;
   brand?: Brand;
   price: ProductPrice;
+  features: ProductFeatures[];
+  specs: ProductSpecs[];
   images?: ImageRecord[];
 }

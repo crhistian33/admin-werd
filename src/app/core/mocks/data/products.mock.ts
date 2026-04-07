@@ -21,5 +21,7 @@ export const PRODUCT_MOCK: Product[] = [
     categoryId: '1',
     brandId: '1',
     status: 'active',
+    features: [],
+    specs: [],
   },
 ];

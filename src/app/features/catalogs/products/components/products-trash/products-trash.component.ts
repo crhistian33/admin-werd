@@ -1,27 +1,17 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductStore } from '../../store/product.store';
 import { DialogService } from '@shared/services/ui/dialog.service';
-import { productTableConfig } from '../../config/product-table.config';
 import { Product } from '../../models/product.model';
 import { DataTableComponent } from '@shared/components/ui/data-table/data-table.component';
 import { ButtonModule } from 'primeng/button';
-import { ProductFilterComponent } from '../../components/product-filter/product-filter.component';
 import { CommonModule } from '@angular/common';
-import { FilterFieldConfig } from '@shared/types/filter-config.type';
 import { ProductFilter } from '../../models/product-filter.model';
-import { FilterDynamicComponent } from '@shared/components/ui/filter-dynamic/filter-dynamic.component';
 import { productTrashTableConfig } from '../../config/product-trash-table.config';
 
 @Component({
   selector: 'app-products-trash',
-  imports: [
-    CommonModule,
-    DataTableComponent,
-    ButtonModule,
-    ProductFilterComponent,
-    FilterDynamicComponent,
-  ],
+  imports: [CommonModule, DataTableComponent, ButtonModule],
   templateUrl: './products-trash.component.html',
   styleUrl: './products-trash.component.scss',
 })
