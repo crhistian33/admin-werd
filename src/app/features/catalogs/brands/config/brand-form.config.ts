@@ -32,7 +32,7 @@ export function buildBrandFormConfig(
       cols: 1,
       // Sube al /temp y retorna el UUID que irá en el payload
       uploadHandler: (file: File) =>
-        firstValueFrom(imageUpload.uploadTemp(file, 'brand', 'main')).then(
+        firstValueFrom(imageUpload.uploadTemp(file, 'brand', 'logo')).then(
           (res) => res.data.imageId,
         ),
     },

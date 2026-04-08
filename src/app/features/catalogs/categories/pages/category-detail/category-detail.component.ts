@@ -1,57 +1,62 @@
-import { Component, inject, input } from '@angular/core';
-import { CategoryStore } from '../../store/category.store';
-import { ButtonModule } from 'primeng/button';
+import { Component, computed, inject, input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SkeletonModule } from 'primeng/skeleton';
-import { TagModule } from 'primeng/tag';
+import { CategoryStore } from '../../store/category.store';
 import { DialogService } from '@shared/services/ui/dialog.service';
-import { CardModule } from 'primeng/card';
-import { LucideAngularModule } from 'lucide-angular';
-import { environment } from '@env/environment';
-import { DatePipe } from '@angular/common';
+import { DetailDynamicComponent } from '@shared/components/ui/detail-dynamic/detail-dynamic.component';
+import { CATEGORY_DETAIL_CONFIG } from '../../config/category-detail.config';
+import {
+  getDisplayUrl,
+  getImageByRole,
+} from '@shared/images/interfaces/image.interface';
 
 @Component({
   selector: 'app-category-detail',
-  imports: [
-    ButtonModule,
-    SkeletonModule,
-    TagModule,
-    CardModule,
-    LucideAngularModule,
-    DatePipe,
-  ],
+  imports: [DetailDynamicComponent],
   templateUrl: './category-detail.component.html',
   styleUrl: './category-detail.component.scss',
 })
 export class CategoryDetailComponent {
+  private readonly router = inject(Router);
+  private readonly dialog = inject(DialogService);
   readonly store = inject(CategoryStore);
-  private dialog = inject(DialogService);
-  private router = inject(Router);
 
-  id = input.required<string>();
+  readonly id = input.required<string>();
+  readonly detailConfig = CATEGORY_DETAIL_CONFIG;
 
-  readonly apiURL = environment.apiImagesUrl;
-
-  goBack = () => this.router.navigate(['/catalogos/categorias']);
-  edit = () =>
-    this.router.navigate(['/catalogos/categorias', this.id(), 'editar']);
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.store.getById(this.id());
+  }
+
+  // Mapea selected() inyectando _mainImageUrl para el campo de imagen
+  readonly detailData = computed(() => {
+    const selected = this.store.selected();
+    if (!selected) return null;
+
+    const mainImage = getImageByRole((selected as any).images ?? [], 'main');
+
+    return {
+      ...selected,
+      _mainImageUrl: mainImage ? getDisplayUrl(mainImage) : null,
+    } as Record<string, any>;
+  });
+
+  goBack(): void {
+    void this.router.navigate(['/catalogos/categorias']);
+  }
+
+  goToEdit(): void {
+    void this.router.navigate(['/catalogos/categorias', this.id(), 'editar']);
   }
 
   onDelete(): void {
     const category = this.store.selected();
-    if (!category || !category.id) return;
+    if (!category) return;
+
     this.dialog.delete({
-      message: `¿Está seguro de eliminar la categoría <strong>${category.name}</strong>?. <br>No se podrá reestablecer la acción`,
+      message: `¿Eliminar la categoría <strong>${(category as any).name}</strong>?
+                <br>Podrás recuperarla desde la papelera.`,
       onAccept: () => {
-        this.store.delete(category.id);
-        this.dialog.success(
-          `Categoría ${this.store.selected()?.name} eliminada`,
-          'Eliminación exitosa',
-        );
-        this.router.navigate(['/catalogos/categorias']);
+        this.store.softDelete((category as any).id, () => this.goBack());
       },
     });
   }

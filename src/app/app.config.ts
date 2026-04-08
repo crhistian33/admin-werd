@@ -50,6 +50,7 @@ import {
   Package,
   PackageSearch,
   PackageX,
+  SearchX,
   Settings,
   ShieldCheck,
   ShoppingBag,
@@ -213,6 +214,7 @@ export const appConfig: ApplicationConfig = {
         Folder,
         PackageX,
         Calendar,
+        SearchX,
       }),
     ),
     provideStore(

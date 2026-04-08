@@ -31,7 +31,7 @@ export class BrandFormComponent implements OnInit {
     const selected = this.store.selected();
     if (!selected) return null;
 
-    const mainImage = getImageByRole(selected.images ?? [], 'main');
+    const mainImage = getImageByRole(selected.images ?? [], 'logo');
 
     return {
       // id es necesario para que el linkedSignal de FormDynamic

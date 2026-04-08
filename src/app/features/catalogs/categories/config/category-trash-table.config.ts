@@ -52,7 +52,7 @@ export const categoryTrashTableConfig = (
     },
     {
       icon: 'pi pi-trash',
-      tooltip: 'Eliminar permanentemente',
+      tooltip: 'Eliminar',
       severity: 'danger',
       action: (row) => callbacks.onDelete(row),
     },

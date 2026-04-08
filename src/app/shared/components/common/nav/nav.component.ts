@@ -191,7 +191,7 @@ export class NavComponent {
 
   closeSubNav() {
     this.nav.isSubNav.set(false);
-    this.titleSubnav = '';
-    this.children = [];
+    // this.titleSubnav = '';
+    // this.children = [];
   }
 }
