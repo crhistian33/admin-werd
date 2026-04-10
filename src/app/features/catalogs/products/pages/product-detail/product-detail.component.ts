@@ -41,7 +41,9 @@ export class ProductDetailComponent implements OnInit {
   }
 
   goToEdit(): void {
-    void this.router.navigate(['/catalogos/productos', this.id(), 'editar']);
+    void this.router.navigate(['/catalogos/productos', this.id(), 'editar'], {
+      queryParams: { returnUrl: this.router.url },
+    });
   }
 
   onDelete(): void {

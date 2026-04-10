@@ -4,7 +4,7 @@ import { FormDynamicComponent } from '@shared/components/ui/form-dynamic/form-dy
 import { CategoryStore } from '../../store/category.store';
 import { buildCategoryFormConfig } from '../../config/category-form.config';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
-import { FormFieldConfig } from '@shared/types/form-dynamic.type';
+import { FormStepConfig } from '@shared/types/form-dynamic.type';
 import {
   getDisplayUrl,
   getImageByRole,
@@ -12,6 +12,7 @@ import {
 
 @Component({
   selector: 'app-category-form',
+  standalone: true,
   imports: [FormDynamicComponent],
   templateUrl: './category-form.component.html',
   styleUrl: './category-form.component.scss',
@@ -21,7 +22,7 @@ export class CategoryFormComponent implements OnInit {
   private readonly imageUpload = inject(ImageUploadService);
   readonly store = inject(CategoryStore);
 
-  fields: FormFieldConfig[] = buildCategoryFormConfig(this.imageUpload);
+  steps: FormStepConfig[] = buildCategoryFormConfig(this.imageUpload);
 
   id = input<string | null>(null);
   readonly isEdit = computed(() => !!this.id());
@@ -59,7 +60,10 @@ export class CategoryFormComponent implements OnInit {
     if (id) {
       this.store.getById(id);
     } else {
-      this.fields = this.fields.filter((f) => f.showOnCreate !== false);
+      this.steps = this.steps.map((s) => ({
+        ...s,
+        fields: s.fields.filter((f) => f.showOnCreate !== false),
+      }));
       this.store.setSelected(null);
     }
   }

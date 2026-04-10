@@ -7,6 +7,8 @@ import {
   output,
   signal,
   untracked,
+  effect,
+  DestroyRef,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -22,9 +24,20 @@ import { ButtonModule } from 'primeng/button';
 import { FileUploadModule } from 'primeng/fileupload';
 import { SkeletonModule } from 'primeng/skeleton';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FormFieldConfig } from '@shared/types/form-dynamic.type';
+import { EditorModule } from 'primeng/editor';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { OrderListModule } from 'primeng/orderlist';
+import { StepperModule } from 'primeng/stepper';
+import {
+  FormFieldConfig,
+  FormStepConfig,
+} from '@shared/types/form-dynamic.type';
 import { LucideAngularModule } from 'lucide-angular';
 import { environment } from '@env/environment';
+import { ImageUploadService } from '@shared/images/services/image-upload.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+type RemovedImageMap = { [key: string]: string | string[] };
 
 @Component({
   selector: 'app-form-dynamic',
@@ -38,6 +51,10 @@ import { environment } from '@env/environment';
     FileUploadModule,
     SkeletonModule,
     CheckboxModule,
+    EditorModule,
+    ToggleSwitchModule,
+    OrderListModule,
+    StepperModule,
     LucideAngularModule,
   ],
   templateUrl: './form-dynamic.component.html',
@@ -45,24 +62,40 @@ import { environment } from '@env/environment';
 })
 export class FormDynamicComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly imageUpload = inject(ImageUploadService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    // Reset activeAction when global loading turns off
+    effect(() => {
+      if (!this.loading()) {
+        untracked(() => this.activeAction.set(null));
+      }
+    });
+  }
 
   // ── Inputs ────────────────────────────────────────────────────────
-  fields = input.required<FormFieldConfig[]>();
+  steps = input.required<FormStepConfig[]>();
+  readonly flatFields = computed(() => this.steps().flatMap((s) => s.fields));
   initialData = input<Record<string, any> | null>(null);
   loading = input<boolean>(false);
   fetching = input<boolean>(false);
   submitLabel = input<string>('Guardar');
   title = input<string>('');
   size = input<'compact' | 'full'>('full');
+  customActions = input<
+    { label: string; action: string; icon?: string; severity?: string }[]
+  >([]);
 
   // ── Outputs ───────────────────────────────────────────────────────
   submitted = output<Record<string, any>>();
+  customActionSubmit = output<{ action: string; data: Record<string, any> }>();
   cancelled = output<void>();
 
   // ── Disparador por ID ─────────────────────────────────────────────
   // linkedSignal solo se recalcula cuando cambia el ID, no en cada
   // cambio de referencia del objeto initialData completo
-  private readonly dataId = computed(() => {
+  readonly dataId = computed(() => {
     const data = this.initialData();
     return data ? data['id'] : undefined;
   });
@@ -77,7 +110,7 @@ export class FormDynamicComponent {
     source: () => this.dataId(),
     computation: (id) => {
       const data = this.initialData();
-      const currentFields = untracked(() => this.fields());
+      const currentFields = untracked(() => this.flatFields());
 
       return untracked(() => {
         if (!data) return {};
@@ -86,7 +119,8 @@ export class FormDynamicComponent {
         currentFields
           .filter((f) => f.type === 'file-image')
           .forEach((f) => {
-            const remotePath = data['_currentImageUrl'];
+            const remotePath =
+              data[`_currentImageUrl_${f.key}`] || data['_currentImageUrl'];
             if (remotePath) {
               newPreviews[f.key] = remotePath.startsWith('http')
                 ? remotePath
@@ -105,15 +139,62 @@ export class FormDynamicComponent {
   // Se resetea cuando cambia el dataId (nueva entidad cargada)
   readonly removedImageIds = linkedSignal<
     string | number | undefined,
-    Record<string, string>
+    RemovedImageMap
   >({
     source: () => this.dataId(),
     // Al cargar una entidad nueva, resetea los IDs eliminados
-    computation: () => ({}),
+    computation: (): RemovedImageMap => ({}),
   });
 
   // ── Subidas en progreso ───────────────────────────────────────────
   readonly uploadingFields = signal<Record<string, boolean>>({});
+
+  /**
+   * Rastrea qué acción de guardado se está ejecutando para mostrar
+   * el spinner solo en ese botón y deshabilitar los otros.
+   */
+  readonly activeAction = signal<string | null>(null);
+
+  // ── Galería de imágenes (file-gallery) ───────────────────────────
+  // key = field.key, value = array de { tempId, previewUrl }
+  readonly galleryItems = linkedSignal<
+    string | number | undefined,
+    Record<
+      string,
+      { tempId: string; previewUrl: string; isExisting: boolean }[]
+    >
+  >({
+    source: () => this.dataId(),
+    computation: () => {
+      const data = this.initialData();
+      const currentFields = untracked(() => this.flatFields());
+
+      return untracked(() => {
+        if (!data) return {};
+        const items: Record<
+          string,
+          { tempId: string; previewUrl: string; isExisting: boolean }[]
+        > = {};
+
+        currentFields
+          .filter((f) => f.type === 'file-gallery')
+          .forEach((f) => {
+            const remoteItems = data[`_galleryItems_${f.key}`];
+            if (Array.isArray(remoteItems)) {
+              items[f.key] = remoteItems.map((item: any) => ({
+                tempId: item.tempId || item.id,
+                previewUrl: item.url?.startsWith('http')
+                  ? item.url
+                  : `${environment.apiImagesUrl}${item.url}`,
+                isExisting: true, // ← marca como existente
+              }));
+            }
+          });
+
+        return items;
+      });
+    },
+  });
 
   isDragging = false;
 
@@ -122,7 +203,7 @@ export class FormDynamicComponent {
     source: () => this.dataId(),
     computation: () => {
       const data = this.initialData();
-      const currentFields = untracked(() => this.fields());
+      const currentFields = untracked(() => this.flatFields());
 
       return untracked(() => {
         const controls: Record<string, any> = {};
@@ -142,8 +223,12 @@ export class FormDynamicComponent {
         if (data) {
           const safeData = { ...data };
           currentFields
-            .filter((f) => f.type === 'file-image')
+            .filter((f) => f.type === 'file-image' || f.type === 'file-gallery')
             .forEach((f) => delete safeData[f.key]);
+
+          Object.keys(safeData).forEach((k) => {
+            if (k.startsWith('_')) delete safeData[k];
+          });
           group.patchValue(safeData);
         }
 
@@ -152,17 +237,29 @@ export class FormDynamicComponent {
     },
   });
 
-  // ── Layout ────────────────────────────────────────────────────────
   readonly layoutClass = computed(
     () =>
       ({
-        compact: { container: 'max-w-2xl', grid: 'grid grid-cols-1 gap-4' },
+        compact: { container: 'max-w-4xl', grid: 'grid grid-cols-1 gap-4' },
         full: {
           container: 'w-full',
-          grid: 'grid grid-cols-1 md:grid-cols-2 gap-4',
+          grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4',
         },
       })[this.size()],
   );
+
+  getFieldColClass(cols?: number): string {
+    if (this.size() !== 'full') return 'col-span-1';
+    switch (cols) {
+      case 3:
+        return 'col-span-1 md:col-span-2 lg:col-span-3';
+      case 2:
+        return 'col-span-1 md:col-span-2 lg:col-span-2';
+      case 1:
+      default:
+        return 'col-span-1';
+    }
+  }
 
   // ── Helpers ───────────────────────────────────────────────────────
 
@@ -180,7 +277,7 @@ export class FormDynamicComponent {
     const file: File = event.files?.[0] ?? event.currentFiles?.[0];
     if (!file) return;
 
-    const field = this.fields().find((f) => f.key === key);
+    const field = this.flatFields().find((f) => f.key === key);
     if (!field || field.type !== 'file-image') return;
 
     // Preview local inmediato
@@ -218,17 +315,26 @@ export class FormDynamicComponent {
   }
 
   clearFile(key: string): void {
-    // Guarda el ID de la imagen que se elimina para enviarlo al backend
-    // El ID viene en initialData como '_currentImageId_<key>'
-    // Ejemplo: '_currentImageId_tempImageId' para categorías
     const data = this.initialData();
-    const imageId = data?.[`_currentImageId_${key}`] as string | undefined;
+    const existingImageId = data?.[`_currentImageId_${key}`] as
+      | string
+      | undefined;
 
-    if (imageId) {
-      this.removedImageIds.update((prev) => ({ ...prev, [key]: imageId }));
+    if (existingImageId) {
+      this.removedImageIds.update((prev: RemovedImageMap) => ({
+        ...prev,
+        [key]: existingImageId, // string simple para imagen principal
+      }));
+    } else {
+      const currentTempId = this.form().get(key)?.value as string | null;
+      if (currentTempId) {
+        this.imageUpload
+          .deleteTempById(currentTempId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({ error: () => null });
+      }
     }
 
-    // Limpia el control y el preview
     this.form().get(key)?.setValue(null);
     this.form().get(key)?.markAsDirty();
     this.previews.update((prev) => {
@@ -268,6 +374,178 @@ export class FormDynamicComponent {
     fileUpload.files = [files[0]];
   }
 
+  // ── Galería (file-gallery) ────────────────────────────────────────
+
+  async onGalleryFileSelect(
+    event: any,
+    key: string,
+    fileUpload: any,
+  ): Promise<void> {
+    const files: File[] = Array.from(event.files ?? event.currentFiles ?? []);
+    if (!files.length) return;
+
+    fileUpload.clear();
+
+    const field = this.flatFields().find((f) => f.key === key);
+    if (!field || field.type !== 'file-gallery') return;
+
+    const currentCount = this.galleryItems()[key]?.length ?? 0;
+    const remainingSlots = 3 - currentCount;
+    if (remainingSlots <= 0) return;
+
+    const filesToProcess = files.slice(0, remainingSlots);
+
+    for (const file of filesToProcess) {
+      this.uploadingFields.update((prev) => ({ ...prev, [key]: true }));
+
+      // Preview local inmediato
+      const previewUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.readAsDataURL(file);
+      });
+
+      try {
+        let tempId: string;
+        if (field.uploadHandler) {
+          tempId = await field.uploadHandler(file);
+        } else {
+          // Fallback: usar URL local (sin subida real)
+          tempId = previewUrl;
+        }
+
+        this.galleryItems.update((prev) => ({
+          ...prev,
+          [key]: [
+            ...(prev[key] ?? []),
+            { tempId, previewUrl, isExisting: false },
+          ],
+        }));
+
+        // Sincroniza el control reactivo con el array de tempIds
+        this._syncGalleryControl(key);
+      } catch {
+        // el uploadHandler falló – no agregamos el item
+      } finally {
+        this.uploadingFields.update((prev) => ({ ...prev, [key]: false }));
+      }
+    }
+  }
+
+  removeGalleryItem(key: string, index: number): void {
+    const itemToRemove = (this.galleryItems()[key] ?? [])[index];
+
+    if (itemToRemove) {
+      if (itemToRemove.isExisting) {
+        this.removedImageIds.update((rm: RemovedImageMap) => {
+          const existing = rm[key];
+          const updated: string[] = Array.isArray(existing)
+            ? [...existing, itemToRemove.tempId]
+            : existing
+              ? [existing, itemToRemove.tempId]
+              : [itemToRemove.tempId];
+          return { ...rm, [key]: updated };
+        });
+      } else {
+        this.imageUpload
+          .deleteTempById(itemToRemove.tempId)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({ error: () => null });
+      }
+    }
+
+    this.galleryItems.update((prev) => ({
+      ...prev,
+      [key]: (prev[key] ?? []).filter((_, i) => i !== index),
+    }));
+    this._syncGalleryControl(key);
+  }
+
+  private _syncGalleryControl(key: string): void {
+    const newIds = (this.galleryItems()[key] ?? [])
+      .filter((i) => !i.isExisting)
+      .map((i) => i.tempId);
+
+    this.form().get(key)?.setValue(newIds);
+    this.form().get(key)?.markAsDirty();
+  }
+
+  // ── Specs ─────────────────────────────────────────────────────────
+
+  getSpecsValue(
+    key: string,
+  ): { specKey: string; specValue: string; sortOrder: number }[] {
+    return this.form().get(key)?.value ?? [];
+  }
+
+  addSpec(key: string): void {
+    const current = this.getSpecsValue(key);
+    const updated = [
+      ...current,
+      { specKey: '', specValue: '', sortOrder: current.length },
+    ];
+    this.form().get(key)?.setValue(updated);
+    this.form().get(key)?.markAsDirty();
+  }
+
+  updateSpec(
+    key: string,
+    index: number,
+    field: 'specKey' | 'specValue',
+    value: string,
+  ): void {
+    const current = [...this.getSpecsValue(key)];
+    current[index] = { ...current[index], [field]: value };
+    this.form().get(key)?.setValue(current);
+  }
+
+  removeSpec(key: string, index: number): void {
+    const updated = this.getSpecsValue(key)
+      .filter((_, i) => i !== index)
+      .map((s, i) => ({ ...s, sortOrder: i }));
+    this.form().get(key)?.setValue(updated);
+    this.form().get(key)?.markAsDirty();
+  }
+
+  onSpecsReorder(key: string, items: any[]): void {
+    const reordered = items.map((s, i) => ({ ...s, sortOrder: i }));
+    this.form().get(key)?.setValue(reordered);
+    this.form().get(key)?.markAsDirty();
+  }
+
+  // ── Features ──────────────────────────────────────────────────────
+
+  getFeaturesValue(key: string): { feature: string; sortOrder: number }[] {
+    return this.form().get(key)?.value ?? [];
+  }
+
+  addFeature(key: string): void {
+    const current = this.getFeaturesValue(key);
+    const updated = [...current, { feature: '', sortOrder: current.length }];
+    this.form().get(key)?.setValue(updated);
+    this.form().get(key)?.markAsDirty();
+  }
+
+  updateFeature(key: string, index: number, value: string): void {
+    const current = [...this.getFeaturesValue(key)];
+    current[index] = { ...current[index], feature: value };
+    this.form().get(key)?.setValue(current);
+  }
+
+  removeFeature(key: string, index: number): void {
+    const updated = this.getFeaturesValue(key)
+      .filter((_, i) => i !== index)
+      .map((f, i) => ({ ...f, sortOrder: i }));
+    this.form().get(key)?.setValue(updated);
+    this.form().get(key)?.markAsDirty();
+  }
+
+  onFeaturesReorder(key: string, items: any[]): void {
+    const reordered = items.map((f, i) => ({ ...f, sortOrder: i }));
+    this.form().get(key)?.setValue(reordered);
+    this.form().get(key)?.markAsDirty();
+  }
+
   // ── Submit ────────────────────────────────────────────────────────
 
   onSubmit(): void {
@@ -276,8 +554,7 @@ export class FormDynamicComponent {
       return;
     }
 
-    console.log('Data ID', this.dataId());
-    console.log('Form data to submit:', this.form().getRawValue());
+    this.activeAction.set('submit');
 
     // Incluye los IDs de imágenes eliminadas para que el componente padre
     // los use al construir el payload del backend
@@ -285,6 +562,40 @@ export class FormDynamicComponent {
       ...this.form().getRawValue(),
       _removedImageIds: this.removedImageIds(),
     });
+  }
+
+  onCustomActionSubmit(action: string): void {
+    if (this.form().invalid || this.isUploading()) {
+      this.form().markAllAsTouched();
+      return;
+    }
+
+    this.activeAction.set(action);
+
+    this.customActionSubmit.emit({
+      action,
+      data: {
+        ...this.form().getRawValue(),
+        _removedImageIds: this.removedImageIds(),
+      },
+    });
+  }
+
+  nextStep(stepIndex: number, activateCallback: (val: number) => void): void {
+    const currentStep = this.steps()[stepIndex];
+    let isValid = true;
+
+    currentStep.fields.forEach((field) => {
+      const control = this.form().get(field.key);
+      if (control?.invalid) {
+        control.markAsTouched();
+        isValid = false;
+      }
+    });
+
+    if (isValid) {
+      activateCallback(stepIndex + 2); // activateCallback es 1-based (Paso 1 = valor 1), por lo tanto next step = i + 2
+    }
   }
 
   // ── Validaciones ──────────────────────────────────────────────────

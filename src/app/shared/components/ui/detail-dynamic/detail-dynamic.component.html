@@ -12,7 +12,7 @@
       @if (loading()) {
         <p-skeleton width="14rem" height="2rem" />
       } @else if (title()) {
-        <h1 class="text-xl font-semibold text-slate-800 truncate">
+        <h1 class="text-xl font-semibold text-slate-800 truncate uppercase">
           {{ title() }}
         </h1>
         @if (subtitle()) {
@@ -59,14 +59,12 @@
 
   <!-- ── Secciones ──────────────────────────────────────────── -->
   @if (!loading() && hasData()) {
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       @for (section of config().sections; track $index) {
         <div [class]="getSectionClass(section)">
           <!-- ════ INFO — lista label/valor ════ -->
           @if (section.layout === "info") {
-            <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full"
-            >
+            <div class="bg-white rounded-lg border border-slate-100 p-6 h-full">
               @if (section.title) {
                 <h2
                   class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
@@ -78,7 +76,7 @@
                 @for (field of section.fields; track field.key) {
                   @if (isVisible(field)) {
                     <div
-                      class="flex items-start justify-between py-3 gap-4 min-h-[3rem]"
+                      class="flex items-start justify-between py-3 gap-4 min-h-12"
                     >
                       <span class="text-sm text-slate-500 shrink-0">{{
                         field.label
@@ -136,7 +134,7 @@
                         }
                         @default {
                           <span
-                            class="text-sm font-medium text-slate-800 text-right break-words max-w-xs"
+                            class="text-sm font-medium text-slate-800 text-right wrap-break-word max-w-xs"
                           >
                             {{ getFormattedValue(field) }}
                           </span>
@@ -152,7 +150,7 @@
           <!-- ════ IMAGE — imagen única ════ -->
           @if (section.layout === "image") {
             <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-full"
+              class="bg-white rounded-lg border border-slate-100 overflow-hidden h-full"
             >
               @if (section.title) {
                 <div class="px-6 pt-5">
@@ -173,9 +171,11 @@
                       [src]="buildUrl(imgPath, field.imageBaseUrl)"
                       [alt]="field.label"
                       [ngClass]="
-                        field.type === 'logo' ? 'w-auto mx-auto' : 'w-full'
+                        field.type === 'logo'
+                          ? 'w-auto h-30 mx-auto px-4'
+                          : 'w-full h-auto'
                       "
-                      class="h-auto object-cover mt-4"
+                      class="object-cover mt-4"
                       (error)="
                         $any($event.target).src =
                           'assets/images/placeholder.png'
@@ -196,9 +196,7 @@
 
           <!-- ════ GALLERY — p-galleria ════ -->
           @if (section.layout === "gallery") {
-            <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden h-full"
-            >
+            <div class="bg-white rounded-lg overflow-hidden h-full">
               @if (section.title) {
                 <div class="px-6 pt-5">
                   <h2
@@ -212,32 +210,35 @@
                 @if (isVisible(field) && field.type === "gallery") {
                   @if (getGalleriaItems(field); as items) {
                     @if (items.length > 0) {
-                      <p-galleria
-                        [value]="items"
-                        [numVisible]="4"
-                        [showThumbnails]="items.length > 1"
-                        [showIndicators]="false"
-                        [showItemNavigators]="items.length > 4"
-                        [showThumbnailNavigators]="false"
-                        [circular]="true"
-                        [transitionInterval]="0"
-                        containerClass="w-full"
-                      >
-                        <ng-template #item let-item>
-                          <img
-                            [src]="item.itemImageSrc"
-                            [alt]="item.alt"
-                            class="w-full h-72 object-contain p-4"
-                          />
-                        </ng-template>
-                        <ng-template #thumbnail let-item>
-                          <img
-                            [src]="item.thumbnailImageSrc"
-                            [alt]="item.alt"
-                            class="w-14 h-14 object-cover rounded-lg"
-                          />
-                        </ng-template>
-                      </p-galleria>
+                      <div class="flex flex-col">
+                        <p-galleria
+                          [value]="items"
+                          [numVisible]="4"
+                          [showThumbnails]="items.length > 1"
+                          [showIndicators]="false"
+                          [showItemNavigators]="items.length > 4"
+                          [showThumbnailNavigators]="false"
+                          thumbnailsPosition="left"
+                          [circular]="true"
+                          [transitionInterval]="0"
+                          containerClass="w-full"
+                        >
+                          <ng-template #item let-item>
+                            <img
+                              [src]="item.itemImageSrc"
+                              [alt]="item.alt"
+                              class="w-full object-contain"
+                            />
+                          </ng-template>
+                          <ng-template #thumbnail let-item>
+                            <img
+                              [src]="item.thumbnailImageSrc"
+                              [alt]="item.alt"
+                              class="w-20 h-20 object-cover"
+                            />
+                          </ng-template>
+                        </p-galleria>
+                      </div>
                     } @else {
                       <div
                         class="flex flex-col items-center justify-center h-72 bg-slate-50 text-slate-400 gap-2"
@@ -254,9 +255,7 @@
 
           <!-- ════ PRICE — bloque precio/costo/margen ════ -->
           @if (section.layout === "price") {
-            <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full"
-            >
+            <div class="bg-white rounded-lg border border-slate-100 p-6 h-full">
               @if (section.title) {
                 <h2
                   class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
@@ -329,9 +328,7 @@
 
           <!-- ════ SPECS — tabla key/value ════ -->
           @if (section.layout === "specs") {
-            <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full"
-            >
+            <div class="bg-white rounded-lg border border-slate-100 p-6 h-full">
               @if (section.title) {
                 <h2
                   class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
@@ -369,9 +366,7 @@
 
           <!-- ════ FEATURES — lista con checks ════ -->
           @if (section.layout === "features") {
-            <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full"
-            >
+            <div class="bg-white rounded-lg border border-slate-100 p-6 h-full">
               @if (section.title) {
                 <h2
                   class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
@@ -406,9 +401,7 @@
 
           <!-- ════ HTML — contenido richtext ════ -->
           @if (section.layout === "html") {
-            <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6"
-            >
+            <div class="bg-white rounded-lg border border-slate-100 p-6">
               @if (section.title) {
                 <h2
                   class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
@@ -420,7 +413,7 @@
                 @if (isVisible(field) && field.type === "html") {
                   @if (getSafeHtml(field); as html) {
                     <div
-                      class="prose prose-slate max-w-none text-sm"
+                      class="rich-content prose prose-slate max-w-none text-sm"
                       [innerHTML]="html"
                     ></div>
                   } @else {
@@ -433,9 +426,7 @@
 
           <!-- ════ TAGS — fila de badges ════ -->
           @if (section.layout === "tags") {
-            <div
-              class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6"
-            >
+            <div class="bg-white rounded-lg border border-slate-100 p-6">
               @if (section.title) {
                 <h2
                   class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"

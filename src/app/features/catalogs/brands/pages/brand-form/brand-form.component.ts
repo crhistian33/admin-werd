@@ -2,7 +2,7 @@ import { Component, computed, inject, input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BrandStore } from '../../store/brand.store';
 import { FormDynamicComponent } from '@shared/components/ui/form-dynamic/form-dynamic.component';
-import { FormFieldConfig } from '@shared/types/form-dynamic.type';
+import { FormStepConfig } from '@shared/types/form-dynamic.type';
 import { buildBrandFormConfig } from '../../config/brand-form.config';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
 import {
@@ -21,7 +21,7 @@ export class BrandFormComponent implements OnInit {
   private readonly imageUpload = inject(ImageUploadService);
   readonly store = inject(BrandStore);
 
-  fields: FormFieldConfig[] = buildBrandFormConfig(this.imageUpload);
+  steps: FormStepConfig[] = buildBrandFormConfig(this.imageUpload);
 
   id = input.required<string>();
   readonly isEdit = computed(() => !!this.id());
@@ -59,7 +59,10 @@ export class BrandFormComponent implements OnInit {
     if (id) {
       this.store.getById(id);
     } else {
-      this.fields = this.fields.filter((f) => f.showOnCreate !== false);
+      this.steps = this.steps.map((s) => ({
+        ...s,
+        fields: s.fields.filter((f) => f.showOnCreate !== false),
+      }));
       this.store.setSelected(null);
     }
   }

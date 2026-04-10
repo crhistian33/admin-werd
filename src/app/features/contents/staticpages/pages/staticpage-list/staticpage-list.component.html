@@ -1,1 +1,32 @@
-<p>staticpage-list works!</p>
+<p-tabs lazy value="0" class="bg-transparent!">
+  <p-tablist>
+    <p-tab value="0" class="flex items-center gap-2">
+      <lucide-icon name="list-check" class="w-4 h-4" />
+      <span>Listado</span>
+      @if (store.totalItems() > 0) {
+        <p-badge [value]="store.totalItems().toString()" severity="secondary" />
+      }
+    </p-tab>
+
+    <p-tab value="1" class="flex items-center gap-2">
+      <lucide-icon name="trash" class="w-4 h-4" />
+      <span>Papelera</span>
+      @if (store.trashTotalItems() > 0) {
+        <p-badge
+          [value]="store.trashTotalItems().toString()"
+          severity="danger"
+        />
+      }
+    </p-tab>
+  </p-tablist>
+
+  <p-tabpanels>
+    <p-tabpanel value="0">
+      <app-pages-active />
+    </p-tabpanel>
+
+    <p-tabpanel value="1">
+      <app-pages-trash />
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>

@@ -34,6 +34,7 @@ import { environment } from '@env/environment';
     LucideAngularModule,
   ],
   templateUrl: './detail-dynamic.component.html',
+  styleUrl: './detail-dynamic.component.scss',
 })
 export class DetailDynamicComponent {
   private readonly sanitizer = inject(DomSanitizer);
@@ -105,7 +106,14 @@ export class DetailDynamicComponent {
   getGalleriaItems(field: DetailFieldConfig): any[] {
     const images = this.getFieldValue(field);
     if (!Array.isArray(images)) return [];
-    return images.map((img: any) => ({
+
+    // Ordenar: 'main' primero, luego 'gallery', el resto al final
+    const sorted = [...images].sort((a, b) => {
+      const order: Record<string, number> = { main: 0, gallery: 1 };
+      return (order[a.imageRole] ?? 2) - (order[b.imageRole] ?? 2);
+    });
+
+    return sorted.map((img: any) => ({
       itemImageSrc: this.buildUrl(
         img.variants?.original ?? img.url,
         field.imageBaseUrl,

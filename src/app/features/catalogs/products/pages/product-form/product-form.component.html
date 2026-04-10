@@ -1,1 +1,12 @@
-<p>product-form works!</p>
+<app-form-dynamic
+  [steps]="steps()"
+  [initialData]="initialData()"
+  [loading]="loading()"
+  [fetching]="fetching()"
+  [title]="title()"
+  [submitLabel]="isEditMode() ? 'Guardar cambios' : 'Guardar (Borrador)'"
+  [customActions]="customActions()"
+  (customActionSubmit)="onCustomActionSave($event)"
+  (submitted)="onSubmit($event)"
+  (cancelled)="onCancel()"
+/>

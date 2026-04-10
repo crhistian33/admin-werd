@@ -3,16 +3,22 @@ import { ValidatorFn } from '@angular/forms';
 export type FieldType =
   | 'text'
   | 'textarea'
+  | 'editor'
   | 'number'
+  | 'number-decimal'
   | 'select'
   | 'email'
   | 'url'
   | 'file-image'
-  | 'checkbox';
+  | 'file-gallery'
+  | 'checkbox'
+  | 'switch'
+  | 'features'
+  | 'specs';
 
 export interface SelectOption {
   label: string;
-  value: string | number;
+  value: string | number | boolean;
 }
 
 export interface FormFieldConfig {
@@ -20,11 +26,18 @@ export interface FormFieldConfig {
   label: string;
   type: FieldType;
   placeholder?: string;
+  hint?: string;
   validators?: ValidatorFn[];
   options?: SelectOption[];
   accept?: string;
   maxFileSize?: number;
-  cols?: 1 | 2;
+  cols?: 1 | 2 | 3;
+  /** Para inputs numéricos: valor mínimo permitido */
+  min?: number;
+  /** Para inputs numéricos: valor máximo permitido */
+  max?: number;
+  /** Cantidad de decimales a mostrar en number-decimal (default: 2) */
+  minFractionDigits?: number;
 
   // Para campos file-image que deben subir al /temp antes de guardar.
   // Recibe el File seleccionado y retorna el tempImageId (UUID).
@@ -36,4 +49,10 @@ export interface FormFieldConfig {
    * Si es false, solo en edición. Si es undefined, siempre se muestra.
    */
   showOnCreate?: boolean;
+}
+
+export interface FormStepConfig {
+  title: string;
+  description?: string;
+  fields: FormFieldConfig[];
 }

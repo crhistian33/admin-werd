@@ -235,7 +235,7 @@ export abstract class BaseStore<
             'Operación exitosa',
           );
           this.reloadActive();
-          this.detailResource.reload();
+          this.selectedId.set(null);
           onSuccess?.();
         },
         error: () => this.isSaving.set(false),

@@ -110,7 +110,9 @@ export const productTableConfig = (
       tooltip: 'Editar',
       severity: 'warn',
       action: (row) =>
-        router.navigate(['/catalogos/productos', row.id, 'editar']),
+        router.navigate(['/catalogos/productos', row.id, 'editar'], {
+          queryParams: { returnUrl: router.url },
+        }),
     },
     {
       icon: 'pi pi-trash',
