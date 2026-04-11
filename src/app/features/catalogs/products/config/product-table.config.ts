@@ -96,6 +96,12 @@ export const productTableConfig = (
         ],
       },
     },
+    {
+      field: 'createdBy.name',
+      header: 'Creado por',
+      type: 'text',
+      width: '180px',
+    },
     { field: 'actions', header: '', type: 'actions', width: '80px' },
   ],
   actions: [

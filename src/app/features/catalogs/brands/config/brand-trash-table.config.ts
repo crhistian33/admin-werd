@@ -29,6 +29,12 @@ export const brandTrashTableConfig = (
       type: 'text',
     },
     {
+      field: 'deletedBy.name',
+      header: 'Eliminado por',
+      type: 'text',
+      width: '180px',
+    },
+    {
       field: 'isActive',
       header: 'Estado',
       type: 'badge',

@@ -48,13 +48,6 @@ export const productTrashTableConfig = (
       width: '120px',
     },
     {
-      field: 'stock',
-      header: 'Stock',
-      type: 'number',
-      sortable: true,
-      width: '120px',
-    },
-    {
       field: 'status',
       header: 'Estado',
       type: 'badge',
@@ -66,6 +59,12 @@ export const productTrashTableConfig = (
         { value: 'inactive', label: 'Archivado', severity: 'danger' },
         { value: 'out_of_stock', label: 'Agotado', severity: 'warn' },
       ],
+    },
+    {
+      field: 'deletedBy.name',
+      header: 'Eliminado por',
+      type: 'text',
+      width: '180px',
     },
     { field: 'actions', header: '', type: 'actions', width: '80px' },
   ],

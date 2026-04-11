@@ -41,6 +41,12 @@ export const pageTableConfig = (
         ],
       },
     },
+    {
+      field: 'createdBy.name',
+      header: 'Creado por',
+      type: 'text',
+      width: '180px',
+    },
     { field: 'actions', header: '', type: 'actions', width: '80px' },
   ],
   actions: [
@@ -48,14 +54,15 @@ export const pageTableConfig = (
       icon: 'pi pi-eye',
       tooltip: 'Ver página',
       severity: 'info',
-      action: (row) => router.navigate(['/contenidos/paginas', row.id]),
+      action: (row) =>
+        router.navigate(['/contenidos/paginas-internas', row.id]),
     },
     {
       icon: 'pi pi-pencil',
       tooltip: 'Editar',
       severity: 'warn',
       action: (row) =>
-        router.navigate(['/contenidos/paginas', row.id, 'editar'], {
+        router.navigate(['/contenidos/paginas-internas', row.id, 'editar'], {
           queryParams: { returnUrl: router.url },
         }),
     },

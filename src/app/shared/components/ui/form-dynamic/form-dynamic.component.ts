@@ -556,11 +556,16 @@ export class FormDynamicComponent {
 
     this.activeAction.set('submit');
 
-    // Incluye los IDs de imágenes eliminadas para que el componente padre
-    // los use al construir el payload del backend
+    const { ...formValue } = this.form().getRawValue();
+
+    // Solo incluir _removedImageIds si hay campos de imagen en el form
+    const hasImageFields = this.flatFields().some(
+      (f) => f.type === 'file-image' || f.type === 'file-gallery',
+    );
+
     this.submitted.emit({
-      ...this.form().getRawValue(),
-      _removedImageIds: this.removedImageIds(),
+      ...formValue,
+      ...(hasImageFields ? { _removedImageIds: this.removedImageIds() } : {}),
     });
   }
 

@@ -30,11 +30,10 @@ export const categoryTrashTableConfig = (
       type: 'text',
     },
     {
-      field: 'deletedAt',
-      header: 'Eliminado el',
-      type: 'date',
-      sortable: true,
-      width: '160px',
+      field: 'deletedBy.name',
+      header: 'Eliminado por',
+      type: 'text',
+      width: '180px',
     },
     {
       field: 'actions',

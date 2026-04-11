@@ -1,1 +1,11 @@
-<p>staticpage-form works!</p>
+<app-form-dynamic
+  [steps]="steps"
+  [initialData]="initialData()"
+  [loading]="store.isSaving()"
+  [fetching]="isEdit() && store.loadingState().initial"
+  [title]="isEdit() ? (store.selected()?.title ?? '...') : 'Crear página'"
+  [submitLabel]="isEdit() ? 'Actualizar' : 'Crear'"
+  size="compact"
+  (submitted)="onSubmit($event)"
+  (cancelled)="goBack()"
+/>

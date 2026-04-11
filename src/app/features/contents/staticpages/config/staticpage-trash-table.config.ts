@@ -31,6 +31,12 @@ export const pageTrashTableConfig = (
       sortable: true,
       width: '160px',
     },
+    {
+      field: 'deletedBy.name',
+      header: 'Eliminado por',
+      type: 'text',
+      width: '180px',
+    },
     { field: 'actions', header: '', type: 'actions', width: '80px' },
   ],
   actions: [

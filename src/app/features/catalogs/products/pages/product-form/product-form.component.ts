@@ -102,7 +102,6 @@ export class ProductFormComponent implements OnInit {
       payload['status'] = this.initialData()?.['status'] ?? 'draft';
     }
 
-    console.log('payload', payload);
     if (currentId) {
       this.store.update(currentId, payload, () => this._goBack());
     } else {
