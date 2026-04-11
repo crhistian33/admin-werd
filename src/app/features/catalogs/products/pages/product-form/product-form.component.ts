@@ -31,7 +31,7 @@ export class ProductFormComponent implements OnInit {
 
   // ── Modo creación o edición ───────────────────────────────────────
   readonly id = input<string | null>(null);
-  readonly returnUrl = input<string | null>(null);
+  readonly from = input<string | null>(null);
   readonly isEditMode = computed(() => !!this.id());
 
   // ── Estado del formulario ─────────────────────────────────────────
@@ -237,11 +237,13 @@ export class ProductFormComponent implements OnInit {
   }
 
   private _goBack(): void {
-    const backUrl = this.returnUrl();
-    if (backUrl) {
-      void this.router.navigateByUrl(backUrl);
+    const currentId = this.id();
+    const from = this.from();
+
+    if (from === 'detail' && currentId) {
+      void this.router.navigate(['/catalogos/productos', currentId]);
     } else {
-      void this.router.navigate(['../'], { relativeTo: this.route });
+      void this.router.navigate(['/catalogos/productos']);
     }
   }
 }

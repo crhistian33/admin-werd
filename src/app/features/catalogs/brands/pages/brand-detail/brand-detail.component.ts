@@ -45,7 +45,9 @@ export class BrandDetailComponent {
   }
 
   goToEdit(): void {
-    void this.router.navigate(['/catalogos/marcas', this.id(), 'editar']);
+    void this.router.navigate(['/catalogos/marcas', this.id(), 'editar'], {
+      queryParams: { from: 'detail' },
+    });
   }
 
   onDelete(): void {

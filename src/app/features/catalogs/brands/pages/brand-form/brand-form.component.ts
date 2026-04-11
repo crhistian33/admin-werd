@@ -23,7 +23,8 @@ export class BrandFormComponent implements OnInit {
 
   steps: FormStepConfig[] = buildBrandFormConfig(this.imageUpload);
 
-  id = input.required<string>();
+  readonly id = input.required<string>();
+  readonly from = input<string | null>(null);
   readonly isEdit = computed(() => !!this.id());
 
   // initialData como computed — no se recrea en cada ciclo de detección de cambios
@@ -92,13 +93,20 @@ export class BrandFormComponent implements OnInit {
     }
 
     if (this.isEdit()) {
-      this.store.update(this.id()!, payload, () => this.goBack());
+      this.store.update(this.id()!, payload, () => this._goBack());
     } else {
-      this.store.create(payload, () => this.goBack());
+      this.store.create(payload, () => this._goBack());
     }
   }
 
-  goBack(): void {
-    this.router.navigate(['/catalogos/marcas']);
+  _goBack(): void {
+    const currentId = this.id();
+    const from = this.from();
+
+    if (from === 'detail' && currentId) {
+      void this.router.navigate(['/catalogos/marcas', currentId]);
+    } else {
+      void this.router.navigate(['/catalogos/marcas']);
+    }
   }
 }

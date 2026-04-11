@@ -160,7 +160,13 @@ export class DetailDynamicComponent {
 
   getSafeHtml(field: DetailFieldConfig): SafeHtml | null {
     const raw = this.getFieldValue(field);
-    return raw ? this.sanitizer.bypassSecurityTrustHtml(raw) : null;
+    if (!raw) return null;
+
+    // Reemplazamos los &nbsp; por espacios normales antes de sanitizar
+    // Esto permite que el navegador sepa dónde SI puede saltar de línea
+    const cleanHtml = raw.replace(/&nbsp;/g, ' ');
+
+    return this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
   }
 
   // ── Grid span ─────────────────────────────────────────────────────

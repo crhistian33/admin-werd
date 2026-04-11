@@ -1,1 +1,9 @@
-<p>staticpage-detail works!</p>
+<app-detail-dynamic
+  [config]="detailConfig"
+  [data]="detailData()"
+  [loading]="store.loadingState().initial"
+  [title]="store.selected()?.title ?? ''"
+  (onBack)="goBack()"
+  (onEdit)="goToEdit()"
+  (onDelete)="onDelete()"
+/>

@@ -7,5 +7,5 @@
   [submitLabel]="isEdit() ? 'Actualizar' : 'Crear'"
   size="compact"
   (submitted)="onSubmit($event)"
-  (cancelled)="goBack()"
+  (cancelled)="_goBack()"
 />

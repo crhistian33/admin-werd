@@ -45,7 +45,9 @@ export class CategoryDetailComponent {
   }
 
   goToEdit(): void {
-    void this.router.navigate(['/catalogos/categorias', this.id(), 'editar']);
+    void this.router.navigate(['/catalogos/categorias', this.id(), 'editar'], {
+      queryParams: { from: 'detail' },
+    });
   }
 
   onDelete(): void {

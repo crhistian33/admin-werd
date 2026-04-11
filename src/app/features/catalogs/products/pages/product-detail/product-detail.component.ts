@@ -42,7 +42,7 @@ export class ProductDetailComponent implements OnInit {
 
   goToEdit(): void {
     void this.router.navigate(['/catalogos/productos', this.id(), 'editar'], {
-      queryParams: { returnUrl: this.router.url },
+      queryParams: { from: 'detail' },
     });
   }
 

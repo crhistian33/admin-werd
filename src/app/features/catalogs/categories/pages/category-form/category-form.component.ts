@@ -24,7 +24,8 @@ export class CategoryFormComponent implements OnInit {
 
   steps: FormStepConfig[] = buildCategoryFormConfig(this.imageUpload);
 
-  id = input<string | null>(null);
+  readonly id = input<string | null>(null);
+  readonly from = input<string | null>(null);
   readonly isEdit = computed(() => !!this.id());
 
   // initialData como computed — no se recrea en cada ciclo de detección de cambios
@@ -94,13 +95,20 @@ export class CategoryFormComponent implements OnInit {
     }
 
     if (this.isEdit()) {
-      this.store.update(this.id()!, payload, () => this.goBack());
+      this.store.update(this.id()!, payload, () => this._goBack());
     } else {
-      this.store.create(payload, () => this.goBack());
+      this.store.create(payload, () => this._goBack());
     }
   }
 
-  goBack(): void {
-    void this.router.navigate(['/catalogos/categorias']);
+  _goBack(): void {
+    const currentId = this.id();
+    const from = this.from();
+
+    if (from === 'detail' && currentId) {
+      void this.router.navigate(['/catalogos/categorias', currentId]);
+    } else {
+      void this.router.navigate(['/catalogos/categorias']);
+    }
   }
 }

@@ -17,7 +17,8 @@ export class StaticpageFormComponent {
 
   steps: FormStepConfig[] = buildPageFormConfig();
 
-  id = input<string | null>(null);
+  readonly id = input<string | null>(null);
+  readonly from = input<string | null>(null);
   readonly isEdit = computed(() => !!this.id());
 
   // initialData como computed — no se recrea en cada ciclo de detección de cambios
@@ -51,13 +52,20 @@ export class StaticpageFormComponent {
   onSubmit(data: Record<string, any>): void {
     console.log('Data', data);
     if (this.isEdit()) {
-      this.store.update(this.id()!, data, () => this.goBack());
+      this.store.update(this.id()!, data, () => this._goBack());
     } else {
-      this.store.create(data, () => this.goBack());
+      this.store.create(data, () => this._goBack());
     }
   }
 
-  goBack(): void {
-    void this.router.navigate(['/contenidos/paginas-internas']);
+  _goBack(): void {
+    const currentId = this.id();
+    const from = this.from();
+
+    if (from === 'detail' && currentId) {
+      void this.router.navigate(['/contenidos/paginas-internas', currentId]);
+    } else {
+      void this.router.navigate(['/contenidos/paginas-internas']);
+    }
   }
 }
