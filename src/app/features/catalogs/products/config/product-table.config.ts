@@ -3,6 +3,7 @@ import { DataTableConfig } from '@shared/types/data-table.type';
 import { Product, ProductStatus } from '../models/product.model';
 import { Category } from '@features/catalogs/categories/models/category.model';
 import { Brand } from '@features/catalogs/brands/models/brand.model';
+import { environment } from '@env/environment';
 
 type ProductTableCallbacks = {
   onDelete: (product: Product) => void;
@@ -22,6 +23,19 @@ export const productTableConfig = (
   selectable: true,
   showFilter: true,
   columns: [
+    {
+      field: 'images',
+      header: 'Imagen',
+      type: 'image',
+      width: '100px',
+      format: (val, row: any) => {
+        const thumb = row.images?.[0]?.variants?.thumb;
+        if (!thumb) return null;
+        return thumb.startsWith('http')
+          ? thumb
+          : `${environment.apiImagesUrl}${thumb}`;
+      },
+    },
     {
       field: 'sku',
       header: 'SKU',

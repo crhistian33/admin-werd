@@ -1,6 +1,7 @@
 import { Router } from '@angular/router';
 import { DataTableConfig } from '@shared/types/data-table.type';
 import { Category } from '../models/category.model';
+import { environment } from '@env/environment';
 
 type CategoryTableCallbacks = {
   onDelete: (category: Category) => void;
@@ -15,6 +16,19 @@ export const categoryTableConfig = (
   selectable: true,
   showFilter: true,
   columns: [
+    {
+      field: 'images',
+      header: 'Imagen',
+      type: 'image',
+      width: '100px',
+      format: (val, row: any) => {
+        const thumb = row.images?.[0]?.variants?.thumb;
+        if (!thumb) return null;
+        return thumb.startsWith('http')
+          ? thumb
+          : `${environment.apiImagesUrl}${thumb}`;
+      },
+    },
     {
       field: 'name',
       header: 'Nombre',
@@ -78,7 +92,6 @@ export const categoryTableConfig = (
       tooltip: 'Eliminar',
       severity: 'danger',
       action: (row) => callback.onDelete(row),
-      isAsync: true,
     },
   ],
 });

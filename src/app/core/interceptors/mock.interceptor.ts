@@ -12,12 +12,9 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   if (!environment.useMocks) return next(req);
 
   const path = new URL(req.url).pathname; // → '/api/categories/2'
-  console.log('MockInterceptor - Interceptando:', req.method, path);
-
   const handler = MOCK_HANDLERS.find((h) => {
     const samePath = path === h.url || path.startsWith(h.url + '/');
     const sameMethod = req.method === h.method;
-    console.log(`Comparando con handler ${path} - ${h.url}`);
     return samePath && sameMethod;
   });
 

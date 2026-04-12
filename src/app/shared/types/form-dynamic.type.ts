@@ -14,7 +14,8 @@ export type FieldType =
   | 'checkbox'
   | 'switch'
   | 'features'
-  | 'specs';
+  | 'specs'
+  | 'date';
 
 export interface SelectOption {
   label: string;
@@ -31,7 +32,7 @@ export interface FormFieldConfig {
   options?: SelectOption[];
   accept?: string;
   maxFileSize?: number;
-  cols?: 1 | 2 | 3;
+  cols?: 1 | 2 | 3 | 4;
   /** Para inputs numéricos: valor mínimo permitido */
   min?: number;
   /** Para inputs numéricos: valor máximo permitido */
@@ -49,6 +50,11 @@ export interface FormFieldConfig {
    * Si es false, solo en edición. Si es undefined, siempre se muestra.
    */
   showOnCreate?: boolean;
+  /**
+   * Función que determina si el campo debe ser visible.
+   * Recibe el valor actual del formulario y retorna true si debe mostrarse, false en caso contrario.
+   */
+  visibleWhen?: (formValue: Record<string, any>) => boolean;
 }
 
 export interface FormStepConfig {

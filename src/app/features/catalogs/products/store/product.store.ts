@@ -1,12 +1,11 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { BaseStore } from '@core/store/base.store';
 import { ProductService } from '../services/product.service';
+import { Product } from '../models/product.model';
 import {
   productFilterDefaults,
   type ProductFilter,
 } from '../models/product-filter.model';
-import { Product } from '../models/product.model';
-import { DialogService } from '@shared/services/ui/dialog.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({ providedIn: 'root' })

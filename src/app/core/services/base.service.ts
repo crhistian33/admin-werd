@@ -71,7 +71,6 @@ export abstract class BaseService<T> {
   }
 
   restoreAll(ids: string[]): Observable<ApiResponse<void>> {
-    console.log('IDS', ids, `${this.url}/bulk/restore`);
     return this.http.patch<ApiResponse<void>>(
       `${this.url}/bulk/restore`,
       { ids },

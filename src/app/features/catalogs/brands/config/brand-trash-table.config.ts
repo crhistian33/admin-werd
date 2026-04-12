@@ -3,7 +3,7 @@ import { DataTableConfig } from '@shared/types/data-table.type';
 import { Brand } from '../models/brand.model';
 
 type TrashTableCallbacks = {
-  onRestore: (category: Brand) => void;
+  onRestore: (brand: Brand) => void;
   onDelete: (brand: Brand) => void;
 };
 

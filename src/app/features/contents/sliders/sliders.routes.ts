@@ -8,16 +8,16 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./pages/slider-list/slider-list.component').then(
-            (m) => m.SliderListComponent,
+          import('./pages/slide-list/slide-list.component').then(
+            (m) => m.SlideListComponent,
           ),
         title: 'Destacados',
       },
       {
         path: 'nuevo',
         loadComponent: () =>
-          import('./pages/slider-form/slider-form.component').then(
-            (m) => m.SliderFormComponent,
+          import('./pages/slide-form/slide-form.component').then(
+            (m) => m.SlideFormComponent,
           ),
         title: 'Nuevo destacado',
         data: { breadcrumb: 'Nuevo' },
@@ -25,8 +25,8 @@ export const routes: Routes = [
       {
         path: ':id/editar',
         loadComponent: () =>
-          import('./pages/slider-form/slider-form.component').then(
-            (m) => m.SliderFormComponent,
+          import('./pages/slide-form/slide-form.component').then(
+            (m) => m.SlideFormComponent,
           ),
         title: 'Editar destacado',
         data: { breadcrumb: 'Editar' },
@@ -34,8 +34,8 @@ export const routes: Routes = [
       {
         path: ':id',
         loadComponent: () =>
-          import('./pages/slider-detail/slider-detail.component').then(
-            (m) => m.SliderDetailComponent,
+          import('./pages/slide-detail/slide-detail.component').then(
+            (m) => m.SlideDetailComponent,
           ),
         title: 'Detalle del destacado',
         data: { breadcrumb: 'Detalle' },

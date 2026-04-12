@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { input } from '@angular/core';
 import { FormDynamicComponent } from '@shared/components/ui/form-dynamic/form-dynamic.component';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
@@ -22,7 +22,6 @@ import {
   styleUrl: './product-form.component.scss',
 })
 export class ProductFormComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly store = inject(ProductStore);
   private readonly imageUpload = inject(ImageUploadService);

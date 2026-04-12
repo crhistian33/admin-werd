@@ -39,7 +39,7 @@ export function buildProductFormConfig(
             Validators.minLength(3),
             Validators.maxLength(50),
           ],
-          cols: 1, // 1 de 3 en desktop
+          cols: 2, // 1 de 4 en desktop
         },
         {
           key: 'name',
@@ -59,7 +59,7 @@ export function buildProductFormConfig(
           type: 'textarea',
           placeholder: 'Breve resumen visible en listados y tarjetas',
           validators: [Validators.maxLength(300)],
-          cols: 3, // Ocupa toda la fila
+          cols: 4, // Ocupa toda la fila
         },
 
         // ── Sección 2: Precio e inventario ────────────────────────────────
@@ -106,6 +106,7 @@ export function buildProductFormConfig(
           min: 0,
           cols: 1,
         },
+        // ── Sección 3: Categorización ──────────────────────────────────────
         {
           key: 'weight',
           label: 'Peso (kg)',
@@ -117,14 +118,6 @@ export function buildProductFormConfig(
           minFractionDigits: 3,
           cols: 1,
         },
-        {
-          key: 'isFeatured',
-          label: 'Producto destacado',
-          type: 'switch',
-          placeholder: 'Marcar como destacado en la tienda',
-          cols: 1,
-        },
-        // ── Sección 3: Categorización ──────────────────────────────────────
         {
           key: 'categoryId',
           label: 'Categoría',
@@ -146,6 +139,13 @@ export function buildProductFormConfig(
           options: options.brands.map((b) => ({ label: b.name, value: b.id })),
           cols: 1,
         },
+        {
+          key: 'isFeatured',
+          label: 'Producto destacado',
+          type: 'switch',
+          placeholder: 'Marcar como destacado en la tienda',
+          cols: 1,
+        },
         // ── Sección 4: Descripción completa ───────────────────────────────
         {
           key: 'description',
@@ -153,7 +153,7 @@ export function buildProductFormConfig(
           type: 'editor',
           placeholder: 'Descripción detallada del producto (acepta HTML)',
           validators: [Validators.required],
-          cols: 3,
+          cols: 4,
         },
         // ── Sección 5: SEO ────────────────────────────────────────────────
         {
@@ -163,16 +163,16 @@ export function buildProductFormConfig(
           placeholder: 'Ej: Notebook Gamer X - Las mejores especificaciones',
           hint: 'Recomendado: 50–60 caracteres',
           validators: [Validators.maxLength(70)],
-          cols: 3,
+          cols: 2,
         },
         {
           key: 'metaDescription',
           label: 'Meta descripción (SEO)',
-          type: 'textarea',
+          type: 'text',
           placeholder: 'Breve descripción para buscadores',
           hint: 'Recomendado: 150–160 caracteres',
           validators: [Validators.maxLength(170)],
-          cols: 3,
+          cols: 2,
         },
       ],
     },
@@ -190,7 +190,7 @@ export function buildProductFormConfig(
             firstValueFrom(
               imageUpload.uploadTemp(file, 'product', 'main'),
             ).then((res) => res.data.imageId),
-          cols: 1,
+          cols: 2,
         },
         {
           key: 'tempGalleryImageIds',
@@ -216,14 +216,14 @@ export function buildProductFormConfig(
           label: 'Especificaciones técnicas',
           type: 'specs',
           hint: 'Arrastra para reordenar. Ej: Procesador → Intel Core i7',
-          cols: 3,
+          cols: 4,
         },
         {
           key: 'features',
           label: 'Características destacadas',
           type: 'features',
           hint: 'Arrastra para reordenar. Ej: Pantalla Full HD antirreflejo',
-          cols: 3,
+          cols: 4,
         },
       ],
     },

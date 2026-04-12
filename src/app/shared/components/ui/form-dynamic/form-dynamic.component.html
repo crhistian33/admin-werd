@@ -62,228 +62,338 @@
                 <ng-template #content let-activateCallback="activateCallback">
                   <div [class]="layoutClass().grid">
                     @for (field of step.fields; track field.key) {
-                      <div [class]="getFieldColClass(field.cols)">
-                        <label
-                          [for]="field.key"
-                          class="block text-sm font-medium text-slate-600 mb-1.5"
-                        >
-                          {{ field.label }}
-                          @if (isRequired(field)) {
-                            <span class="text-red-400 ml-0.5">*</span>
-                          }
-                        </label>
+                      @if (
+                        !field.visibleWhen ||
+                        field.visibleWhen(form().getRawValue())
+                      ) {
+                        <div [class]="getFieldColClass(field.cols)">
+                          <label
+                            [for]="field.key"
+                            class="block text-sm font-medium text-slate-600 mb-1.5"
+                          >
+                            {{ field.label }}
+                            @if (isRequired(field)) {
+                              <span class="text-red-400 ml-0.5">*</span>
+                            }
+                          </label>
 
-                        @switch (field.type) {
-                          @case ("text") {
-                            <input
-                              pInputText
-                              [id]="field.key"
-                              [formControlName]="field.key"
-                              [placeholder]="field.placeholder ?? ''"
-                              class="w-full"
-                            />
-                          }
+                          @switch (field.type) {
+                            @case ("text") {
+                              <input
+                                pInputText
+                                [id]="field.key"
+                                [formControlName]="field.key"
+                                [placeholder]="field.placeholder ?? ''"
+                                class="w-full"
+                              />
+                            }
 
-                          @case ("email") {
-                            <input
-                              pInputText
-                              type="email"
-                              [id]="field.key"
-                              [formControlName]="field.key"
-                              [placeholder]="field.placeholder ?? ''"
-                              class="w-full"
-                            />
-                          }
+                            @case ("email") {
+                              <input
+                                pInputText
+                                type="email"
+                                [id]="field.key"
+                                [formControlName]="field.key"
+                                [placeholder]="field.placeholder ?? ''"
+                                class="w-full"
+                              />
+                            }
 
-                          @case ("url") {
-                            <input
-                              pInputText
-                              type="url"
-                              [id]="field.key"
-                              [formControlName]="field.key"
-                              [placeholder]="field.placeholder ?? ''"
-                              class="w-full"
-                            />
-                          }
+                            @case ("url") {
+                              <input
+                                pInputText
+                                type="url"
+                                [id]="field.key"
+                                [formControlName]="field.key"
+                                [placeholder]="field.placeholder ?? ''"
+                                class="w-full"
+                              />
+                            }
 
-                          @case ("textarea") {
-                            <textarea
-                              pTextarea
-                              [id]="field.key"
-                              [formControlName]="field.key"
-                              [placeholder]="field.placeholder ?? ''"
-                              rows="3"
-                              class="w-full resize-none"
-                            ></textarea>
-                          }
+                            @case ("textarea") {
+                              <textarea
+                                pTextarea
+                                [id]="field.key"
+                                [formControlName]="field.key"
+                                [placeholder]="field.placeholder ?? ''"
+                                rows="3"
+                                class="w-full resize-none"
+                              ></textarea>
+                            }
 
-                          @case ("editor") {
-                            <p-editor
-                              [formControlName]="field.key"
-                              [style]="{ height: '200px' }"
-                              styleClass="w-full"
-                            />
-                          }
+                            @case ("editor") {
+                              <p-editor
+                                [formControlName]="field.key"
+                                [style]="{ height: '200px' }"
+                                styleClass="w-full"
+                              />
+                            }
 
-                          @case ("number") {
-                            <p-inputnumber
-                              [inputId]="field.key"
-                              [formControlName]="field.key"
-                              [placeholder]="field.placeholder ?? ''"
-                              [min]="field.min ?? 0"
-                              [showButtons]="false"
-                              class="w-full"
-                            />
-                          }
-
-                          @case ("number-decimal") {
-                            <p-inputnumber
-                              [inputId]="field.key"
-                              [formControlName]="field.key"
-                              [placeholder]="field.placeholder ?? '0.00'"
-                              [minFractionDigits]="field.minFractionDigits ?? 2"
-                              [maxFractionDigits]="field.minFractionDigits ?? 2"
-                              [min]="field.min ?? 0"
-                              mode="decimal"
-                              locale="es-PE"
-                              class="w-full"
-                            />
-                          }
-
-                          @case ("select") {
-                            <p-select
-                              [inputId]="field.key"
-                              [formControlName]="field.key"
-                              [options]="field.options ?? []"
-                              optionLabel="label"
-                              optionValue="value"
-                              [placeholder]="
-                                field.placeholder ?? 'Selecciona...'
-                              "
-                              class="w-full"
-                            />
-                          }
-
-                          @case ("checkbox") {
-                            <p-checkbox
-                              [binary]="true"
-                              [inputId]="field.key"
-                              [formControlName]="field.key"
-                              class="flex items-center gap-2"
-                            >
-                              <span>{{ field.placeholder }}</span>
-                            </p-checkbox>
-                          }
-
-                          @case ("switch") {
-                            <div class="flex items-center gap-3 pt-1">
-                              <p-toggleswitch
+                            @case ("number") {
+                              <p-inputnumber
                                 [inputId]="field.key"
                                 [formControlName]="field.key"
+                                [placeholder]="field.placeholder ?? ''"
+                                [min]="field.min ?? 0"
+                                [showButtons]="false"
+                                class="w-full"
                               />
-                              @if (field.placeholder) {
-                                <span class="text-sm text-slate-500">{{
-                                  field.placeholder
-                                }}</span>
-                              }
-                            </div>
-                          }
+                            }
 
-                          @case ("file-image") {
-                            <div class="flex flex-col gap-2">
-                              @if (isUploadingField(field.key)) {
-                                <div
-                                  class="flex items-center justify-center gap-3 py-8 px-4 border-2 border-dashed border-primary-200 rounded-xl bg-primary-50"
-                                >
-                                  <i
-                                    class="pi pi-spin pi-spinner text-primary-500 text-xl"
-                                  ></i>
-                                  <span
-                                    class="text-sm text-primary-600 font-medium"
-                                    >Subiendo imagen...</span
-                                  >
-                                </div>
-                              }
+                            @case ("number-decimal") {
+                              <p-inputnumber
+                                [inputId]="field.key"
+                                [formControlName]="field.key"
+                                [placeholder]="field.placeholder ?? '0.00'"
+                                [minFractionDigits]="
+                                  field.minFractionDigits ?? 2
+                                "
+                                [maxFractionDigits]="
+                                  field.minFractionDigits ?? 2
+                                "
+                                [min]="field.min ?? 0"
+                                mode="decimal"
+                                locale="es-PE"
+                                class="w-full"
+                              />
+                            }
 
-                              @if (!isUploadingField(field.key)) {
-                                @if (previews()[field.key]) {
+                            @case ("select") {
+                              <p-select
+                                [inputId]="field.key"
+                                [formControlName]="field.key"
+                                [options]="field.options ?? []"
+                                optionLabel="label"
+                                optionValue="value"
+                                [placeholder]="
+                                  field.placeholder ?? 'Selecciona...'
+                                "
+                                class="w-full"
+                              />
+                            }
+
+                            @case ("checkbox") {
+                              <p-checkbox
+                                [binary]="true"
+                                [inputId]="field.key"
+                                [formControlName]="field.key"
+                                class="flex items-center gap-2"
+                              >
+                                <span>{{ field.placeholder }}</span>
+                              </p-checkbox>
+                            }
+
+                            @case ("date") {
+                              <p-datepicker
+                                [inputId]="field.key"
+                                [formControlName]="field.key"
+                                [showTime]="false"
+                                [hourFormat]="'24'"
+                                [showIcon]="true"
+                                [dateFormat]="'dd/mm/yy'"
+                                [placeholder]="
+                                  field.placeholder ?? 'Seleccionar fecha'
+                                "
+                                [showClear]="true"
+                                appendTo="body"
+                                fluid
+                              />
+                            }
+
+                            @case ("switch") {
+                              <div class="flex items-center gap-3 pt-1">
+                                <p-toggleswitch
+                                  [inputId]="field.key"
+                                  [formControlName]="field.key"
+                                />
+                                @if (field.placeholder) {
+                                  <span class="text-sm text-slate-500">{{
+                                    field.placeholder
+                                  }}</span>
+                                }
+                              </div>
+                            }
+
+                            @case ("file-image") {
+                              <div class="flex flex-col gap-2">
+                                @if (isUploadingField(field.key)) {
                                   <div
-                                    class="relative group overflow-hidden rounded-xl flex items-center justify-center border border-slate-200 bg-slate-50 cursor-pointer h-64"
-                                    (click)="fileupload.choose()"
-                                    (dragover)="onDragOver($event)"
-                                    (dragleave)="onDragLeave($event)"
-                                    (drop)="
-                                      onDrop($event, field.key, fileupload)
-                                    "
+                                    class="flex items-center justify-center gap-3 py-8 px-4 border-2 border-dashed border-primary-200 rounded-xl bg-primary-50"
                                   >
-                                    <img
-                                      [src]="previews()[field.key]"
-                                      alt="preview"
-                                      class="w-full h-full object-cover transition-all duration-300 group-hover:opacity-75"
-                                    />
-
-                                    <div
-                                      class="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/40"
-                                    ></div>
-
-                                    <div
-                                      class="absolute inset-0 z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                                    <i
+                                      class="pi pi-spin pi-spinner text-primary-500 text-xl"
+                                    ></i>
+                                    <span
+                                      class="text-sm text-primary-600 font-medium"
+                                      >Subiendo imagen...</span
                                     >
-                                      <div
-                                        class="flex flex-col items-center gap-2"
-                                      >
-                                        <i
-                                          class="pi pi-pencil text-white text-3xl font-bold"
-                                        ></i>
-                                        <span
-                                          class="text-white font-medium text-base tracking-wide uppercase px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm"
-                                        >
-                                          Cambiar imagen
-                                        </span>
-                                      </div>
-                                    </div>
-
-                                    @if (isDragging) {
-                                      <div
-                                        class="absolute inset-0 z-20 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center pointer-events-none"
-                                      >
-                                        <div
-                                          class="border-2 border-dashed border-white/60 p-6 rounded-lg flex flex-col items-center"
-                                        >
-                                          <i
-                                            class="pi pi-refresh text-white text-3xl animate-spin-slow"
-                                          ></i>
-                                          <p
-                                            class="text-white font-medium mt-2"
-                                          >
-                                            Suelta para reemplazar
-                                          </p>
-                                        </div>
-                                      </div>
-                                    }
-
-                                    <button
-                                      type="button"
-                                      (click)="
-                                        $event.stopPropagation();
-                                        clearFile(field.key)
-                                      "
-                                      class="z-30 w-8 h-8 absolute top-3 right-3 bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all"
-                                    >
-                                      <lucide-icon name="X" class="size-4" />
-                                    </button>
                                   </div>
                                 }
 
-                                <div [class.hidden]="previews()[field.key]">
+                                @if (!isUploadingField(field.key)) {
+                                  @if (previews()[field.key]) {
+                                    <div
+                                      class="relative group overflow-hidden rounded-xl flex items-center justify-center border border-slate-200 bg-slate-50 cursor-pointer h-64"
+                                      (click)="fileupload.choose()"
+                                      (dragover)="onDragOver($event)"
+                                      (dragleave)="onDragLeave($event)"
+                                      (drop)="
+                                        onDrop($event, field.key, fileupload)
+                                      "
+                                    >
+                                      <img
+                                        [src]="previews()[field.key]"
+                                        alt="preview"
+                                        class="w-full h-full object-cover transition-all duration-300 group-hover:opacity-75"
+                                      />
+
+                                      <div
+                                        class="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/40"
+                                      ></div>
+
+                                      <div
+                                        class="absolute inset-0 z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                                      >
+                                        <div
+                                          class="flex flex-col items-center gap-2"
+                                        >
+                                          <i
+                                            class="pi pi-pencil text-white text-3xl font-bold"
+                                          ></i>
+                                          <span
+                                            class="text-white font-medium text-base tracking-wide uppercase px-3 py-1 bg-white/10 rounded-full backdrop-blur-sm"
+                                          >
+                                            Cambiar imagen
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      @if (isDragging) {
+                                        <div
+                                          class="absolute inset-0 z-20 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+                                        >
+                                          <div
+                                            class="border-2 border-dashed border-white/60 p-6 rounded-lg flex flex-col items-center"
+                                          >
+                                            <i
+                                              class="pi pi-refresh text-white text-3xl animate-spin-slow"
+                                            ></i>
+                                            <p
+                                              class="text-white font-medium mt-2"
+                                            >
+                                              Suelta para reemplazar
+                                            </p>
+                                          </div>
+                                        </div>
+                                      }
+
+                                      <button
+                                        type="button"
+                                        (click)="
+                                          $event.stopPropagation();
+                                          clearFile(field.key)
+                                        "
+                                        class="z-30 w-8 h-8 absolute top-3 right-3 bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all"
+                                      >
+                                        <lucide-icon name="X" class="size-4" />
+                                      </button>
+                                    </div>
+                                  }
+
+                                  <div [class.hidden]="previews()[field.key]">
+                                    <p-fileupload
+                                      #fileupload
+                                      mode="advanced"
+                                      chooseLabel="Seleccionar imagen"
+                                      [accept]="field.accept ?? 'image/*'"
+                                      [maxFileSize]="
+                                        field.maxFileSize ?? 5000000
+                                      "
+                                      [customUpload]="true"
+                                      (onSelect)="
+                                        onFileSelect($event, field.key)
+                                      "
+                                      [showUploadButton]="false"
+                                      [showCancelButton]="false"
+                                      styleClass="w-full"
+                                    >
+                                      <ng-template #content>
+                                        <div
+                                          (click)="fileupload.choose()"
+                                          (dragover)="onDragOver($event)"
+                                          (dragleave)="onDragLeave($event)"
+                                          (drop)="
+                                            onDrop(
+                                              $event,
+                                              field.key,
+                                              fileupload
+                                            )
+                                          "
+                                          class="flex flex-col items-center justify-center gap-3 min-h-64 px-4 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
+                                        >
+                                          <div
+                                            class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center"
+                                          >
+                                            <i
+                                              class="pi pi-image text-xl text-slate-400"
+                                            ></i>
+                                          </div>
+                                          <div class="text-center">
+                                            <p
+                                              class="text-sm font-medium text-slate-600"
+                                            >
+                                              Arrastra tu imagen aquí
+                                            </p>
+                                            <p
+                                              class="text-xs text-slate-400 mt-0.5"
+                                            >
+                                              o haz clic para seleccionar
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </ng-template>
+                                    </p-fileupload>
+                                  </div>
+                                }
+                              </div>
+                            }
+
+                            @case ("file-gallery") {
+                              <div class="flex flex-col gap-3">
+                                <!-- Control de subida compacto arriba -->
+                                @if (isUploadingField(field.key)) {
+                                  <div
+                                    class="flex items-center gap-2 px-3 py-2 border border-dashed border-primary-300 rounded-lg bg-primary-50"
+                                  >
+                                    <i
+                                      class="pi pi-spin pi-spinner text-primary-500 text-sm"
+                                    ></i>
+                                    <span class="text-sm text-primary-600"
+                                      >Subiendo imagen...</span
+                                    >
+                                  </div>
+                                } @else if (
+                                  (galleryItems()[field.key]?.length ?? 0) < 3
+                                ) {
                                   <p-fileupload
                                     #fileupload
                                     mode="advanced"
-                                    chooseLabel="Seleccionar imagen"
+                                    chooseLabel="Agregar imágenes"
                                     [accept]="field.accept ?? 'image/*'"
                                     [maxFileSize]="field.maxFileSize ?? 5000000"
+                                    [fileLimit]="
+                                      3 -
+                                      (galleryItems()[field.key]?.length ?? 0)
+                                    "
+                                    [multiple]="true"
                                     [customUpload]="true"
-                                    (onSelect)="onFileSelect($event, field.key)"
+                                    (onSelect)="
+                                      onGalleryFileSelect(
+                                        $event,
+                                        field.key,
+                                        fileupload
+                                      )
+                                    "
                                     [showUploadButton]="false"
                                     [showCancelButton]="false"
                                     styleClass="w-full"
@@ -296,322 +406,247 @@
                                         (drop)="
                                           onDrop($event, field.key, fileupload)
                                         "
-                                        class="flex flex-col items-center justify-center gap-3 min-h-64 px-4 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
+                                        class="flex items-center gap-3 px-4 py-3 border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
                                       >
                                         <div
-                                          class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center"
+                                          class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0"
                                         >
                                           <i
-                                            class="pi pi-image text-xl text-slate-400"
+                                            class="pi pi-images text-slate-400 text-sm"
                                           ></i>
                                         </div>
-                                        <div class="text-center">
+                                        <div>
                                           <p
-                                            class="text-sm font-medium text-slate-600"
+                                            class="text-sm font-medium text-slate-600 leading-tight"
                                           >
-                                            Arrastra tu imagen aquí
+                                            Arrastra imágenes aquí
                                           </p>
-                                          <p
-                                            class="text-xs text-slate-400 mt-0.5"
-                                          >
-                                            o haz clic para seleccionar
+                                          <p class="text-xs text-slate-400">
+                                            o haz clic para seleccionar ({{
+                                              galleryItems()[field.key]
+                                                ?.length ?? 0
+                                            }}/3)
                                           </p>
                                         </div>
                                       </div>
                                     </ng-template>
                                   </p-fileupload>
-                                </div>
-                              }
-                            </div>
-                          }
-
-                          @case ("file-gallery") {
-                            <div class="flex flex-col gap-3">
-                              <!-- Control de subida compacto arriba -->
-                              @if (isUploadingField(field.key)) {
-                                <div
-                                  class="flex items-center gap-2 px-3 py-2 border border-dashed border-primary-300 rounded-lg bg-primary-50"
-                                >
-                                  <i
-                                    class="pi pi-spin pi-spinner text-primary-500 text-sm"
-                                  ></i>
-                                  <span class="text-sm text-primary-600"
-                                    >Subiendo imagen...</span
+                                } @else {
+                                  <div
+                                    class="flex items-center gap-2 px-4 py-3 border border-slate-200 rounded-lg bg-slate-50"
                                   >
-                                </div>
-                              } @else if (
-                                (galleryItems()[field.key]?.length ?? 0) < 3
-                              ) {
-                                <p-fileupload
-                                  #fileupload
-                                  mode="advanced"
-                                  chooseLabel="Agregar imágenes"
-                                  [accept]="field.accept ?? 'image/*'"
-                                  [maxFileSize]="field.maxFileSize ?? 5000000"
-                                  [fileLimit]="
-                                    3 - (galleryItems()[field.key]?.length ?? 0)
-                                  "
-                                  [multiple]="true"
-                                  [customUpload]="true"
-                                  (onSelect)="
-                                    onGalleryFileSelect(
-                                      $event,
-                                      field.key,
-                                      fileupload
-                                    )
-                                  "
-                                  [showUploadButton]="false"
-                                  [showCancelButton]="false"
-                                  styleClass="w-full"
-                                >
-                                  <ng-template #content>
-                                    <div
-                                      (click)="fileupload.choose()"
-                                      (dragover)="onDragOver($event)"
-                                      (dragleave)="onDragLeave($event)"
-                                      (drop)="
-                                        onDrop($event, field.key, fileupload)
-                                      "
-                                      class="flex items-center gap-3 px-4 py-3 border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
+                                    <i
+                                      class="pi pi-check-circle text-emerald-500 text-sm"
+                                    ></i>
+                                    <span class="text-sm text-slate-500"
+                                      >Máximo de imágenes alcanzado (3/3)</span
                                     >
+                                  </div>
+                                }
+
+                                <!-- Previews debajo, más pequeños en grid -->
+                                @if (
+                                  (galleryItems()[field.key]?.length ?? 0) > 0
+                                ) {
+                                  <div class="grid grid-cols-4 gap-2">
+                                    @for (
+                                      item of galleryItems()[field.key];
+                                      track item.tempId;
+                                      let i = $index
+                                    ) {
                                       <div
-                                        class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0"
+                                        class="relative group rounded-lg overflow-hidden border border-slate-200 aspect-square bg-slate-50"
                                       >
-                                        <i
-                                          class="pi pi-images text-slate-400 text-sm"
-                                        ></i>
-                                      </div>
-                                      <div>
-                                        <p
-                                          class="text-sm font-medium text-slate-600 leading-tight"
-                                        >
-                                          Arrastra imágenes aquí
-                                        </p>
-                                        <p class="text-xs text-slate-400">
-                                          o haz clic para seleccionar ({{
-                                            galleryItems()[field.key]?.length ??
-                                              0
-                                          }}/3)
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </ng-template>
-                                </p-fileupload>
-                              } @else {
-                                <div
-                                  class="flex items-center gap-2 px-4 py-3 border border-slate-200 rounded-lg bg-slate-50"
-                                >
-                                  <i
-                                    class="pi pi-check-circle text-emerald-500 text-sm"
-                                  ></i>
-                                  <span class="text-sm text-slate-500"
-                                    >Máximo de imágenes alcanzado (3/3)</span
-                                  >
-                                </div>
-                              }
-
-                              <!-- Previews debajo, más pequeños en grid -->
-                              @if (
-                                (galleryItems()[field.key]?.length ?? 0) > 0
-                              ) {
-                                <div class="grid grid-cols-4 gap-2">
-                                  @for (
-                                    item of galleryItems()[field.key];
-                                    track item.tempId;
-                                    let i = $index
-                                  ) {
-                                    <div
-                                      class="relative group rounded-lg overflow-hidden border border-slate-200 aspect-square bg-slate-50"
-                                    >
-                                      <img
-                                        [src]="item.previewUrl"
-                                        alt="gallery preview"
-                                        class="w-full h-full object-cover"
-                                      />
-                                      <!-- Badge existente -->
-                                      @if (item.isExisting) {
-                                        <div class="absolute bottom-1 left-1">
-                                          <span
-                                            class="text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded-full leading-none"
-                                          >
-                                            guardada
-                                          </span>
-                                        </div>
-                                      }
-                                      <!-- Botón eliminar -->
-                                      <button
-                                        type="button"
-                                        (click)="
-                                          removeGalleryItem(field.key, i)
-                                        "
-                                        class="absolute top-1 right-1 w-5 h-5 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-                                      >
-                                        <lucide-icon
-                                          name="X"
-                                          class="size-2.5"
+                                        <img
+                                          [src]="item.previewUrl"
+                                          alt="gallery preview"
+                                          class="w-full h-full object-cover"
                                         />
-                                      </button>
-                                    </div>
-                                  }
-                                </div>
-                              }
+                                        <!-- Badge existente -->
+                                        @if (item.isExisting) {
+                                          <div class="absolute bottom-1 left-1">
+                                            <span
+                                              class="text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded-full leading-none"
+                                            >
+                                              guardada
+                                            </span>
+                                          </div>
+                                        }
+                                        <!-- Botón eliminar -->
+                                        <button
+                                          type="button"
+                                          (click)="
+                                            removeGalleryItem(field.key, i)
+                                          "
+                                          class="absolute top-1 right-1 w-5 h-5 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                                        >
+                                          <lucide-icon
+                                            name="X"
+                                            class="size-2.5"
+                                          />
+                                        </button>
+                                      </div>
+                                    }
+                                  </div>
+                                }
 
-                              @if (field.hint) {
-                                <p class="text-xs text-slate-400">
-                                  {{ field.hint }}
-                                </p>
-                              }
-                            </div>
-                          }
+                                @if (field.hint) {
+                                  <p class="text-xs text-slate-400">
+                                    {{ field.hint }}
+                                  </p>
+                                }
+                              </div>
+                            }
 
-                          @case ("specs") {
-                            <div class="flex flex-col gap-2">
-                              @for (
-                                spec of getSpecsValue(field.key);
-                                track spec.sortOrder;
-                                let i = $index
-                              ) {
-                                <div
-                                  class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100"
-                                >
-                                  <span
-                                    class="text-slate-300 cursor-grab select-none px-1"
+                            @case ("specs") {
+                              <div class="flex flex-col gap-2">
+                                @for (
+                                  spec of getSpecsValue(field.key);
+                                  track spec.sortOrder;
+                                  let i = $index
+                                ) {
+                                  <div
+                                    class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100"
                                   >
-                                    <i class="pi pi-bars text-xs"></i>
-                                  </span>
-                                  <input
-                                    pInputText
-                                    type="text"
-                                    [value]="spec.specKey"
-                                    (input)="
-                                      updateSpec(
-                                        field.key,
-                                        i,
-                                        'specKey',
-                                        $any($event.target).value
-                                      )
-                                    "
-                                    placeholder="Propiedad (ej: Procesador)"
-                                    class="flex-1 text-sm"
-                                  />
-                                  <input
-                                    pInputText
-                                    type="text"
-                                    [value]="spec.specValue"
-                                    (input)="
-                                      updateSpec(
-                                        field.key,
-                                        i,
-                                        'specValue',
-                                        $any($event.target).value
-                                      )
-                                    "
-                                    placeholder="Valor (ej: Intel Core i7)"
-                                    class="flex-1 text-sm"
-                                  />
-                                  <button
-                                    type="button"
-                                    (click)="removeSpec(field.key, i)"
-                                    class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                  >
-                                    <lucide-icon
-                                      name="Trash"
-                                      class="size-3.5"
+                                    <span
+                                      class="text-slate-300 cursor-grab select-none px-1"
+                                    >
+                                      <i class="pi pi-bars text-xs"></i>
+                                    </span>
+                                    <input
+                                      pInputText
+                                      type="text"
+                                      [value]="spec.specKey"
+                                      (input)="
+                                        updateSpec(
+                                          field.key,
+                                          i,
+                                          'specKey',
+                                          $any($event.target).value
+                                        )
+                                      "
+                                      placeholder="Propiedad (ej: Procesador)"
+                                      class="flex-1 text-sm"
                                     />
-                                  </button>
-                                </div>
-                              }
-                              <button
-                                type="button"
-                                (click)="addSpec(field.key)"
-                                class="flex items-center gap-2 text-sm text-green-800 hover:text-green-900 font-medium mt-1 w-fit"
-                              >
-                                <i class="pi pi-plus-circle text-sm"></i>
-                                Agregar especificación
-                              </button>
-                              @if (field.hint) {
-                                <p class="text-xs text-slate-400 mt-0.5">
-                                  {{ field.hint }}
-                                </p>
-                              }
-                            </div>
-                          }
-
-                          @case ("features") {
-                            <div class="flex flex-col gap-2">
-                              @for (
-                                feat of getFeaturesValue(field.key);
-                                track feat.sortOrder;
-                                let i = $index
-                              ) {
-                                <div
-                                  class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100"
-                                >
-                                  <span
-                                    class="text-slate-300 cursor-grab select-none px-1"
-                                  >
-                                    <i class="pi pi-bars text-xs"></i>
-                                  </span>
-                                  <input
-                                    pInputText
-                                    type="text"
-                                    [value]="feat.feature"
-                                    (input)="
-                                      updateFeature(
-                                        field.key,
-                                        i,
-                                        $any($event.target).value
-                                      )
-                                    "
-                                    placeholder="Ej: Pantalla Full HD antirreflejo"
-                                    class="flex-1 text-sm"
-                                  />
-                                  <button
-                                    type="button"
-                                    (click)="removeFeature(field.key, i)"
-                                    class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                  >
-                                    <lucide-icon
-                                      name="Trash"
-                                      class="size-3.5"
+                                    <input
+                                      pInputText
+                                      type="text"
+                                      [value]="spec.specValue"
+                                      (input)="
+                                        updateSpec(
+                                          field.key,
+                                          i,
+                                          'specValue',
+                                          $any($event.target).value
+                                        )
+                                      "
+                                      placeholder="Valor (ej: Intel Core i7)"
+                                      class="flex-1 text-sm"
                                     />
-                                  </button>
-                                </div>
-                              }
-                              <button
-                                type="button"
-                                (click)="addFeature(field.key)"
-                                class="flex items-center gap-2 text-sm text-green-800 hover:text-green-900 font-medium mt-1 w-fit"
-                              >
-                                <i class="pi pi-plus-circle text-sm"></i>
-                                Agregar característica
-                              </button>
-                              @if (field.hint) {
-                                <p class="text-xs text-slate-400 mt-0.5">
-                                  {{ field.hint }}
-                                </p>
-                              }
-                            </div>
+                                    <button
+                                      type="button"
+                                      (click)="removeSpec(field.key, i)"
+                                      class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                    >
+                                      <lucide-icon
+                                        name="Trash"
+                                        class="size-3.5"
+                                      />
+                                    </button>
+                                  </div>
+                                }
+                                <button
+                                  type="button"
+                                  (click)="addSpec(field.key)"
+                                  class="flex items-center gap-2 text-sm text-green-600 hover:text-green-700 font-medium mt-1 w-fit"
+                                >
+                                  <i class="pi pi-plus-circle text-sm"></i>
+                                  Agregar especificación
+                                </button>
+                                @if (field.hint) {
+                                  <p class="text-xs text-slate-400 mt-0.5">
+                                    {{ field.hint }}
+                                  </p>
+                                }
+                              </div>
+                            }
+
+                            @case ("features") {
+                              <div class="flex flex-col gap-2">
+                                @for (
+                                  feat of getFeaturesValue(field.key);
+                                  track feat.sortOrder;
+                                  let i = $index
+                                ) {
+                                  <div
+                                    class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100"
+                                  >
+                                    <span
+                                      class="text-slate-300 cursor-grab select-none px-1"
+                                    >
+                                      <i class="pi pi-bars text-xs"></i>
+                                    </span>
+                                    <input
+                                      pInputText
+                                      type="text"
+                                      [value]="feat.feature"
+                                      (input)="
+                                        updateFeature(
+                                          field.key,
+                                          i,
+                                          $any($event.target).value
+                                        )
+                                      "
+                                      placeholder="Ej: Pantalla Full HD antirreflejo"
+                                      class="flex-1 text-sm"
+                                    />
+                                    <button
+                                      type="button"
+                                      (click)="removeFeature(field.key, i)"
+                                      class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                    >
+                                      <lucide-icon
+                                        name="Trash"
+                                        class="size-3.5"
+                                      />
+                                    </button>
+                                  </div>
+                                }
+                                <button
+                                  type="button"
+                                  (click)="addFeature(field.key)"
+                                  class="flex items-center gap-2 text-sm text-green-600 hover:text-green-700 font-medium mt-1 w-fit"
+                                >
+                                  <i class="pi pi-plus-circle text-sm"></i>
+                                  Agregar característica
+                                </button>
+                                @if (field.hint) {
+                                  <p class="text-xs text-slate-400 mt-0.5">
+                                    {{ field.hint }}
+                                  </p>
+                                }
+                              </div>
+                            }
                           }
-                        }
 
-                        @if (
-                          field.hint &&
-                          field.type !== "file-gallery" &&
-                          field.type !== "specs" &&
-                          field.type !== "features"
-                        ) {
-                          <p class="text-xs text-slate-400 mt-1">
-                            {{ field.hint }}
-                          </p>
-                        }
+                          @if (
+                            field.hint &&
+                            field.type !== "file-gallery" &&
+                            field.type !== "specs" &&
+                            field.type !== "features"
+                          ) {
+                            <p class="text-xs text-slate-400 mt-1">
+                              {{ field.hint }}
+                            </p>
+                          }
 
-                        @if (showError(field.key)) {
-                          <p class="text-xs text-red-500 mt-1">
-                            {{ getError(field.key) }}
-                          </p>
-                        }
-                      </div>
+                          @if (showError(field.key)) {
+                            <p class="text-xs text-red-500 mt-1">
+                              {{ getError(field.key) }}
+                            </p>
+                          }
+                        </div>
+                      }
                     }
                   </div>
 

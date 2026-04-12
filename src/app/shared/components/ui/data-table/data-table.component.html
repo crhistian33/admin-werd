@@ -45,6 +45,7 @@
 
     <!-- Acciones de la tabla -->
     <div class="flex items-center ml-auto gap-2">
+      <ng-content select="[tableActions]" />
       @if (config().bulkActions?.length && selectedRows().length) {
         <p-splitbutton
           [label]="config().bulkActions![0].label"
@@ -211,9 +212,7 @@
                           [severity]="action.severity ?? 'secondary'"
                           [text]="true"
                           [rounded]="true"
-                          [loading]="
-                            store.loadingId() === row.id && action.isAsync
-                          "
+                          [loading]="action.isAsync"
                           size="small"
                           [pTooltip]="action.tooltip"
                           tooltipPosition="top"

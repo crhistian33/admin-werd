@@ -3,5 +3,4 @@ export interface BaseFilter {
   limit?: number;
   search: string;
   onlyTrash?: boolean;
-  //isActive?: boolean;
 }

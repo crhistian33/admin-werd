@@ -62,7 +62,7 @@ import { MenuItem } from 'primeng/api';
 })
 export class DataTableComponent<T extends Record<string, any>> {
   readonly router = inject(Router);
-  readonly store = inject(CategoryStore);
+  //readonly store = inject(CategoryStore);
 
   private readonly el = inject(ElementRef);
 

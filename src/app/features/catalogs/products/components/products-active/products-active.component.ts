@@ -1,30 +1,19 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { DataTableComponent } from '@shared/components/ui/data-table/data-table.component';
+import { FilterDynamicComponent } from '@shared/components/ui/filter-dynamic/filter-dynamic.component';
 import { ProductStore } from '../../store/product.store';
 import { DialogService } from '@shared/services/ui/dialog.service';
 import { productTableConfig } from '../../config/product-table.config';
 import { Product, ProductStatus } from '../../models/product.model';
-import { DataTableComponent } from '@shared/components/ui/data-table/data-table.component';
-import { ButtonModule } from 'primeng/button';
-import { ProductFilterComponent } from '../../components/product-filter/product-filter.component';
-import { CommonModule } from '@angular/common';
 import { FilterFieldConfig } from '@shared/types/filter-config.type';
-import {
-  ProductFilter,
-  productFilterDefaults,
-} from '../../models/product-filter.model';
-import { FilterDynamicComponent } from '@shared/components/ui/filter-dynamic/filter-dynamic.component';
+import { productFilterDefaults } from '../../models/product-filter.model';
 import { CategoryStore } from '@features/catalogs/categories/store/category.store';
 import { BrandStore } from '@features/catalogs/brands/store/brand.store';
 
 @Component({
   selector: 'app-products-active',
-  imports: [
-    CommonModule,
-    DataTableComponent,
-    ButtonModule,
-    FilterDynamicComponent,
-  ],
+  imports: [DataTableComponent, FilterDynamicComponent],
   templateUrl: './products-active.component.html',
   styleUrl: './products-active.component.scss',
 })

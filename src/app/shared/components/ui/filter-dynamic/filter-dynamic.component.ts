@@ -43,10 +43,6 @@ export class FilterDynamicComponent implements OnInit {
   constructor() {
     effect(() => {
       const storeFilters = this.initialValues();
-      console.log(
-        'Effect triggered, syncing form with store filters:',
-        storeFilters,
-      );
       this.syncFormWithStore(storeFilters);
     });
   }

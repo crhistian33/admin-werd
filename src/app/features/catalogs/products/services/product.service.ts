@@ -14,7 +14,6 @@ export class ProductService extends BaseService<Product> {
     ids: string[],
     status: string,
   ): Observable<ApiResponse<Product>> {
-    console.log(`${this.url}/bulk-status`);
     return this.http.patch<ApiResponse<Product>>(
       `${this.url}/bulk-status`,
       { ids, status },

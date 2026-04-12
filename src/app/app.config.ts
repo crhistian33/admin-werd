@@ -35,6 +35,7 @@ import {
   FolderTree,
   Grid2x2Check,
   HelpCircle,
+  Image,
   Layers,
   LayoutDashboard,
   LayoutGrid,
@@ -215,6 +216,7 @@ export const appConfig: ApplicationConfig = {
         PackageX,
         Calendar,
         SearchX,
+        Image,
       }),
     ),
     provideStore(

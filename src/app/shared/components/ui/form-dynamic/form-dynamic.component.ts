@@ -36,6 +36,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { environment } from '@env/environment';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DatePickerModule } from 'primeng/datepicker';
 
 type RemovedImageMap = { [key: string]: string | string[] };
 
@@ -56,6 +57,7 @@ type RemovedImageMap = { [key: string]: string | string[] };
     OrderListModule,
     StepperModule,
     LucideAngularModule,
+    DatePickerModule,
   ],
   templateUrl: './form-dynamic.component.html',
   styleUrl: './form-dynamic.component.scss',
@@ -243,7 +245,7 @@ export class FormDynamicComponent {
         compact: { container: 'max-w-4xl', grid: 'grid grid-cols-1 gap-4' },
         full: {
           container: 'w-full',
-          grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4',
+          grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4',
         },
       })[this.size()],
   );
@@ -251,6 +253,8 @@ export class FormDynamicComponent {
   getFieldColClass(cols?: number): string {
     if (this.size() !== 'full') return 'col-span-1';
     switch (cols) {
+      case 4:
+        return 'col-span-1 md:col-span-2 lg:col-span-4';
       case 3:
         return 'col-span-1 md:col-span-2 lg:col-span-3';
       case 2:

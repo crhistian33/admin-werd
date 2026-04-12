@@ -35,9 +35,6 @@ export class ImageUploadService {
       .set('entityKey', entityKey)
       .set('imageRole', imageRole);
 
-    // Debug: mostrar params
-    console.log('HttpParams:', params.toString());
-
     return this.http.post<ApiResponse<TempImageResponse>>(
       `${this.baseUrl}/upload`,
       formData,

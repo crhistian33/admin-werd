@@ -20,7 +20,6 @@ export class BreadcrumbComponent {
 
   readonly items = computed<MenuItem[]>(() => {
     const crumbs = this.breadcrumbService.breadcrumbs();
-    console.log('crumbs:', crumbs);
     return crumbs.map((crumb) => ({
       label: crumb.label,
       ...(crumb.route ? { routerLink: crumb.route } : { disabled: true }),

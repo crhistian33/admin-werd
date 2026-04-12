@@ -50,7 +50,6 @@ export class StaticpageFormComponent {
   }
 
   onSubmit(data: Record<string, any>): void {
-    console.log('Data', data);
     if (this.isEdit()) {
       this.store.update(this.id()!, data, () => this._goBack());
     } else {
