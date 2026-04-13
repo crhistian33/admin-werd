@@ -5,6 +5,7 @@ export type FieldType =
   | 'textarea'
   | 'editor'
   | 'number'
+  | 'password'
   | 'number-decimal'
   | 'select'
   | 'email'
@@ -29,7 +30,7 @@ export interface FormFieldConfig {
   placeholder?: string;
   hint?: string;
   validators?: ValidatorFn[];
-  options?: SelectOption[];
+  options?: SelectOption[] | ((formValue: any) => SelectOption[]);
   accept?: string;
   maxFileSize?: number;
   cols?: 1 | 2 | 3 | 4;

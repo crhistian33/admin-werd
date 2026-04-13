@@ -89,8 +89,6 @@ export class FaqListComponent {
     });
   }
 
-  onReorder() {}
-
   handleClearFilters(): void {
     this.store.setFilter(faqFilterDefaults());
   }

@@ -1,0 +1,45 @@
+<app-data-table
+  [data]="store.data()"
+  [totalItems]="store.totalItems()"
+  [first]="firstRowIndex()"
+  [config]="tableConfig()"
+  [loading]="store.loadingState().initial"
+  [isUpdating]="store.loadingState().updating"
+  [isSaving]="store.isSaving()"
+  [activeFiltersCount]="store.activeFiltersCount()"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
+  (deleteAll)="onDeleteAll($event)"
+  (filterDrawer)="drawerVisible.set(true)"
+  (onClear)="handleClearFilters()"
+>
+  <ng-container tableActions>
+    <p-button
+      label="Reordenar"
+      icon="pi pi-sort"
+      severity="info"
+      (onClick)="reorderVisible.set(true)"
+    />
+  </ng-container>
+  <ng-container tableDrawer>
+    <app-filter-dynamic
+      [(visible)]="drawerVisible"
+      [config]="filterFields()"
+      [initialValues]="store.filter()"
+      (filterChange)="store.setFilter($event)"
+      (filterClear)="handleClearFilters()"
+    />
+  </ng-container>
+</app-data-table>
+<p-dialog
+  header="Reordenar métodos de pago"
+  [visible]="reorderVisible()"
+  (visibleChange)="reorderVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+>
+  @if (reorderVisible()) {
+    <app-payment-method-reorder (saved)="reorderVisible.set(false)" />
+  }
+</p-dialog>

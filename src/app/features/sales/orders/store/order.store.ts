@@ -13,5 +13,7 @@ export class OrderStore extends BaseStore<Order, OrderFilter> {
 
   override readonly filter = signal<OrderFilter>(orderFilterDefaults());
 
-  // Si necesitas búsqueda local adicional, implementa aquí, pero la tabla ahora usa items() directamente.
+  constructor() {
+    super({ useSoftDelete: false });
+  }
 }

@@ -9,8 +9,6 @@ import {
   untracked,
   effect,
   DestroyRef,
-  ViewChild,
-  ElementRef,
   viewChild,
 } from '@angular/core';
 import {
@@ -40,6 +38,7 @@ import { environment } from '@env/environment';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePickerModule } from 'primeng/datepicker';
+import { PasswordModule } from 'primeng/password';
 
 type RemovedImageMap = { [key: string]: string | string[] };
 
@@ -61,6 +60,7 @@ type RemovedImageMap = { [key: string]: string | string[] };
     StepperModule,
     LucideAngularModule,
     DatePickerModule,
+    PasswordModule,
   ],
   templateUrl: './form-dynamic.component.html',
   styleUrl: './form-dynamic.component.scss',
@@ -73,7 +73,24 @@ export class FormDynamicComponent {
   readonly stepper = viewChild<Stepper>('stepper');
 
   constructor() {
-    // Reset activeAction when global loading turns off
+    // Effect para re-aplicar visibilidad cuando cambia el form
+    effect(() => {
+      const currentSteps = this.steps();
+      const currentForm = this.form();
+
+      untracked(() => {
+        // Aplicar visibilidad inicial
+        this._applyVisibility(currentForm, currentSteps);
+
+        // Suscribirse a cambios futuros
+        currentForm.valueChanges
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            this._applyVisibility(currentForm, currentSteps);
+          });
+      });
+    });
+
     effect(() => {
       if (!this.loading()) {
         untracked(() => this.activeAction.set(null));
@@ -217,8 +234,10 @@ export class FormDynamicComponent {
 
         currentFields.forEach((f) => {
           const initialValue =
-            f.type === 'file-image'
-              ? null
+            f.type === 'file-image' || f.type === 'file-gallery'
+              ? f.type === 'file-gallery'
+                ? []
+                : null
               : data
                 ? (data[f.key] ?? null)
                 : null;
@@ -232,12 +251,13 @@ export class FormDynamicComponent {
           currentFields
             .filter((f) => f.type === 'file-image' || f.type === 'file-gallery')
             .forEach((f) => delete safeData[f.key]);
-
           Object.keys(safeData).forEach((k) => {
             if (k.startsWith('_')) delete safeData[k];
           });
           group.patchValue(safeData);
         }
+
+        // ← Ya no aplica visibilidad aquí — lo hace el effect con valueChanges
 
         return group;
       });
@@ -272,12 +292,52 @@ export class FormDynamicComponent {
 
   // ── Helpers ───────────────────────────────────────────────────────
 
+  private _applyVisibility(form: FormGroup, steps: FormStepConfig[]): void {
+    const formValue = form.getRawValue();
+
+    steps.forEach((step) => {
+      step.fields.forEach((field) => {
+        const control = form.get(field.key);
+        if (!control) return;
+
+        if (!field.visibleWhen) {
+          if (control.disabled) control.enable({ emitEvent: false });
+          return;
+        }
+
+        const isVisible = field.visibleWhen(formValue);
+
+        if (isVisible) {
+          if (control.disabled) control.enable({ emitEvent: false });
+        } else {
+          if (control.enabled) {
+            control.disable({ emitEvent: false });
+            control.setValue(null, { emitEvent: false });
+          }
+        }
+      });
+    });
+  }
+
   isUploadingField(key: string): boolean {
     return this.uploadingFields()[key] ?? false;
   }
 
   isUploading(): boolean {
     return Object.values(this.uploadingFields()).some(Boolean);
+  }
+
+  getResolvedOptions(field: any): any[] {
+    if (!field.options) return [];
+
+    if (typeof field.options === 'function') {
+      // IMPORTANTE: usar getRawValue para que si el campo 'type'
+      // está momentáneamente deshabilitado, la función aún reciba su valor.
+      const formValue = this.form().getRawValue();
+      return field.options(formValue);
+    }
+
+    return field.options;
   }
 
   // ── Manejo de archivos ────────────────────────────────────────────

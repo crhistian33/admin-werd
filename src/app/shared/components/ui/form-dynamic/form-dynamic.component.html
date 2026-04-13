@@ -46,6 +46,7 @@
       <form
         [formGroup]="form()"
         (ngSubmit)="onSubmit()"
+        autocomplete="off"
         class="flex flex-col gap-6"
       >
         <p-stepper #stepper [value]="1" [linear]="false" class="w-full">
@@ -84,7 +85,20 @@
                                 [id]="field.key"
                                 [formControlName]="field.key"
                                 [placeholder]="field.placeholder ?? ''"
+                                autocomplete="off"
                                 class="w-full"
+                              />
+                            }
+
+                            @case ("password") {
+                              <p-password
+                                [id]="field.key"
+                                [formControlName]="field.key"
+                                [toggleMask]="true"
+                                [feedback]="false"
+                                [placeholder]="field.placeholder ?? ''"
+                                autocomplete="new-password"
+                                fluid
                               />
                             }
 
@@ -162,7 +176,7 @@
                               <p-select
                                 [inputId]="field.key"
                                 [formControlName]="field.key"
-                                [options]="field.options ?? []"
+                                [options]="getResolvedOptions(field)"
                                 optionLabel="label"
                                 optionValue="value"
                                 [placeholder]="

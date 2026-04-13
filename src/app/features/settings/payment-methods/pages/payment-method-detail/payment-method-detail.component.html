@@ -1,0 +1,9 @@
+<app-detail-dynamic
+  [config]="detailConfig"
+  [data]="store.selected()"
+  [loading]="store.loadingState().initial"
+  [title]="store.selected()?.name ?? ''"
+  (onBack)="goBack()"
+  (onEdit)="goToEdit()"
+  (onDelete)="onDelete()"
+/>

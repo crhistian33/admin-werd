@@ -157,7 +157,7 @@ export class NavComponent {
         {
           label: 'Métodos de pago',
           icon: 'wallet',
-          route: '/configuraciones/pagos',
+          route: '/configuraciones/metodos-pago',
         },
         {
           label: 'Despacho',

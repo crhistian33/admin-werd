@@ -13,9 +13,9 @@ export const routes: Routes = [
       import('./general/general.routes').then((m) => m.routes),
   },
   {
-    path: 'pagos',
+    path: 'metodos-pago',
     loadChildren: () =>
-      import('./pay-methods/pay-methods.routes').then((m) => m.routes),
+      import('./payment-methods/payment-methods.routes').then((m) => m.routes),
   },
   {
     path: 'despacho',

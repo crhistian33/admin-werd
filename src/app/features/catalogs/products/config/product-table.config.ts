@@ -167,14 +167,5 @@ export const productTableConfig = (
           'draft',
         ),
     },
-    {
-      label: 'Sin stock',
-      icon: 'pi pi-exclamation-triangle',
-      action: (rows) =>
-        callback.onBulkStatusChange(
-          rows.map((r) => r.id),
-          'out_of_stock',
-        ),
-    },
   ],
 });

@@ -1,0 +1,12 @@
+<app-form-dynamic
+  [steps]="steps()"
+  [initialData]="initialData()"
+  [loading]="store.isSaving()"
+  [fetching]="isEdit() && store.loadingState().initial"
+  [title]="
+    isEdit() ? (store.selected()?.name ?? '...') : 'Crear método de pago'
+  "
+  [submitLabel]="isEdit() ? 'Actualizar' : 'Crear'"
+  (submitted)="onSubmit($event)"
+  (cancelled)="_goBack()"
+/>
