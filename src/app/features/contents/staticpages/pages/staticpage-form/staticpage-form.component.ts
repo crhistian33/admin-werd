@@ -21,7 +21,6 @@ export class StaticpageFormComponent {
   readonly from = input<string | null>(null);
   readonly isEdit = computed(() => !!this.id());
 
-  // initialData como computed — no se recrea en cada ciclo de detección de cambios
   readonly initialData = computed(() => {
     const selected = this.store.selected();
     if (!selected) return null;

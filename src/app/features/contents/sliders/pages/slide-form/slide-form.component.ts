@@ -25,6 +25,10 @@ export class SlideFormComponent {
   readonly productsStore = inject(ProductStore);
   readonly categoriesStore = inject(CategoryStore);
 
+  readonly id = input<string | null>(null);
+  readonly from = input<string | null>(null);
+  readonly isEdit = computed(() => !!this.id());
+
   readonly steps = computed<FormStepConfig[]>(() => {
     const config = buildHeroSlideFormConfig(this.imageUpload, {
       products: this.productsStore.data(),
@@ -40,10 +44,6 @@ export class SlideFormComponent {
 
     return config;
   });
-
-  readonly id = input<string | null>(null);
-  readonly from = input<string | null>(null);
-  readonly isEdit = computed(() => !!this.id());
 
   // initialData como computed — no se recrea en cada ciclo de detección de cambios
   readonly initialData = computed(() => {

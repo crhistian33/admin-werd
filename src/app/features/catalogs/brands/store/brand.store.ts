@@ -9,5 +9,9 @@ export class BrandStore extends BaseStore<Brand> {
   protected readonly service = inject(BrandService);
   override readonly filter = signal<BrandFilter>(brandFilterDefaults());
 
+  constructor() {
+    super({ useSoftDelete: true });
+  }
+
   // Si necesitas búsqueda local adicional, implementa aquí, pero la tabla ahora usa items() directamente.
 }

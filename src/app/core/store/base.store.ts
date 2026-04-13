@@ -18,6 +18,9 @@ export abstract class BaseStore<
 
   protected abstract readonly service: BaseService<T>;
 
+  // Añadimos una propiedad para saber si este Store debe manejar papelera
+  protected readonly canUseSoftDelete: boolean;
+
   // ── Filtro para la lista de activos ───────────────────────────────
   readonly filter = signal<F>({
     page: 1,
@@ -57,7 +60,7 @@ export abstract class BaseStore<
 
   // ── Resource de papelera ──────────────────────────────────────────
   private readonly _trashResource = httpResource<ApiResponse<T[]>>(() => {
-    if (!this.service?.url) return undefined;
+    if (!this.service?.url || !this.canUseSoftDelete) return undefined;
     const f = this.trashFilter() as Record<string, any>;
     const params = this.buildParams(f);
     return {
@@ -67,7 +70,9 @@ export abstract class BaseStore<
     };
   });
 
-  constructor() {
+  constructor(options: { useSoftDelete: boolean } = { useSoftDelete: true }) {
+    this.canUseSoftDelete = options.useSoftDelete;
+
     // Actualiza cache de activos
     effect(() => {
       const res = this._activeResource.value();

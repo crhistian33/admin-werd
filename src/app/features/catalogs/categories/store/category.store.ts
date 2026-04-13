@@ -12,4 +12,8 @@ export class CategoryStore extends BaseStore<Category> {
   protected readonly service = inject(CategoryService);
 
   override readonly filter = signal<CategoryFilter>(categoryFilterDefaults());
+
+  constructor() {
+    super({ useSoftDelete: true });
+  }
 }

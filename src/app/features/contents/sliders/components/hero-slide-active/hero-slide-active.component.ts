@@ -86,8 +86,6 @@ export class HeroSlideActiveComponent {
     });
   }
 
-  onReorder() {}
-
   handleClearFilters(): void {
     this.store.setFilter(heroSlideFilterDefaults());
   }

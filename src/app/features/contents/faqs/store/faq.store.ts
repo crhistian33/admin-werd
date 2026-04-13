@@ -1,21 +1,18 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { BaseStore } from '@core/store/base.store';
-import { HeroSlidesService } from '../services/hero-slides.service';
-import { HeroSlide } from '../models/hero-slide.model';
-import {
-  HeroSlideFilter,
-  heroSlideFilterDefaults,
-} from '../models/hero-slide-filter.model';
+import { FaqFilter, faqFilterDefaults } from '../models/faq-filter.model';
+import { Faq } from '../models/faq.model';
+import { FaqsService } from '../services/faqs.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({ providedIn: 'root' })
-export class HeroSlideStore extends BaseStore<HeroSlide, HeroSlideFilter> {
-  protected readonly service = inject(HeroSlidesService);
+export class FaqStore extends BaseStore<Faq, FaqFilter> {
+  protected readonly service = inject(FaqsService);
 
-  override readonly filter = signal<HeroSlideFilter>(heroSlideFilterDefaults());
+  override readonly filter = signal<FaqFilter>(faqFilterDefaults());
 
   constructor() {
-    super({ useSoftDelete: true });
+    super({ useSoftDelete: false });
   }
 
   reorder(ids: string[], onSuccess?: () => void): void {

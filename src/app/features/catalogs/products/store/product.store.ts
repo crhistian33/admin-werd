@@ -14,6 +14,10 @@ export class ProductStore extends BaseStore<Product, ProductFilter> {
 
   override readonly filter = signal<ProductFilter>(productFilterDefaults());
 
+  constructor() {
+    super({ useSoftDelete: true });
+  }
+
   // Si necesitas búsqueda local adicional, implementa aquí, pero la tabla ahora usa items() directamente.
   changeStatus(ids: string[], status: string, onSuccess?: () => void) {
     this.isSaving.set(true);

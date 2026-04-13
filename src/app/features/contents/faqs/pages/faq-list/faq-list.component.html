@@ -1,1 +1,45 @@
-<p>faq-list works!</p>
+<app-data-table
+  [data]="store.data()"
+  [totalItems]="store.totalItems()"
+  [first]="firstRowIndex()"
+  [config]="tableConfig()"
+  [loading]="store.loadingState().initial"
+  [isUpdating]="store.loadingState().updating"
+  [isSaving]="store.isSaving()"
+  [activeFiltersCount]="store.activeFiltersCount()"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
+  (deleteAll)="onDeleteAll($event)"
+  (filterDrawer)="drawerVisible.set(true)"
+  (onClear)="handleClearFilters()"
+>
+  <ng-container tableDrawer>
+    <app-filter-dynamic
+      [(visible)]="drawerVisible"
+      [config]="filterFields()"
+      [initialValues]="store.filter()"
+      (filterChange)="store.setFilter($event)"
+      (filterClear)="handleClearFilters()"
+    />
+  </ng-container>
+  <ng-container tableActions>
+    <p-button
+      label="Reordenar"
+      icon="pi pi-sort"
+      severity="info"
+      (onClick)="reorderVisible.set(true)"
+    />
+  </ng-container>
+</app-data-table>
+<p-dialog
+  header="Reordenar slides"
+  [visible]="reorderVisible()"
+  (visibleChange)="reorderVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+>
+  @if (reorderVisible()) {
+    <app-faq-reorder (saved)="reorderVisible.set(false)" />
+  }
+</p-dialog>

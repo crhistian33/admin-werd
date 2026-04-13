@@ -2,20 +2,8 @@ import { Component, inject, input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductStore } from '../../store/product.store';
 import { DialogService } from '@shared/services/ui/dialog.service';
-import { ProductStatus } from '../../models/product.model';
 import { DetailDynamicComponent } from '@shared/components/ui/detail-dynamic/detail-dynamic.component';
 import { PRODUCT_DETAIL_CONFIG } from '../../config/product-detail.config';
-
-// Badge por estado del producto
-const STATUS_CONFIG: Record<
-  ProductStatus,
-  { label: string; severity: string }
-> = {
-  active: { label: 'Publicado', severity: 'success' },
-  inactive: { label: 'Inactivo', severity: 'danger' },
-  draft: { label: 'Borrador', severity: 'warn' },
-  out_of_stock: { label: 'Sin stock', severity: 'danger' },
-};
 
 @Component({
   selector: 'app-product-detail',

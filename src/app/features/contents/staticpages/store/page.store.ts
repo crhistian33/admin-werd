@@ -11,6 +11,10 @@ export class PageStore extends BaseStore<Page> {
 
   override readonly filter = signal<PageFilter>(pageFilterDefaults());
 
+  constructor() {
+    super({ useSoftDelete: true });
+  }
+
   changeStatus(ids: string[], status: string, onSuccess?: () => void) {
     this.isSaving.set(true);
     this.service

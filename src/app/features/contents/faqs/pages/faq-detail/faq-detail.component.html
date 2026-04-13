@@ -1,1 +1,9 @@
-<p>faq-detail works!</p>
+<app-detail-dynamic
+  [config]="detailConfig"
+  [data]="store.selected()"
+  [loading]="store.loadingState().initial"
+  [title]="store.selected()?.question ?? ''"
+  (onBack)="goBack()"
+  (onEdit)="goToEdit()"
+  (onDelete)="onDelete()"
+/>
