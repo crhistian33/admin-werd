@@ -1,0 +1,135 @@
+<div class="flex flex-col gap-4">
+  <div class="flex justify-between items-center">
+    <p class="text-sm text-slate-500">
+      Administra las redes sociales que aparecen en el sitio.
+    </p>
+    <p-button
+      label="Agregar red social"
+      icon="pi pi-plus"
+      size="small"
+      (onClick)="openDialog()"
+    />
+  </div>
+
+  <!-- Lista reordenable -->
+  @if (links().length > 0) {
+    <p-orderlist
+      [value]="links()"
+      [(selection)]="selectedLinks"
+      (onReorder)="onReorder($event)"
+      [dragdrop]="true"
+      dataKey="id"
+      class="w-full"
+    >
+      <ng-template #item let-link>
+        <div class="flex items-center gap-3 py-1 w-full">
+          @if (link.icon) {
+            <i [class]="link.icon + ' text-lg text-slate-500'"></i>
+          }
+          <div class="flex flex-col flex-1 min-w-0">
+            <span class="text-sm font-medium text-slate-800">
+              {{ link.name }}
+            </span>
+            <span class="text-xs text-slate-400 truncate">
+              {{ link.url }}
+            </span>
+          </div>
+          <p-tag
+            [value]="link.isActive ? 'Activo' : 'Inactivo'"
+            [severity]="link.isActive ? 'success' : 'danger'"
+            class="shrink-0"
+          />
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            size="small"
+            (onClick)="onDelete(link)"
+          />
+        </div>
+      </ng-template>
+    </p-orderlist>
+  } @else {
+    <div
+      class="flex flex-col items-center justify-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-lg"
+    >
+      <lucide-icon name="share-2" class="w-8 h-8 mb-2" />
+      <p class="text-sm">Sin redes sociales configuradas</p>
+    </div>
+  }
+</div>
+
+<!-- Dialog para agregar -->
+<p-dialog
+  header="Agregar red social"
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '420px' }"
+  [draggable]="false"
+>
+  <form [formGroup]="form" class="flex flex-col gap-4 pt-2">
+    <div>
+      <label class="block text-sm font-medium text-slate-600 mb-1.5">
+        Red social *
+      </label>
+      <p-select
+        formControlName="network"
+        [options]="networkOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar red..."
+        class="w-full"
+        (onChange)="onNetworkChange($event)"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-600 mb-1.5">
+        Nombre visible *
+      </label>
+      <input
+        pInputText
+        formControlName="name"
+        class="w-full"
+        placeholder="Ej: Facebook"
+      />
+    </div>
+    <!-- <div>
+      <label class="block text-sm font-medium text-slate-600 mb-1.5">
+        Ícono (clase CSS)
+      </label>
+      <input
+        pInputText
+        formControlName="icon"
+        class="w-full"
+        placeholder="Ej: pi pi-facebook"
+      />
+    </div> -->
+    <div>
+      <label class="block text-sm font-medium text-slate-600 mb-1.5">
+        URL *
+      </label>
+      <input
+        pInputText
+        formControlName="url"
+        class="w-full"
+        placeholder="https://facebook.com/mitienda"
+      />
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      (onClick)="dialogVisible.set(false)"
+    />
+    <p-button
+      label="Agregar"
+      icon="pi pi-plus"
+      [disabled]="form.invalid"
+      [loading]="store.isSaving()"
+      (onClick)="onSave()"
+    />
+  </ng-template>
+</p-dialog>

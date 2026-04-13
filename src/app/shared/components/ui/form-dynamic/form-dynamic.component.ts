@@ -9,6 +9,9 @@ import {
   untracked,
   effect,
   DestroyRef,
+  ViewChild,
+  ElementRef,
+  viewChild,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -27,7 +30,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { EditorModule } from 'primeng/editor';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { OrderListModule } from 'primeng/orderlist';
-import { StepperModule } from 'primeng/stepper';
+import { Stepper, StepperModule } from 'primeng/stepper';
 import {
   FormFieldConfig,
   FormStepConfig,
@@ -66,6 +69,8 @@ export class FormDynamicComponent {
   private readonly fb = inject(FormBuilder);
   private readonly imageUpload = inject(ImageUploadService);
   private readonly destroyRef = inject(DestroyRef);
+
+  readonly stepper = viewChild<Stepper>('stepper');
 
   constructor() {
     // Reset activeAction when global loading turns off

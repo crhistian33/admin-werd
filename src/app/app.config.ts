@@ -53,6 +53,7 @@ import {
   PackageX,
   SearchX,
   Settings,
+  Share2,
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
@@ -217,6 +218,7 @@ export const appConfig: ApplicationConfig = {
         Calendar,
         SearchX,
         Image,
+        Share2,
       }),
     ),
     provideStore(

@@ -48,7 +48,7 @@
         (ngSubmit)="onSubmit()"
         class="flex flex-col gap-6"
       >
-        <p-stepper [value]="1" [linear]="false" class="w-full">
+        <p-stepper #stepper [value]="1" [linear]="false" class="w-full">
           @if (steps().length > 1) {
             <p-step-list class="mb-4">
               @for (step of steps(); track step.title; let i = $index) {

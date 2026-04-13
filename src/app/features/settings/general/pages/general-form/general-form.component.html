@@ -1,1 +1,49 @@
-<p>general-form works!</p>
+<div class="flex flex-col gap-6">
+  <h1 class="text-2xl font-semibold text-slate-800 uppercase">
+    Configuración del sitio
+  </h1>
+
+  <p-tabs value="general">
+    <p-tablist>
+      <p-tab value="general">Información y logos</p-tab>
+      <p-tab value="social">
+        Redes sociales
+        @if (store.config()?.socialLinks?.length) {
+          <p-badge
+            [value]="store.config()!.socialLinks.length.toString()"
+            severity="secondary"
+          />
+        }
+      </p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- Tab 1: Formulario principal -->
+      <p-tabpanel value="general">
+        @if (store.isLoading()) {
+          <div class="flex justify-center py-20">
+            <i class="pi pi-spin pi-spinner text-3xl text-slate-400"></i>
+          </div>
+        } @else {
+          <app-form-dynamic
+            #formDynamic
+            [steps]="steps()"
+            [initialData]="initialData()"
+            [loading]="store.isSaving()"
+            [fetching]="store.isLoading()"
+            title=""
+            submitLabel="Guardar configuración"
+            size="full"
+            (submitted)="onSubmit($event)"
+            (cancelled)="load()"
+          />
+        }
+      </p-tabpanel>
+
+      <!-- Tab 2: Redes sociales -->
+      <p-tabpanel value="social">
+        <app-social-links-manager />
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
