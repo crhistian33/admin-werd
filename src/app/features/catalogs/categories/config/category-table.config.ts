@@ -5,6 +5,7 @@ import { environment } from '@env/environment';
 
 type CategoryTableCallbacks = {
   onDelete: (category: Category) => void;
+  onBulkStatusChange: (ids: string[], status: boolean) => void;
 };
 
 export const categoryTableConfig = (
@@ -44,19 +45,19 @@ export const categoryTableConfig = (
     },
     {
       field: 'isActive',
-      header: 'Estado',
+      header: 'Activo',
       type: 'badge',
       width: '150px',
       badges: [
-        { value: 'true', label: 'Activo', severity: 'success' },
-        { value: 'false', label: 'Inactivo', severity: 'danger' },
+        { value: 'true', label: 'Sí', severity: 'success' },
+        { value: 'false', label: 'No', severity: 'danger' },
       ],
       filter: {
         enabled: true,
         type: 'boolean',
         options: [
-          { label: 'Activo', value: true },
-          { label: 'Inactivo', value: false },
+          { label: 'Sí', value: true },
+          { label: 'No', value: false },
         ],
       },
     },
@@ -92,6 +93,26 @@ export const categoryTableConfig = (
       tooltip: 'Eliminar',
       severity: 'danger',
       action: (row) => callback.onDelete(row),
+    },
+  ],
+  bulkActions: [
+    {
+      label: 'Activar',
+      icon: 'pi pi-check-circle',
+      action: (rows) =>
+        callback.onBulkStatusChange(
+          rows.map((r) => r.id),
+          true,
+        ),
+    },
+    {
+      label: 'Desactivar',
+      icon: 'pi pi-ban',
+      action: (rows) =>
+        callback.onBulkStatusChange(
+          rows.map((r) => r.id),
+          false,
+        ),
     },
   ],
 });

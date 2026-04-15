@@ -38,25 +38,4 @@ export class PaymentMethodStore extends BaseStore<
         error: () => this.isSaving.set(false),
       });
   }
-
-  changeStatus(ids: string[], status: boolean, onSuccess?: () => void) {
-    this.isSaving.set(true);
-    this.service
-      .changeStatus(ids, status)
-      .pipe(takeUntilDestroyed(this.destroy))
-      .subscribe({
-        next: (res) => {
-          this.isSaving.set(false);
-          this.dialog.success(
-            res.message || 'Actualización de estados realizados',
-            'Operación exitosa',
-          );
-          this.reloadActive();
-          onSuccess?.();
-        },
-        error: () => {
-          this.isSaving.set(false);
-        },
-      });
-  }
 }

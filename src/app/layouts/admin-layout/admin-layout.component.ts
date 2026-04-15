@@ -15,6 +15,9 @@ import { Store } from '@ngxs/store';
 import { AuthState } from '@core/auth/store/auth.state';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DialogModule } from 'primeng/dialog';
+import { ReorderDynamicComponent } from '@shared/components/ui/reorder-dynamic/reorder-dynamic.component';
+import { ReorderService } from '@shared/services/ui/reorder.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -29,12 +32,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     BreadcrumbComponent,
     ConfirmDialogModule,
     ProgressBarModule,
+    DialogModule,
+    ReorderDynamicComponent,
   ],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.scss',
 })
 export class AdminLayoutComponent {
   private readonly nav = inject(NavToggleService);
+  readonly reorderService = inject(ReorderService);
   readonly pageTitle = inject(PageTitleService);
   readonly store = inject(Store);
   readonly router = inject(Router);

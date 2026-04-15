@@ -48,7 +48,7 @@ export class PagesActiveComponent {
 
   onBulkStatusChange(ids: string[], status: PageStatus): void {
     const labels: Record<PageStatus, string> = {
-      published: 'Publicar',
+      published: 'publicar',
       draft: 'Cambiar a borrador',
     };
 
@@ -56,7 +56,7 @@ export class PagesActiveComponent {
       message: `¿${labels[status].charAt(0).toUpperCase() + labels[status].slice(1)} <strong>${ids.length}</strong> página(s) seleccionada(s)?`,
       acceptLabel: 'Confirmar',
       onAccept: () => {
-        this.store.changeStatus(ids, status, () => {
+        this.store.changeStatusPage(ids, status, () => {
           this.table()?.selectedRows.set([]);
         });
       },

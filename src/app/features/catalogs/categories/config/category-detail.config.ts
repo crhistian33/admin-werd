@@ -27,11 +27,11 @@ export const CATEGORY_DETAIL_CONFIG: DetailViewConfig = {
         },
         {
           key: 'isActive',
-          label: 'Estado',
+          label: 'Activo',
           type: 'boolean',
           badges: [
-            { value: true, label: 'Activo', severity: 'success' },
-            { value: false, label: 'Inactivo', severity: 'danger' },
+            { value: true, label: 'Sí', severity: 'success' },
+            { value: false, label: 'No', severity: 'danger' },
           ],
         },
         {

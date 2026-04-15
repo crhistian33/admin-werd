@@ -79,4 +79,13 @@ export abstract class BaseService<T> {
       },
     );
   }
+
+  changeStatus(ids: string[], status: boolean): Observable<ApiResponse<T>> {
+    console.log('IDS', ids);
+    return this.http.patch<ApiResponse<T>>(
+      `${this.url}/bulk-status`,
+      { ids, status },
+      { context: this.context },
+    );
+  }
 }

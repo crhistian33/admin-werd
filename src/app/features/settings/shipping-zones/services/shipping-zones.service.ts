@@ -11,17 +11,6 @@ import { Department, District, Province } from '../models/ubigeo.model';
 export class ShippingZonesService extends BaseService<ShippingZone> {
   protected readonly endpoint = 'shipping-zones';
 
-  changeStatus(
-    ids: string[],
-    status: boolean,
-  ): Observable<ApiResponse<ShippingZone>> {
-    return this.http.patch<ApiResponse<ShippingZone>>(
-      `${this.url}/bulk-status`,
-      { ids, status },
-      { context: this.context },
-    );
-  }
-
   getDepartments(): Observable<ApiResponse<Department[]>> {
     return this.http.get<ApiResponse<Department[]>>(
       `${this.url}/ubigeo/departments`,

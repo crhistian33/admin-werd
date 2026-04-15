@@ -10,7 +10,10 @@ import { ApiResponse } from '@shared/models/api-response.model';
 export class PagesService extends BaseService<Page> {
   protected readonly endpoint = 'pages';
 
-  changeStatus(ids: string[], status: string): Observable<ApiResponse<Page>> {
+  changeStatusPage(
+    ids: string[],
+    status: string,
+  ): Observable<ApiResponse<Page>> {
     return this.http.patch<ApiResponse<Page>>(
       `${this.url}/bulk/status`,
       { ids, status },

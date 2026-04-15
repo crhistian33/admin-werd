@@ -32,12 +32,11 @@
         </p-overlaybadge>
         @if (activeFiltersCount() > 0) {
           <button
-            class="flex items-center gap-1 text-sm text-red-600 hover:text-red-700 disabled:text-red-300 ml-2"
+            class="flex items-center justify-center w-10 h-10 text-red-600 hover:text-red-700 disabled:text-red-300"
             (click)="onClear.emit()"
             [disabled]="activeFiltersCount() === 0"
           >
-            <lucide-icon name="trash" class="w-4 h-4" />
-            <span>Limpiar</span>
+            <lucide-icon name="x" class="w-5 h-5" />
           </button>
         }
       }

@@ -28,7 +28,7 @@ export function buildCategoryFormConfig(
         {
           key: 'isActive',
           label: 'Activo',
-          type: 'checkbox',
+          type: 'switch',
           cols: 3,
           showOnCreate: false, // Solo mostrar en edición
         },

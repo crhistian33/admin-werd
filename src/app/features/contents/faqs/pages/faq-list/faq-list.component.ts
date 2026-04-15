@@ -8,19 +8,12 @@ import { faqTableConfig } from '../../config/faq-table.config';
 import { FilterFieldConfig } from '@shared/types/filter-config.type';
 import { Faq } from '../../models/faq.model';
 import { faqFilterDefaults } from '../../models/faq-filter.model';
+import { ReorderService } from '@shared/services/ui/reorder.service';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { FaqReorderComponent } from '../../components/faq-reorder/faq-reorder.component';
 
 @Component({
   selector: 'app-faq-list',
-  imports: [
-    DataTableComponent,
-    FilterDynamicComponent,
-    ButtonModule,
-    DialogModule,
-    FaqReorderComponent,
-  ],
+  imports: [DataTableComponent, FilterDynamicComponent, ButtonModule],
   templateUrl: './faq-list.component.html',
   styleUrl: './faq-list.component.scss',
 })
@@ -28,12 +21,12 @@ export class FaqListComponent {
   readonly router = inject(Router);
   readonly store = inject(FaqStore);
   private readonly dialog = inject(DialogService);
-
-  readonly reorderVisible = signal(false);
+  private readonly reorderService = inject(ReorderService);
 
   readonly tableConfig = computed(() => {
     return faqTableConfig(this.router, {
       onDelete: (faq) => this.onDelete(faq),
+      onBulkStatusChange: (ids, status) => this.onBulkStatusChange(ids, status),
     });
   });
 
@@ -59,6 +52,20 @@ export class FaqListComponent {
   });
 
   // --- Acciones ---
+
+  onBulkStatusChange(ids: string[], status: boolean): void {
+    const actionText = status ? 'activar' : 'desactivar';
+
+    this.dialog.confirm({
+      message: `¿Deseas ${actionText} <strong>${ids.length}</strong> pregunta(s) seleccionada(s)?`,
+      acceptLabel: 'Confirmar',
+      onAccept: () => {
+        this.store.changeStatus(ids, status, () => {
+          this.table()?.selectedRows.set([]);
+        });
+      },
+    });
+  }
 
   onDelete(faq: Faq): void {
     this.dialog.delete({
@@ -91,6 +98,20 @@ export class FaqListComponent {
 
   handleClearFilters(): void {
     this.store.setFilter(faqFilterDefaults());
+  }
+
+  onOpenReorder(): void {
+    this.reorderService.open({
+      title: 'Reordenar Preguntas Frecuentes',
+      items: this.store.data(),
+      labelField: 'question',
+      onSave: (ids) => {
+        this.reorderService.setLoading(true);
+        this.store.reorder(ids, () => {
+          this.reorderService.close();
+        });
+      },
+    });
   }
 
   // --- Eventos tabla ---

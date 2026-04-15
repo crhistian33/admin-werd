@@ -208,21 +208,38 @@ export function buildProductFormConfig(
       ],
     },
     {
-      title: 'Especificaciones y Características',
+      title: 'Especificaciones Técnicas',
       fields: [
-        // ── Sección 7: Specs y Features ───────────────────────────────────
+        // ── Sección 7: Specs ──────────────────────────────────────────────
         {
           key: 'specs',
           label: 'Especificaciones técnicas',
           type: 'specs',
-          hint: 'Arrastra para reordenar. Ej: Procesador → Intel Core i7',
+          isArray: true,
+          template: {
+            specKey: ['', [Validators.required]],
+            specValue: ['', [Validators.required]],
+            sortOrder: [null, [Validators.required, Validators.min(0)]],
+          },
+          validators: [Validators.required, Validators.minLength(1)],
           cols: 4,
         },
+      ],
+    },
+    {
+      title: 'Características Principales',
+      fields: [
+        // ── Sección 8: Features ───────────────────────────────────────────
         {
           key: 'features',
-          label: 'Características destacadas',
+          label: 'Características principales',
           type: 'features',
-          hint: 'Arrastra para reordenar. Ej: Pantalla Full HD antirreflejo',
+          isArray: true,
+          template: {
+            feature: ['', [Validators.required]],
+            sortOrder: [null, [Validators.required, Validators.min(0)]],
+          },
+          validators: [Validators.required, Validators.minLength(1)],
           cols: 4,
         },
       ],

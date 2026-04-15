@@ -84,7 +84,7 @@ export const pageTableConfig = (
         ),
     },
     {
-      label: 'Cambiar a borrador',
+      label: 'Borrador',
       icon: 'pi pi-file-edit',
       action: (rows) =>
         callback.onBulkStatusChange(

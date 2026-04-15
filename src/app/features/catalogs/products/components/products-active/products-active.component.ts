@@ -63,8 +63,8 @@ export class ProductsActiveComponent {
 
   onBulkStatusChange(ids: string[], status: ProductStatus): void {
     const labels: Record<ProductStatus, string> = {
-      active: 'activar',
-      inactive: 'desactivar',
+      active: 'publicar',
+      inactive: 'archivar',
       draft: 'pasar a borrador',
       out_of_stock: 'marcar sin stock',
     };
@@ -73,7 +73,7 @@ export class ProductsActiveComponent {
       message: `¿${labels[status].charAt(0).toUpperCase() + labels[status].slice(1)} <strong>${ids.length}</strong> producto(s) seleccionado(s)?`,
       acceptLabel: 'Confirmar',
       onAccept: () => {
-        this.store.changeStatus(ids, status, () => {
+        this.store.changeStatusProduct(ids, status, () => {
           this.table()?.selectedRows.set([]);
         });
       },

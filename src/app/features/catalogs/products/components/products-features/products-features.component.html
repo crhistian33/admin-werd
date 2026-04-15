@@ -1,0 +1,54 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-3">
+    @for (control of formArray().controls; track $index; let i = $index) {
+      <div
+        class="relative p-4 bg-slate-50 rounded-lg border border-slate-200 flex flex-col gap-4"
+        [formGroup]="$any(control)"
+      >
+        <div class="absolute top-1 right-1">
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            (onClick)="removeFeature(i)"
+          />
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 pt-4">
+          <div class="col-span-12 md:col-span-9 flex flex-col gap-2">
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Característica</label
+            >
+            <input
+              pInputText
+              formControlName="feature"
+              placeholder="Ej: Pantalla Full HD"
+              class="w-full"
+            />
+          </div>
+          <div class="col-span-12 md:col-span-3 flex flex-col gap-2">
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Orden</label
+            >
+            <p-inputNumber
+              formControlName="sortOrder"
+              placeholder="0"
+              [min]="0"
+              inputStyleClass="w-full"
+            />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <p-button
+    label="Agregar característica"
+    icon="pi pi-plus"
+    [outlined]="true"
+    size="small"
+    styleClass="w-fit border-dashed"
+    (onClick)="addFeature()"
+  />
+</div>

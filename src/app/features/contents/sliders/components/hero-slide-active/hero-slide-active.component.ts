@@ -8,19 +8,12 @@ import { heroSlideTableConfig } from '../../config/hero-slide-table.config';
 import { FilterFieldConfig } from '@shared/types/filter-config.type';
 import { HeroSlide } from '../../models/hero-slide.model';
 import { heroSlideFilterDefaults } from '../../models/hero-slide-filter.model';
+import { ReorderService } from '@shared/services/ui/reorder.service';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { HeroSlideReorderComponent } from '../hero-slide-reorder/hero-slide-reorder.component';
 
 @Component({
   selector: 'app-hero-slide-active',
-  imports: [
-    DataTableComponent,
-    FilterDynamicComponent,
-    HeroSlideReorderComponent,
-    ButtonModule,
-    DialogModule,
-  ],
+  imports: [DataTableComponent, FilterDynamicComponent, ButtonModule],
   templateUrl: './hero-slide-active.component.html',
   styleUrl: './hero-slide-active.component.scss',
 })
@@ -28,12 +21,12 @@ export class HeroSlideActiveComponent {
   readonly router = inject(Router);
   readonly store = inject(HeroSlideStore);
   private readonly dialog = inject(DialogService);
-
-  readonly reorderVisible = signal(false);
+  private readonly reorderService = inject(ReorderService);
 
   readonly tableConfig = computed(() => {
     return heroSlideTableConfig(this.router, {
       onDelete: (heroSlide) => this.onSoftDelete(heroSlide),
+      onBulkStatusChange: (ids, status) => this.onBulkStatusChange(ids, status),
     });
   });
 
@@ -57,6 +50,20 @@ export class HeroSlideActiveComponent {
     const { page = 1, limit = 10 } = this.store.filter();
     return (page - 1) * limit;
   });
+
+  onBulkStatusChange(ids: string[], status: boolean): void {
+    const actionText = status ? 'activar' : 'desactivar';
+
+    this.dialog.confirm({
+      message: `¿Deseas ${actionText} <strong>${ids.length}</strong> slide(s) seleccionado(s)?`,
+      acceptLabel: 'Confirmar',
+      onAccept: () => {
+        this.store.changeStatus(ids, status, () => {
+          this.table()?.selectedRows.set([]);
+        });
+      },
+    });
+  }
 
   // --- Acciones ---
 
@@ -88,6 +95,21 @@ export class HeroSlideActiveComponent {
 
   handleClearFilters(): void {
     this.store.setFilter(heroSlideFilterDefaults());
+  }
+
+  onOpenReorder(): void {
+    this.reorderService.open({
+      title: 'Reordenar Hero Slides',
+      items: this.store.data(),
+      labelField: 'title',
+      imageField: (slide) => slide.images?.[0]?.variants?.thumb,
+      onSave: (ids) => {
+        this.reorderService.setLoading(true);
+        this.store.reorder(ids, () => {
+          this.reorderService.close();
+        });
+      },
+    });
   }
 
   // --- Eventos tabla ---

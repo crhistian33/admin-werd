@@ -60,3 +60,17 @@
     }
   </ng-template>
 </p-confirmdialog>
+
+<p-dialog
+  [header]="reorderService.config()?.title || ''"
+  [visible]="reorderService.isVisible()"
+  (visibleChange)="reorderService.isVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: reorderService.config()?.width || '480px' }"
+  [draggable]="false"
+  [dismissableMask]="true"
+>
+  @if (reorderService.isVisible()) {
+    <app-reorder-dynamic />
+  }
+</p-dialog>

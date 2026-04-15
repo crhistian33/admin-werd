@@ -18,7 +18,7 @@
       label="Reordenar"
       icon="pi pi-sort"
       severity="info"
-      (onClick)="reorderVisible.set(true)"
+      (onClick)="onOpenReorder()"
     />
   </ng-container>
   <ng-container tableDrawer>
@@ -31,15 +31,3 @@
     />
   </ng-container>
 </app-data-table>
-<p-dialog
-  header="Reordenar métodos de pago"
-  [visible]="reorderVisible()"
-  (visibleChange)="reorderVisible.set($event)"
-  [modal]="true"
-  [style]="{ width: '480px' }"
-  [draggable]="false"
->
-  @if (reorderVisible()) {
-    <app-payment-method-reorder (saved)="reorderVisible.set(false)" />
-  }
-</p-dialog>

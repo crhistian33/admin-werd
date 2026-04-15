@@ -4,6 +4,7 @@ import { Faq } from '../models/faq.model';
 
 type FaqTableCallbacks = {
   onDelete: (faq: Faq) => void;
+  onBulkStatusChange: (ids: string[], status: boolean) => void;
 };
 
 export const faqTableConfig = (
@@ -105,6 +106,26 @@ export const faqTableConfig = (
       tooltip: 'Eliminar',
       severity: 'danger',
       action: (row) => callback.onDelete(row),
+    },
+  ],
+  bulkActions: [
+    {
+      label: 'Activar',
+      icon: 'pi pi-check-circle',
+      action: (rows) =>
+        callback.onBulkStatusChange(
+          rows.map((r) => r.id),
+          true,
+        ),
+    },
+    {
+      label: 'Desactivar',
+      icon: 'pi pi-ban',
+      action: (rows) =>
+        callback.onBulkStatusChange(
+          rows.map((r) => r.id),
+          false,
+        ),
     },
   ],
 });

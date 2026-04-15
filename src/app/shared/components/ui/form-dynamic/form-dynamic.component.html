@@ -513,133 +513,17 @@
                             }
 
                             @case ("specs") {
-                              <div class="flex flex-col gap-2">
-                                @for (
-                                  spec of getSpecsValue(field.key);
-                                  track spec.sortOrder;
-                                  let i = $index
-                                ) {
-                                  <div
-                                    class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100"
-                                  >
-                                    <span
-                                      class="text-slate-300 cursor-grab select-none px-1"
-                                    >
-                                      <i class="pi pi-bars text-xs"></i>
-                                    </span>
-                                    <input
-                                      pInputText
-                                      type="text"
-                                      [value]="spec.specKey"
-                                      (input)="
-                                        updateSpec(
-                                          field.key,
-                                          i,
-                                          'specKey',
-                                          $any($event.target).value
-                                        )
-                                      "
-                                      placeholder="Propiedad (ej: Procesador)"
-                                      class="flex-1 text-sm"
-                                    />
-                                    <input
-                                      pInputText
-                                      type="text"
-                                      [value]="spec.specValue"
-                                      (input)="
-                                        updateSpec(
-                                          field.key,
-                                          i,
-                                          'specValue',
-                                          $any($event.target).value
-                                        )
-                                      "
-                                      placeholder="Valor (ej: Intel Core i7)"
-                                      class="flex-1 text-sm"
-                                    />
-                                    <button
-                                      type="button"
-                                      (click)="removeSpec(field.key, i)"
-                                      class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                    >
-                                      <lucide-icon
-                                        name="Trash"
-                                        class="size-3.5"
-                                      />
-                                    </button>
-                                  </div>
-                                }
-                                <button
-                                  type="button"
-                                  (click)="addSpec(field.key)"
-                                  class="flex items-center gap-2 text-sm text-green-600 hover:text-green-700 font-medium mt-1 w-fit"
-                                >
-                                  <i class="pi pi-plus-circle text-sm"></i>
-                                  Agregar especificación
-                                </button>
-                                @if (field.hint) {
-                                  <p class="text-xs text-slate-400 mt-0.5">
-                                    {{ field.hint }}
-                                  </p>
-                                }
-                              </div>
+                              <app-products-specs
+                                [field]="field"
+                                [formArray]="getFormArray(field.key)"
+                              />
                             }
 
                             @case ("features") {
-                              <div class="flex flex-col gap-2">
-                                @for (
-                                  feat of getFeaturesValue(field.key);
-                                  track feat.sortOrder;
-                                  let i = $index
-                                ) {
-                                  <div
-                                    class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100"
-                                  >
-                                    <span
-                                      class="text-slate-300 cursor-grab select-none px-1"
-                                    >
-                                      <i class="pi pi-bars text-xs"></i>
-                                    </span>
-                                    <input
-                                      pInputText
-                                      type="text"
-                                      [value]="feat.feature"
-                                      (input)="
-                                        updateFeature(
-                                          field.key,
-                                          i,
-                                          $any($event.target).value
-                                        )
-                                      "
-                                      placeholder="Ej: Pantalla Full HD antirreflejo"
-                                      class="flex-1 text-sm"
-                                    />
-                                    <button
-                                      type="button"
-                                      (click)="removeFeature(field.key, i)"
-                                      class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                    >
-                                      <lucide-icon
-                                        name="Trash"
-                                        class="size-3.5"
-                                      />
-                                    </button>
-                                  </div>
-                                }
-                                <button
-                                  type="button"
-                                  (click)="addFeature(field.key)"
-                                  class="flex items-center gap-2 text-sm text-green-600 hover:text-green-700 font-medium mt-1 w-fit"
-                                >
-                                  <i class="pi pi-plus-circle text-sm"></i>
-                                  Agregar característica
-                                </button>
-                                @if (field.hint) {
-                                  <p class="text-xs text-slate-400 mt-0.5">
-                                    {{ field.hint }}
-                                  </p>
-                                }
-                              </div>
+                              <app-products-features
+                                [field]="field"
+                                [formArray]="getFormArray(field.key)"
+                              />
                             }
 
                             @case ("shipping-areas") {
@@ -648,6 +532,7 @@
                                 [formArray]="getFormArray(field.key)"
                               />
                             }
+
                             @case ("shipping-rates") {
                               <app-shipping-rates
                                 [field]="field"

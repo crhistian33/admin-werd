@@ -20,8 +20,11 @@ export class BrandsActiveComponent {
   readonly store = inject(BrandStore);
   private readonly dialog = inject(DialogService);
 
-  readonly tableConfig = brandTableConfig(this.router, {
-    onDelete: (brand) => this.onSoftDelete(brand),
+  readonly tableConfig = computed(() => {
+    return brandTableConfig(this.router, {
+      onDelete: (brand) => this.onSoftDelete(brand),
+      onBulkStatusChange: (ids, status) => this.onBulkStatusChange(ids, status),
+    });
   });
 
   readonly table = viewChild(DataTableComponent);
@@ -29,8 +32,8 @@ export class BrandsActiveComponent {
   readonly drawerVisible = signal(false);
 
   readonly filterFields = computed<FilterFieldConfig[]>(() =>
-    this.tableConfig.columns
-      .filter((col) => col.filter?.enabled)
+    this.tableConfig()
+      .columns.filter((col) => col.filter?.enabled)
       .map((col) => ({
         key: col.field as string,
         label: col.header,
@@ -45,6 +48,20 @@ export class BrandsActiveComponent {
     const { page = 1, limit = 10 } = this.store.filter();
     return (page - 1) * limit;
   });
+
+  onBulkStatusChange(ids: string[], status: boolean): void {
+    const actionText = status ? 'activar' : 'desactivar';
+
+    this.dialog.confirm({
+      message: `¿Deseas ${actionText} <strong>${ids.length}</strong> marca(s) seleccionada(s)?`,
+      acceptLabel: 'Confirmar',
+      onAccept: () => {
+        this.store.changeStatus(ids, status, () => {
+          this.table()?.selectedRows.set([]);
+        });
+      },
+    });
+  }
 
   // --- Acciones ---
   onSoftDelete(brand: Brand): void {

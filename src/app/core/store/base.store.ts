@@ -361,6 +361,27 @@ export abstract class BaseStore<
       });
   }
 
+  changeStatus(ids: string[], status: boolean, onSuccess?: () => void) {
+    this.isSaving.set(true);
+    this.service
+      .changeStatus(ids, status)
+      .pipe(takeUntilDestroyed(this.destroy))
+      .subscribe({
+        next: (res) => {
+          this.isSaving.set(false);
+          this.dialog.success(
+            res.message || 'Actualización de estados realizados',
+            'Operación exitosa',
+          );
+          this.reloadActive();
+          onSuccess?.();
+        },
+        error: () => {
+          this.isSaving.set(false);
+        },
+      });
+  }
+
   // ── Helper privado ────────────────────────────────────────────────
 
   private buildParams(f: Record<string, any>): Record<string, string> {

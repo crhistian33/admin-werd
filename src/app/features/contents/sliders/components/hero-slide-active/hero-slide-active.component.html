@@ -28,19 +28,7 @@
       label="Reordenar"
       icon="pi pi-sort"
       severity="info"
-      (onClick)="reorderVisible.set(true)"
+      (onClick)="onOpenReorder()"
     />
   </ng-container>
 </app-data-table>
-<p-dialog
-  header="Reordenar slides"
-  [visible]="reorderVisible()"
-  (visibleChange)="reorderVisible.set($event)"
-  [modal]="true"
-  [style]="{ width: '480px' }"
-  [draggable]="false"
->
-  @if (reorderVisible()) {
-    <app-hero-slide-reorder (saved)="reorderVisible.set(false)" />
-  }
-</p-dialog>

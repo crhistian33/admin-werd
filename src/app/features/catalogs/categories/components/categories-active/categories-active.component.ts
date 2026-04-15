@@ -23,13 +23,16 @@ export class CategoriesActiveComponent {
 
   readonly drawerVisible = signal(false);
 
-  readonly tableConfig = categoryTableConfig(this.router, {
-    onDelete: (category) => this.onSoftDelete(category),
+  readonly tableConfig = computed(() => {
+    return categoryTableConfig(this.router, {
+      onDelete: (method) => this.onSoftDelete(method),
+      onBulkStatusChange: (ids, status) => this.onBulkStatusChange(ids, status),
+    });
   });
 
   readonly filterFields = computed<FilterFieldConfig[]>(() =>
-    this.tableConfig.columns
-      .filter((col) => col.filter?.enabled)
+    this.tableConfig()
+      .columns.filter((col) => col.filter?.enabled)
       .map((col) => ({
         key: (col.filterField ?? col.field) as string,
         label: col.header,
@@ -45,6 +48,20 @@ export class CategoriesActiveComponent {
     const { page = 1, limit = 10 } = this.store.filter();
     return (page - 1) * limit;
   });
+
+  onBulkStatusChange(ids: string[], status: boolean): void {
+    const actionText = status ? 'activar' : 'desactivar';
+
+    this.dialog.confirm({
+      message: `¿Deseas ${actionText} <strong>${ids.length}</strong> categoría(s) seleccionada(s)?`,
+      acceptLabel: 'Confirmar',
+      onAccept: () => {
+        this.store.changeStatus(ids, status, () => {
+          this.table()?.selectedRows.set([]);
+        });
+      },
+    });
+  }
 
   onSoftDelete(category: Category): void {
     this.dialog.delete({

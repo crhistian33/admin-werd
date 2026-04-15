@@ -9,28 +9,21 @@ import { FilterFieldConfig } from '@shared/types/filter-config.type';
 import { PaymentMethod } from '../../models/payment-method.model';
 import { ButtonModule } from 'primeng/button';
 import { paymentMethodFilterDefaults } from '../../models/payment-method-filter.model';
-import { DialogModule } from 'primeng/dialog';
-import { PaymentMethodReorderComponent } from '../../components/payment-method-reorder/payment-method-reorder.component';
+import { ReorderService } from '@shared/services/ui/reorder.service';
 
 @Component({
   selector: 'app-payment-method-list',
   standalone: true,
-  imports: [
-    DataTableComponent,
-    FilterDynamicComponent,
-    ButtonModule,
-    DialogModule,
-    PaymentMethodReorderComponent,
-  ],
+  imports: [DataTableComponent, FilterDynamicComponent, ButtonModule],
   templateUrl: './payment-method-list.component.html',
 })
 export class PaymentMethodListComponent {
   readonly router = inject(Router);
   readonly store = inject(PaymentMethodStore);
   private readonly dialog = inject(DialogService);
+  private readonly reorderService = inject(ReorderService);
 
   readonly drawerVisible = signal(false);
-  readonly reorderVisible = signal(false);
   readonly table = viewChild(DataTableComponent);
 
   // Configuración de la tabla con callbacks
@@ -108,6 +101,20 @@ export class PaymentMethodListComponent {
 
   handleClearFilters(): void {
     this.store.setFilter(paymentMethodFilterDefaults());
+  }
+
+  onOpenReorder(): void {
+    this.reorderService.open({
+      title: 'Reordenar Métodos de Pago',
+      items: this.store.data(),
+      labelField: 'name',
+      onSave: (ids) => {
+        this.reorderService.setLoading(true);
+        this.store.reorder(ids, () => {
+          this.reorderService.close();
+        });
+      },
+    });
   }
 
   handlePagination(event: any): void {

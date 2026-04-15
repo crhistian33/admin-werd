@@ -49,7 +49,7 @@ export const productTableConfig = (
       header: 'Precio',
       type: 'currency',
       sortable: true,
-      width: '120px',
+      width: '150px',
     },
     {
       field: 'category.name',
@@ -141,7 +141,7 @@ export const productTableConfig = (
   ],
   bulkActions: [
     {
-      label: 'Activar',
+      label: 'Publicar',
       icon: 'pi pi-check-circle',
       action: (rows) =>
         callback.onBulkStatusChange(
@@ -150,7 +150,7 @@ export const productTableConfig = (
         ),
     },
     {
-      label: 'Desactivar',
+      label: 'Archivar',
       icon: 'pi pi-ban',
       action: (rows) =>
         callback.onBulkStatusChange(

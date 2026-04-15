@@ -19,10 +19,10 @@ export class ProductStore extends BaseStore<Product, ProductFilter> {
   }
 
   // Si necesitas búsqueda local adicional, implementa aquí, pero la tabla ahora usa items() directamente.
-  changeStatus(ids: string[], status: string, onSuccess?: () => void) {
+  changeStatusProduct(ids: string[], status: string, onSuccess?: () => void) {
     this.isSaving.set(true);
     this.service
-      .changeStatus(ids, status)
+      .changeStatusProduct(ids, status)
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (res) => {

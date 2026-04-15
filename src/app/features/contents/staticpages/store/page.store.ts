@@ -15,10 +15,10 @@ export class PageStore extends BaseStore<Page> {
     super({ useSoftDelete: true });
   }
 
-  changeStatus(ids: string[], status: string, onSuccess?: () => void) {
+  changeStatusPage(ids: string[], status: string, onSuccess?: () => void) {
     this.isSaving.set(true);
     this.service
-      .changeStatus(ids, status)
+      .changeStatusPage(ids, status)
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (res) => {

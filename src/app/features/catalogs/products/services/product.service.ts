@@ -10,7 +10,7 @@ import { ApiResponse } from '@shared/models/api-response.model';
 export class ProductService extends BaseService<Product> {
   protected readonly endpoint = 'products';
 
-  changeStatus(
+  changeStatusProduct(
     ids: string[],
     status: string,
   ): Observable<ApiResponse<Product>> {

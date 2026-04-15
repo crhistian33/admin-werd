@@ -5,6 +5,7 @@ import { environment } from '@env/environment';
 
 type HeroSlideTableCallbacks = {
   onDelete: (heroSlide: HeroSlide) => void;
+  onBulkStatusChange: (ids: string[], status: boolean) => void;
 };
 
 export const heroSlideTableConfig = (
@@ -67,13 +68,13 @@ export const heroSlideTableConfig = (
     },
     {
       field: 'isActive',
-      header: 'Estado',
+      header: 'Activo',
       type: 'badge',
       sortable: true,
       width: '130px',
       badges: [
-        { value: 'true', label: 'Activo', severity: 'success' },
-        { value: 'false', label: 'Inactivo', severity: 'danger' },
+        { value: 'true', label: 'Sí', severity: 'success' },
+        { value: 'false', label: 'No', severity: 'danger' },
       ],
       filter: {
         enabled: true,
@@ -111,6 +112,26 @@ export const heroSlideTableConfig = (
       tooltip: 'Eliminar',
       severity: 'danger',
       action: (row) => callback.onDelete(row),
+    },
+  ],
+  bulkActions: [
+    {
+      label: 'Activar',
+      icon: 'pi pi-check-circle',
+      action: (rows) =>
+        callback.onBulkStatusChange(
+          rows.map((r) => r.id),
+          true,
+        ),
+    },
+    {
+      label: 'Desactivar',
+      icon: 'pi pi-ban',
+      action: (rows) =>
+        callback.onBulkStatusChange(
+          rows.map((r) => r.id),
+          false,
+        ),
     },
   ],
 });

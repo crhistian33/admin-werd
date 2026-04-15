@@ -42,6 +42,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { PasswordModule } from 'primeng/password';
 import { ShippingRatesComponent } from '@features/settings/shipping-zones/components/shipping-rates/shipping-rates.component';
 import { ShippingAreasComponent } from '@features/settings/shipping-zones/components/shipping-areas/shipping-areas.component';
+import { ProductsFeaturesComponent } from '@features/catalogs/products/components/products-features/products-features.component';
+import { ProductsSpecsComponent } from '@features/catalogs/products/components/products-specs/products-specs.component';
 
 type RemovedImageMap = { [key: string]: string | string[] };
 
@@ -66,6 +68,8 @@ type RemovedImageMap = { [key: string]: string | string[] };
     PasswordModule,
     ShippingRatesComponent,
     ShippingAreasComponent,
+    ProductsFeaturesComponent,
+    ProductsSpecsComponent,
   ],
   templateUrl: './form-dynamic.component.html',
   styleUrl: './form-dynamic.component.scss',
@@ -558,82 +562,6 @@ export class FormDynamicComponent {
       .map((i) => i.tempId);
 
     this.form().get(key)?.setValue(newIds);
-    this.form().get(key)?.markAsDirty();
-  }
-
-  // ── Specs ─────────────────────────────────────────────────────────
-
-  getSpecsValue(
-    key: string,
-  ): { specKey: string; specValue: string; sortOrder: number }[] {
-    return this.form().get(key)?.value ?? [];
-  }
-
-  addSpec(key: string): void {
-    const current = this.getSpecsValue(key);
-    const updated = [
-      ...current,
-      { specKey: '', specValue: '', sortOrder: current.length },
-    ];
-    this.form().get(key)?.setValue(updated);
-    this.form().get(key)?.markAsDirty();
-  }
-
-  updateSpec(
-    key: string,
-    index: number,
-    field: 'specKey' | 'specValue',
-    value: string,
-  ): void {
-    const current = [...this.getSpecsValue(key)];
-    current[index] = { ...current[index], [field]: value };
-    this.form().get(key)?.setValue(current);
-  }
-
-  removeSpec(key: string, index: number): void {
-    const updated = this.getSpecsValue(key)
-      .filter((_, i) => i !== index)
-      .map((s, i) => ({ ...s, sortOrder: i }));
-    this.form().get(key)?.setValue(updated);
-    this.form().get(key)?.markAsDirty();
-  }
-
-  onSpecsReorder(key: string, items: any[]): void {
-    const reordered = items.map((s, i) => ({ ...s, sortOrder: i }));
-    this.form().get(key)?.setValue(reordered);
-    this.form().get(key)?.markAsDirty();
-  }
-
-  // ── Features ──────────────────────────────────────────────────────
-
-  getFeaturesValue(key: string): { feature: string; sortOrder: number }[] {
-    return this.form().get(key)?.value ?? [];
-  }
-
-  addFeature(key: string): void {
-    const current = this.getFeaturesValue(key);
-    const updated = [...current, { feature: '', sortOrder: current.length }];
-    this.form().get(key)?.setValue(updated);
-    this.form().get(key)?.markAsDirty();
-  }
-
-  updateFeature(key: string, index: number, value: string): void {
-    const current = [...this.getFeaturesValue(key)];
-    current[index] = { ...current[index], feature: value };
-    this.form().get(key)?.setValue(current);
-  }
-
-  removeFeature(key: string, index: number): void {
-    const updated = this.getFeaturesValue(key)
-      .filter((_, i) => i !== index)
-      .map((f, i) => ({ ...f, sortOrder: i }));
-    this.form().get(key)?.setValue(updated);
-    this.form().get(key)?.markAsDirty();
-  }
-
-  onFeaturesReorder(key: string, items: any[]): void {
-    const reordered = items.map((f, i) => ({ ...f, sortOrder: i }));
-    this.form().get(key)?.setValue(reordered);
     this.form().get(key)?.markAsDirty();
   }
 

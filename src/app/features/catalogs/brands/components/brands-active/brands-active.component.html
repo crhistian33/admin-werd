@@ -2,7 +2,7 @@
   [data]="store.data()"
   [totalItems]="store.totalItems()"
   [first]="firstRowIndex()"
-  [config]="tableConfig"
+  [config]="tableConfig()"
   [loading]="store.loadingState().initial"
   [isSaving]="store.loadingState().updating"
   (onPageChange)="handlePagination($event)"

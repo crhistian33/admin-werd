@@ -8,7 +8,6 @@ import {
 } from '../models/shipping-filter.model';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '@shared/models/api-response.model';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({ providedIn: 'root' })
 export class ShippingZoneStore extends BaseStore<ShippingZone> {
@@ -20,27 +19,6 @@ export class ShippingZoneStore extends BaseStore<ShippingZone> {
 
   constructor() {
     super({ useSoftDelete: true });
-  }
-
-  changeStatus(ids: string[], status: boolean, onSuccess?: () => void) {
-    this.isSaving.set(true);
-    this.service
-      .changeStatus(ids, status)
-      .pipe(takeUntilDestroyed(this.destroy))
-      .subscribe({
-        next: (res) => {
-          this.isSaving.set(false);
-          this.dialog.success(
-            res.message || 'Actualización de estados realizados',
-            'Operación exitosa',
-          );
-          this.reloadActive();
-          onSuccess?.();
-        },
-        error: () => {
-          this.isSaving.set(false);
-        },
-      });
   }
 
   // Ubigeo

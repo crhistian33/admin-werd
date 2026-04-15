@@ -17,15 +17,4 @@ export class PaymentMethodsService extends BaseService<PaymentMethod> {
       { context: this.context },
     );
   }
-
-  changeStatus(
-    ids: string[],
-    status: boolean,
-  ): Observable<ApiResponse<PaymentMethod>> {
-    return this.http.patch<ApiResponse<PaymentMethod>>(
-      `${this.url}/bulk-status`,
-      { ids, status },
-      { context: this.context },
-    );
-  }
 }
