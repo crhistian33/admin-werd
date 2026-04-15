@@ -16,6 +16,8 @@ export type FieldType =
   | 'switch'
   | 'features'
   | 'specs'
+  | 'shipping-areas'
+  | 'shipping-rates'
   | 'date';
 
 export interface SelectOption {
@@ -29,6 +31,8 @@ export interface FormFieldConfig {
   type: FieldType;
   placeholder?: string;
   hint?: string;
+  isArray?: boolean;
+  template?: { [key: string]: any };
   validators?: ValidatorFn[];
   options?: SelectOption[] | ((formValue: any) => SelectOption[]);
   accept?: string;

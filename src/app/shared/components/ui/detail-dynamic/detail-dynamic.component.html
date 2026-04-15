@@ -399,6 +399,109 @@
             </div>
           }
 
+          <!-- ════ SHIPPING DATA — tarifas y áreas ════ -->
+          @if (section.layout === "shipping-data") {
+            <div class="bg-white rounded-lg border border-slate-100 p-6 h-full">
+              @if (section.title) {
+                <h2
+                  class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
+                >
+                  {{ section.title }}
+                </h2>
+              }
+              <div class="flex flex-col gap-6">
+                @for (field of section.fields; track field.key) {
+                  @if (isVisible(field)) {
+                    @if (field.type === "rates") {
+                      @if (getRates(field); as rates) {
+                        @if (rates.length > 0) {
+                          <div class="flex flex-col gap-2">
+                            <span
+                              class="text-[10px] font-bold text-slate-400 uppercase tracking-tight"
+                              >{{ field.label }}</span
+                            >
+                            <div class="divide-y divide-slate-100">
+                              @for (rate of rates; track rate.id) {
+                                <div
+                                  class="flex items-start justify-between py-3 gap-4"
+                                >
+                                  <div class="flex flex-col gap-1">
+                                    <span
+                                      class="text-sm text-slate-500 shrink-0"
+                                      >{{ rate.name }}</span
+                                    >
+                                    <span class="text-[11px] text-slate-400">
+                                      Tiempo: {{ rate.estimatedMin }}
+                                      @if (rate.estimatedMax) {
+                                        a {{ rate.estimatedMax }}
+                                      }
+                                      {{
+                                        formatDeliveryUnit(rate.estimatedUnit)
+                                      }}
+                                    </span>
+                                  </div>
+                                  <div class="flex flex-col items-end">
+                                    <span
+                                      class="text-sm font-medium text-slate-800"
+                                      >{{ rate.price | currency: "PEN" }}</span
+                                    >
+                                    @if (rate.minOrderAmount > 0) {
+                                      <span class="text-[10px] text-slate-400">
+                                        Min:
+                                        {{
+                                          rate.minOrderAmount
+                                            | currency: "PEN"
+                                        }}
+                                      </span>
+                                    }
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        }
+                      }
+                    }
+
+                    @if (field.type === "areas") {
+                      @if (getAreas(field); as areas) {
+                        @if (areas.length > 0) {
+                          <div class="flex flex-col gap-2">
+                            <span
+                              class="text-[10px] font-bold text-slate-400 uppercase tracking-tight"
+                              >{{ field.label }}</span
+                            >
+                            <div class="flex flex-wrap gap-2">
+                              @for (area of areas; track $index) {
+                                <p-tag severity="secondary" [rounded]="true">
+                                  <div class="flex items-center gap-1 px-1">
+                                    <i class="pi pi-map-marker text-[10px]"></i>
+                                    <span class="text-[10px] font-medium">
+                                      {{
+                                        area.department?.name ||
+                                          area.departmentId
+                                      }}
+                                      @if (area.province) {
+                                        / {{ area.province.name }}
+                                      }
+                                      @if (area.district) {
+                                        / {{ area.district.name }}
+                                      }
+                                    </span>
+                                  </div>
+                                </p-tag>
+                              }
+                            </div>
+                          </div>
+                        }
+                      }
+                    }
+                  }
+                }
+              </div>
+            </div>
+          }
+
           <!-- ════ HTML — contenido richtext ════ -->
           @if (section.layout === "html") {
             <div class="bg-white rounded-lg border border-slate-100 p-6">

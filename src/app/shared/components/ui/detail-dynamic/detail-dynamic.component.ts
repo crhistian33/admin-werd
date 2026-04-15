@@ -134,6 +134,27 @@ export class DetailDynamicComponent {
     return Array.isArray(arr) ? arr : [];
   }
 
+  getRates(field: DetailFieldConfig) {
+    const key = field.key;
+    const arr = this.getValue(key);
+    return Array.isArray(arr) ? arr : [];
+  }
+
+  getAreas(field: DetailFieldConfig) {
+    const key = field.key;
+    const arr = this.getValue(key);
+    return Array.isArray(arr) ? arr : [];
+  }
+
+  formatDeliveryUnit(unit: string): string {
+    const units: Record<string, string> = {
+      days: 'día(s)',
+      hours: 'hora(s)',
+      minutes: 'minuto(s)',
+    };
+    return units[unit] || unit;
+  }
+
   // ── Features ──────────────────────────────────────────────────────
 
   getFeatures(field: DetailFieldConfig): { feature: string }[] {

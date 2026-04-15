@@ -18,8 +18,8 @@ export const routes: Routes = [
       import('./payment-methods/payment-methods.routes').then((m) => m.routes),
   },
   {
-    path: 'despacho',
+    path: 'zonas-envio',
     loadChildren: () =>
-      import('./shipping/shipping.routes').then((m) => m.routes),
+      import('./shipping-zones/shipping-zones.routes').then((m) => m.routes),
   },
 ];

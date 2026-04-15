@@ -641,6 +641,19 @@
                                 }
                               </div>
                             }
+
+                            @case ("shipping-areas") {
+                              <app-shipping-areas
+                                [field]="field"
+                                [formArray]="getFormArray(field.key)"
+                              />
+                            }
+                            @case ("shipping-rates") {
+                              <app-shipping-rates
+                                [field]="field"
+                                [formArray]="getFormArray(field.key)"
+                              />
+                            }
                           }
 
                           @if (

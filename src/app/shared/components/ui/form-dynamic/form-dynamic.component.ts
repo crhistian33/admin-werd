@@ -12,6 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
@@ -39,6 +40,8 @@ import { ImageUploadService } from '@shared/images/services/image-upload.service
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePickerModule } from 'primeng/datepicker';
 import { PasswordModule } from 'primeng/password';
+import { ShippingRatesComponent } from '@features/settings/shipping-zones/components/shipping-rates/shipping-rates.component';
+import { ShippingAreasComponent } from '@features/settings/shipping-zones/components/shipping-areas/shipping-areas.component';
 
 type RemovedImageMap = { [key: string]: string | string[] };
 
@@ -61,6 +64,8 @@ type RemovedImageMap = { [key: string]: string | string[] };
     LucideAngularModule,
     DatePickerModule,
     PasswordModule,
+    ShippingRatesComponent,
+    ShippingAreasComponent,
   ],
   templateUrl: './form-dynamic.component.html',
   styleUrl: './form-dynamic.component.scss',
@@ -232,16 +237,28 @@ export class FormDynamicComponent {
       return untracked(() => {
         const controls: Record<string, any> = {};
 
-        currentFields.forEach((f) => {
-          const initialValue =
-            f.type === 'file-image' || f.type === 'file-gallery'
-              ? f.type === 'file-gallery'
-                ? []
-                : null
-              : data
-                ? (data[f.key] ?? null)
-                : null;
-          controls[f.key] = [initialValue, f.validators ?? []];
+        currentFields.forEach((f: FormFieldConfig) => {
+          if (f.isArray) {
+            // Si hay data, mapeamos cada objeto a un FormGroup usando el template
+            const initialArray = data && data[f.key] ? data[f.key] : [];
+            const template = f.template || {};
+            const formGroups = initialArray.map((item: any) => {
+              const group = this.fb.group(template);
+              group.patchValue(item);
+              return group;
+            });
+            controls[f.key] = this.fb.array(formGroups, f.validators ?? []);
+          } else {
+            const initialValue =
+              f.type === 'file-image' || f.type === 'file-gallery'
+                ? f.type === 'file-gallery'
+                  ? []
+                  : null
+                : data
+                  ? (data[f.key] ?? null)
+                  : null;
+            controls[f.key] = [initialValue, f.validators ?? []];
+          }
         });
 
         const group = this.fb.group(controls);
@@ -288,6 +305,11 @@ export class FormDynamicComponent {
       default:
         return 'col-span-1';
     }
+  }
+
+  // Método auxiliar para el HTML
+  getFormArray(key: string): FormArray {
+    return this.form().get(key) as FormArray;
   }
 
   // ── Helpers ───────────────────────────────────────────────────────
@@ -686,11 +708,29 @@ export class FormDynamicComponent {
   getError(key: string): string {
     const ctrl = this.form().get(key);
     if (!ctrl?.errors) return '';
-    if (ctrl.errors['required']) return 'Este campo es obligatorio';
-    if (ctrl.errors['minlength'])
-      return `Mínimo ${ctrl.errors['minlength'].requiredLength} caracteres`;
-    if (ctrl.errors['email']) return 'Email inválido';
-    if (ctrl.errors['pattern']) return 'Formato inválido';
+
+    const error = ctrl.errors;
+
+    // 1. Caso: Campo Obligatorio
+    if (error['required']) return 'Este campo es obligatorio';
+
+    // 2. Caso: Longitud Mínima (Diferenciando Array vs String)
+    if (error['minlength']) {
+      const requiredLength = error['minlength'].requiredLength;
+
+      // Si el control es un FormArray, hablamos de "registros" o "tarifas"
+      if (ctrl instanceof FormArray) {
+        return `Debes agregar al menos ${requiredLength} registro(s)`;
+      }
+
+      // Si es un campo de texto normal, hablamos de "caracteres"
+      return `Mínimo ${requiredLength} caracteres`;
+    }
+
+    // 3. Otros casos estándar
+    if (error['email']) return 'Email inválido';
+    if (error['pattern']) return 'Formato inválido';
+    if (error['min']) return `El valor mínimo es ${error['min'].min}`;
     return 'Campo inválido';
   }
 

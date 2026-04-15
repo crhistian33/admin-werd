@@ -1,30 +1,31 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { CategoryStore } from '../../store/category.store';
-import { DialogService } from '@shared/services/ui/dialog.service';
-import { categoryTableConfig } from '../../config/category-table.config';
 import { DataTableComponent } from '@shared/components/ui/data-table/data-table.component';
 import { FilterDynamicComponent } from '@shared/components/ui/filter-dynamic/filter-dynamic.component';
+import { ShippingZoneStore } from '../../store/shipping-zone.store';
+import { DialogService } from '@shared/services/ui/dialog.service';
+import { shippingZoneTableConfig } from '../../config/shipping-zone-table.config';
 import { FilterFieldConfig } from '@shared/types/filter-config.type';
-import { Category } from '../../models/category.model';
-import { categoryFilterDefaults } from '../../models/category-filter.model';
+import { ShippingZone } from '../../models/shipping.model';
+import { shippingZoneFilterDefaults } from '../../models/shipping-filter.model';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
-  selector: 'app-categories-active',
-  imports: [DataTableComponent, FilterDynamicComponent],
-  templateUrl: './categories-active.component.html',
-  // Sin providers: [CategoryStore] — usa el store del padre (singleton compartido)
+  selector: 'app-shipping-zone-active',
+  imports: [DataTableComponent, FilterDynamicComponent, ButtonModule],
+  templateUrl: './shipping-zone-active.component.html',
+  styleUrl: './shipping-zone-active.component.scss',
 })
-export class CategoriesActiveComponent {
+export class ShippingZoneActiveComponent {
   readonly router = inject(Router);
-  // Store inyectado desde el padre — compartido con CategoriesTrashComponent
-  readonly store = inject(CategoryStore);
+  readonly store = inject(ShippingZoneStore);
   private readonly dialog = inject(DialogService);
 
   readonly drawerVisible = signal(false);
 
-  readonly tableConfig = categoryTableConfig(this.router, {
-    onDelete: (category) => this.onSoftDelete(category),
+  readonly tableConfig = shippingZoneTableConfig(this.router, {
+    onDelete: (item) => this.onSoftDelete(item),
+    onBulkStatusChange: (ids, status) => this.onBulkStatusChange(ids, status),
   });
 
   readonly filterFields = computed<FilterFieldConfig[]>(() =>
@@ -46,26 +47,40 @@ export class CategoriesActiveComponent {
     return (page - 1) * limit;
   });
 
-  onSoftDelete(category: Category): void {
+  onBulkStatusChange(ids: string[], status: boolean): void {
+    const actionText = status ? 'activar' : 'desactivar';
+
+    this.dialog.confirm({
+      message: `¿Deseas ${actionText} <strong>${ids.length}</strong> zona(s) de envío seleccionada(s)?`,
+      acceptLabel: 'Confirmar',
+      onAccept: () => {
+        this.store.changeStatus(ids, status, () => {
+          this.table()?.selectedRows.set([]);
+        });
+      },
+    });
+  }
+
+  onSoftDelete(shippingZone: ShippingZone): void {
     this.dialog.delete({
-      message: `¿Está seguro de eliminar la categoría <strong>${category.name}</strong>?
+      message: `¿Está seguro de eliminar la zona de envío <strong>${shippingZone.name}</strong>?
                 <br>Podrás recuperarla desde la papelera.`,
       onAccept: () => {
-        this.store.softDelete(category.id, () => {
+        this.store.softDelete(shippingZone.id, () => {
           this.table()?.selectedRows.update((rows: any[]) =>
-            rows.filter((r) => r.id !== category.id),
+            rows.filter((r) => r.id !== shippingZone.id),
           );
         });
       },
     });
   }
 
-  onSoftDeleteAll(categories: Category[]): void {
+  onSoftDeleteAll(shippingZones: ShippingZone[]): void {
     this.dialog.delete({
-      message: `¿Está seguro de eliminar <strong>${categories.length}</strong> registros seleccionados?
+      message: `¿Está seguro de eliminar <strong>${shippingZones.length}</strong> registros seleccionados?
                 <br>Se moverán a la papelera.`,
       onAccept: () => {
-        const ids = categories.map((c) => c.id);
+        const ids = shippingZones.map((c) => c.id);
         this.store.softDeleteAll(ids, () => {
           this.table()?.selectedRows.set([]);
         });
@@ -74,7 +89,7 @@ export class CategoriesActiveComponent {
   }
 
   handleClearFilters(): void {
-    this.store.setFilter(categoryFilterDefaults());
+    this.store.setFilter(shippingZoneFilterDefaults());
   }
 
   handlePagination(event: any): void {

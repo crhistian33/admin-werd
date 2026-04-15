@@ -12,7 +12,9 @@ export type DetailFieldType =
   | 'gallery' // galería con thumbnails (p-galleria)
   | 'specs' // tabla key/value — { specKey, specValue }[]
   | 'features' // lista con check icons — { feature }[]
-  | 'price-block'; // bloque precio + costo + margen calculado
+  | 'price-block' // bloque precio + costo + margen calculado
+  | 'rates' // tabla rates
+  | 'areas'; // tabla areas
 
 export interface BadgeOption {
   value: any;
@@ -69,7 +71,8 @@ export type DetailSectionLayout =
   | 'features' // lista con checks — card
   | 'price' // bloque de precios — card
   | 'html' // contenido richtext — card full-width
-  | 'tags'; // fila de badges
+  | 'tags' // fila de badges
+  | 'shipping-data'; // tabla shipping
 
 export interface DetailSectionConfig {
   title?: string;

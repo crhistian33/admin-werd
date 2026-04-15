@@ -1,0 +1,100 @@
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-4">
+    @for (area of formArray().controls; track $index; let i = $index) {
+      <div
+        class="relative p-6 bg-slate-50/50 rounded-lg border border-slate-200 hover:bg-white transition-all animate-[fadeUp_.3s_ease_both]"
+        [formGroup]="$any(area)"
+      >
+        <div class="absolute top-1 right-1">
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            (onClick)="removeArea(i)"
+          />
+        </div>
+
+        <div class="grid grid-cols-12 gap-5">
+          <!-- Departamento -->
+          <div class="col-span-12 md:col-span-4 flex flex-col gap-2">
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Departamento</label
+            >
+            <p-select
+              [options]="store.departments()"
+              formControlName="departmentId"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Selecciona departamento"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              (onChange)="onDepartmentChange(i, $event.value)"
+              appendTo="body"
+              class="w-full"
+              inputStyleClass="w-full"
+            />
+          </div>
+
+          <!-- Provincia -->
+          <div class="col-span-12 md:col-span-4 flex flex-col gap-2">
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Provincia</label
+            >
+            <p-select
+              [options]="provincesMap()[i] || []"
+              formControlName="provinceId"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Todas las provincias"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              (onChange)="onProvinceChange(i, $event.value)"
+              appendTo="body"
+              class="w-full"
+              inputStyleClass="w-full"
+            />
+          </div>
+
+          <!-- Distrito -->
+          <div class="col-span-12 md:col-span-4 flex flex-col gap-2">
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Distrito</label
+            >
+            <p-select
+              [options]="districtsMap()[i] || []"
+              formControlName="districtId"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Todos los distritos"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              appendTo="body"
+              class="w-full"
+              inputStyleClass="w-full"
+            />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <p-button
+    label="Agregar área"
+    icon="pi pi-plus"
+    [outlined]="true"
+    size="small"
+    styleClass="!border-green-700 !text-green-700 w-fit border-dashed"
+    (onClick)="addArea()"
+  />
+
+  @if (field().hint) {
+    <p class="text-xs text-slate-400 mt-1">
+      <i class="pi pi-info-circle mr-1"></i>
+      {{ field().hint }}
+    </p>
+  }
+</div>

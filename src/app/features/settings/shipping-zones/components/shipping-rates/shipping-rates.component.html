@@ -1,0 +1,148 @@
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-6">
+    @for (rate of formArray().controls; track $index; let i = $index) {
+      <div
+        class="relative p-6 bg-slate-50/50 rounded-lg border border-slate-200 hover:bg-white transition-all animate-[fadeUp_.3s_ease_both]"
+        [formGroup]="$any(rate)"
+      >
+        <div class="absolute top-1 right-1">
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            (onClick)="removeRate(i)"
+          />
+        </div>
+
+        <div class="grid grid-cols-12 gap-5">
+          <div class="col-span-12 md:col-span-6 flex flex-col gap-2">
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Nombre del Servicio</label
+            >
+            <input
+              pInputText
+              formControlName="name"
+              placeholder="Ej: Envío Estándar"
+              class="w-full"
+            />
+          </div>
+          <div
+            class="col-span-6 md:col-span-3 lg:col-span-2 flex flex-col gap-2"
+          >
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Costo (S/)</label
+            >
+            <p-inputNumber
+              formControlName="price"
+              [placeholder]="'0.00'"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [min]="0"
+              mode="decimal"
+              locale="es-PE"
+              inputStyleClass="w-full"
+            />
+          </div>
+          <div
+            class="col-span-6 md:col-span-3 lg:col-span-2 flex flex-col gap-2"
+          >
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Mín. Pedido</label
+            >
+            <p-inputnumber
+              formControlName="minOrderAmount"
+              [placeholder]="'0.00'"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [min]="0"
+              mode="decimal"
+              locale="es-PE"
+              inputStyleClass="w-full"
+            />
+          </div>
+          <div
+            class="col-span-6 md:col-span-4 lg:col-span-2 flex flex-col gap-2"
+          >
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Envío Gratis desde</label
+            >
+            <p-inputnumber
+              formControlName="freeShippingThreshold"
+              placeholder="Ej: 200.00"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [min]="0"
+              mode="decimal"
+              locale="es-PE"
+              inputStyleClass="w-full"
+            />
+          </div>
+          <div
+            class="col-span-6 md:col-span-4 lg:col-span-3 flex flex-col gap-2"
+          >
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Tiempo de Entrega</label
+            >
+            <div class="flex items-center justify-around gap-2">
+              <p-inputNumber
+                formControlName="estimatedMin"
+                placeholder="Min"
+                [min]="0"
+                inputStyleClass="w-full"
+              />
+              <span class="text-slate-400">-</span>
+              <p-inputNumber
+                formControlName="estimatedMax"
+                placeholder="Max"
+                [min]="0"
+                inputStyleClass="w-full"
+              />
+            </div>
+          </div>
+          <div
+            class="col-span-6 md:col-span-4 lg:col-span-3 flex flex-col gap-2"
+          >
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Unidad</label
+            >
+            <p-select
+              [options]="[
+                { l: 'Minutos', v: 'minutes' },
+                { l: 'Horas', v: 'hours' },
+                { l: 'Días', v: 'days' },
+              ]"
+              formControlName="estimatedUnit"
+              optionLabel="l"
+              optionValue="v"
+              appendTo="body"
+              inputStyleClass="w-full"
+            />
+          </div>
+          <div
+            class="col-span-6 md:col-span-4 lg:col-span-3 flex flex-col gap-2"
+          >
+            <label class="text-xs font-bold text-slate-500 uppercase"
+              >Orden</label
+            >
+            <p-inputNumber
+              formControlName="sortOrder"
+              placeholder="0"
+              [min]="0"
+              inputStyleClass="w-full"
+            />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <p-button
+    label="Agregar tarifa"
+    icon="pi pi-plus"
+    [outlined]="true"
+    size="small"
+    styleClass="!border-green-700 !text-green-700 w-fit border-dashed"
+    (onClick)="addRate()"
+  />
+</div>

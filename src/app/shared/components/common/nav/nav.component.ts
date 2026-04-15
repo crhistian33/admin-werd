@@ -160,9 +160,9 @@ export class NavComponent {
           route: '/configuraciones/metodos-pago',
         },
         {
-          label: 'Despacho',
+          label: 'Zonas de envío',
           icon: 'truck',
-          route: '/configuraciones/despacho',
+          route: '/configuraciones/zonas-envio',
         },
       ],
     },
