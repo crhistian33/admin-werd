@@ -22,6 +22,8 @@ export const productTableConfig = (
   globalFilter: true,
   selectable: true,
   showFilter: true,
+  showCreate: true,
+  showDeleteAll: true,
   columns: [
     {
       field: 'images',

@@ -15,6 +15,8 @@ export const brandTableConfig = (
   globalFilter: true,
   showFilter: false,
   selectable: true,
+  showCreate: true,
+  showDeleteAll: true,
   columns: [
     {
       field: 'name',

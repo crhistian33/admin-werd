@@ -15,6 +15,8 @@ export const shippingZoneTableConfig = (
   globalFilter: true,
   selectable: true,
   showFilter: true,
+  showCreate: true,
+  showDeleteAll: true,
   columns: [
     {
       field: 'name',

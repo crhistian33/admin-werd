@@ -16,6 +16,8 @@ export const heroSlideTrahsTableConfig = (
   selectable: true,
   showFilter: true,
   isTrashView: true,
+  showCreate: false,
+  showDeleteAll: true,
   columns: [
     {
       field: 'title',

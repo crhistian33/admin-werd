@@ -16,6 +16,8 @@ export const shippingZoneTrashTableConfig = (
   selectable: true,
   showFilter: false, // La papelera no tiene filtros
   isTrashView: true, // Activa el modo papelera en DataTableComponent
+  showCreate: false,
+  showDeleteAll: true,
   columns: [
     {
       field: 'name',

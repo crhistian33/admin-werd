@@ -67,15 +67,17 @@
           (onClick)="onRestoreAll()"
         />
       }
-      <p-button
-        label="Eliminar selección"
-        icon="pi pi-trash"
-        severity="danger"
-        [loading]="isSaving()"
-        [disabled]="!selectedRows().length"
-        (onClick)="onDeleteAll()"
-      />
-      @if (!isTrashView()) {
+      @if (config().showDeleteAll) {
+        <p-button
+          label="Eliminar selección"
+          icon="pi pi-trash"
+          severity="danger"
+          [loading]="isSaving()"
+          [disabled]="!selectedRows().length"
+          (onClick)="onDeleteAll()"
+        />
+      }
+      @if (config().showCreate) {
         <p-button label="Nuevo" icon="pi pi-plus" routerLink="nuevo" />
       }
     </div>

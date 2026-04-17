@@ -16,6 +16,8 @@ export const categoryTableConfig = (
   globalFilter: true,
   selectable: true,
   showFilter: true,
+  showCreate: true,
+  showDeleteAll: true,
   columns: [
     {
       field: 'images',

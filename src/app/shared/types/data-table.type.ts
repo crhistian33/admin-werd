@@ -115,5 +115,9 @@ export type DataTableConfig<T = any> = {
   /** Campo único para rastrear filas (default: 'id') */
   dataKey?: string;
   isTrashView?: boolean;
+  /** Mostrar botón "Nuevo" (default: true) */
+  showCreate?: boolean;
+  /** Mostrar botón "Eliminar selección" (default: true) */
+  showDeleteAll?: boolean;
   bulkActions?: BulkAction[];
 };

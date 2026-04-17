@@ -17,6 +17,8 @@ export const productTrashTableConfig = (
   selectable: true,
   showFilter: false, // La papelera no tiene filtros
   isTrashView: true,
+  showCreate: false,
+  showDeleteAll: true,
   columns: [
     {
       field: 'sku',

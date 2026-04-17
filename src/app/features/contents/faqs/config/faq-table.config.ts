@@ -15,6 +15,8 @@ export const faqTableConfig = (
   globalFilter: true,
   selectable: true,
   showFilter: true,
+  showCreate: true,
+  showDeleteAll: true,
   columns: [
     {
       field: 'question',

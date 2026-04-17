@@ -16,6 +16,8 @@ export const brandTrashTableConfig = (
   showFilter: false,
   selectable: true,
   isTrashView: true,
+  showCreate: false,
+  showDeleteAll: true,
   columns: [
     {
       field: 'name',
