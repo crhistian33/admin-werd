@@ -13,6 +13,10 @@ export const orderTableConfig = (
 ): DataTableConfig<Order> => ({
   dataKey: 'id',
   globalFilter: true,
+  selectable: false,
+  showFilter: true,
+  showCreate: false,
+  showDeleteAll: false,
   columns: [
     {
       field: 'code',

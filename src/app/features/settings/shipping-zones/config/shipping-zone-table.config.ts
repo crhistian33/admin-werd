@@ -84,6 +84,7 @@ export const shippingZoneTableConfig = (
     {
       label: 'Activar',
       icon: 'pi pi-check-circle',
+      severity: 'success',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),
@@ -93,6 +94,7 @@ export const shippingZoneTableConfig = (
     {
       label: 'Desactivar',
       icon: 'pi pi-ban',
+      severity: 'warn',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),

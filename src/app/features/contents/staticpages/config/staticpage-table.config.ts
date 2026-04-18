@@ -79,6 +79,7 @@ export const pageTableConfig = (
     {
       label: 'Publicar',
       icon: 'pi pi-check-circle',
+      severity: 'success',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),
@@ -88,6 +89,7 @@ export const pageTableConfig = (
     {
       label: 'Borrador',
       icon: 'pi pi-file-edit',
+      severity: 'warn',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),

@@ -120,6 +120,7 @@ export const heroSlideTableConfig = (
     {
       label: 'Activar',
       icon: 'pi pi-check-circle',
+      severity: 'success',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),
@@ -129,6 +130,7 @@ export const heroSlideTableConfig = (
     {
       label: 'Desactivar',
       icon: 'pi pi-ban',
+      severity: 'warn',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),

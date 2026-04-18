@@ -1,0 +1,12 @@
+<app-data-table
+  [data]="store.trashData()"
+  [totalItems]="store.trashTotalItems()"
+  [first]="firstRowIndex()"
+  [config]="tableConfig()"
+  [loading]="store.trashLoadingState().initial"
+  [isUpdating]="store.trashLoadingState().updating"
+  [isSaving]="store.isSaving()"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
+  (restoreAll)="onRestoreAll($event)"
+/>

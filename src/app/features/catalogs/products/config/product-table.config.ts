@@ -145,6 +145,7 @@ export const productTableConfig = (
     {
       label: 'Publicar',
       icon: 'pi pi-check-circle',
+      severity: 'success',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),
@@ -154,6 +155,7 @@ export const productTableConfig = (
     {
       label: 'Archivar',
       icon: 'pi pi-ban',
+      severity: 'danger',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),
@@ -163,6 +165,7 @@ export const productTableConfig = (
     {
       label: 'Borrador',
       icon: 'pi pi-file-edit',
+      severity: 'warn',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),

@@ -51,14 +51,14 @@ export const categoryTableConfig = (
       type: 'badge',
       width: '150px',
       badges: [
-        { value: 'true', label: 'Sí', severity: 'success' },
+        { value: 'true', label: 'Si', severity: 'success' },
         { value: 'false', label: 'No', severity: 'danger' },
       ],
       filter: {
         enabled: true,
         type: 'boolean',
         options: [
-          { label: 'Sí', value: true },
+          { label: 'Si', value: true },
           { label: 'No', value: false },
         ],
       },
@@ -101,6 +101,7 @@ export const categoryTableConfig = (
     {
       label: 'Activar',
       icon: 'pi pi-check-circle',
+      severity: 'success',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),
@@ -110,6 +111,7 @@ export const categoryTableConfig = (
     {
       label: 'Desactivar',
       icon: 'pi pi-ban',
+      severity: 'warn',
       action: (rows) =>
         callback.onBulkStatusChange(
           rows.map((r) => r.id),

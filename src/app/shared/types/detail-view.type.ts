@@ -14,7 +14,8 @@ export type DetailFieldType =
   | 'features' // lista con check icons — { feature }[]
   | 'price-block' // bloque precio + costo + margen calculado
   | 'rates' // tabla rates
-  | 'areas'; // tabla areas
+  | 'areas' // tabla areas
+  | 'addresses'; // lista de direcciones
 
 export interface BadgeOption {
   value: any;
@@ -72,7 +73,8 @@ export type DetailSectionLayout =
   | 'price' // bloque de precios — card
   | 'html' // contenido richtext — card full-width
   | 'tags' // fila de badges
-  | 'shipping-data'; // tabla shipping
+  | 'shipping-data' // tabla shipping
+  | 'addresses'; // lista de direcciones
 
 export interface DetailSectionConfig {
   title?: string;

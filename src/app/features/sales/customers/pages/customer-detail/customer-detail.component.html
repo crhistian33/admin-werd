@@ -1,1 +1,12 @@
-<p>customer-detail works!</p>
+<app-detail-dynamic
+  [config]="config"
+  [data]="store.selected()"
+  [loading]="store.loadingState().initial"
+  [title]="
+    store.selected()
+      ? store.selected()!.firstName + ' ' + store.selected()!.lastName
+      : 'Cargando...'
+  "
+  (onBack)="onBack()"
+  (onDelete)="onDelete()"
+/>

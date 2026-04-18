@@ -146,6 +146,12 @@ export class DetailDynamicComponent {
     return Array.isArray(arr) ? arr : [];
   }
 
+  getAddresses(field: DetailFieldConfig) {
+    const key = field.key;
+    const arr = this.getValue(key);
+    return Array.isArray(arr) ? arr : [];
+  }
+
   formatDeliveryUnit(unit: string): string {
     const units: Record<string, string> = {
       days: 'día(s)',

@@ -1,83 +1,72 @@
 import { Router } from '@angular/router';
 import { DataTableConfig } from '@shared/types/data-table.type';
-import { Brand } from '../models/brand.model';
+import { Customer } from '../models/customer.model';
 
-type BrandTableCallbacks = {
-  onDelete: (brand: Brand) => void;
-  onBulkStatusChange: (ids: string[], status: boolean) => void;
-};
-
-export const brandTableConfig = (
+export const customerTableConfig = (
   router: Router,
-  callback: BrandTableCallbacks,
-): DataTableConfig<Brand> => ({
+  actions: {
+    onDelete: (customer: Customer) => void;
+    onBulkStatusChange: (ids: string[], status: boolean) => void;
+  },
+): DataTableConfig<Customer> => ({
   dataKey: 'id',
   globalFilter: true,
-  showFilter: false,
   selectable: true,
-  showCreate: true,
+  showFilter: true,
+  showCreate: false, // Por ahora no se crean clientes desde el admin según requerimiento previo
   showDeleteAll: true,
   columns: [
     {
-      field: 'name',
+      field: 'firstName',
       header: 'Nombre',
       type: 'text',
       sortable: true,
     },
     {
-      field: 'description',
-      header: 'Descripción',
+      field: 'lastName',
+      header: 'Apellido',
+      type: 'text',
+      sortable: true,
+    },
+    {
+      field: 'email',
+      header: 'Email',
+      type: 'text',
+      sortable: true,
+    },
+    {
+      field: 'phone',
+      header: 'Teléfono',
       type: 'text',
     },
     {
       field: 'isActive',
       header: 'Activo',
       type: 'badge',
-      width: '150px',
+      sortable: true,
       badges: [
         { value: 'true', label: 'Si', severity: 'success' },
         { value: 'false', label: 'No', severity: 'danger' },
       ],
-      filter: {
-        enabled: true,
-        type: 'boolean',
-        options: [
-          { label: 'Si', value: 'true' },
-          { label: 'No', value: 'false' },
-        ],
-      },
-    },
-    {
-      field: 'createdBy.name',
-      header: 'Creado por',
-      type: 'text',
-      width: '180px',
     },
     {
       field: 'actions',
-      header: '',
+      header: 'Acciones',
       type: 'actions',
-      width: '80px',
     },
   ],
   actions: [
     {
       icon: 'pi pi-eye',
-      tooltip: 'Ver marca',
+      tooltip: 'Ver cliente',
       severity: 'info',
-      action: (row) => router.navigate(['/catalogos/marcas', row.id]),
-    },
-    {
-      icon: 'pi pi-pencil',
-      tooltip: 'Editar',
-      severity: 'warn',
-      action: (row) => router.navigate(['/catalogos/marcas', row.id, 'editar']),
+      action: (customer) => router.navigate(['/ventas/clientes', customer.id]),
     },
     {
       icon: 'pi pi-trash',
       tooltip: 'Eliminar',
       severity: 'danger',
-      action: (row) => callback.onDelete(row),
+      action: (customer) => actions.onDelete(customer),
     },
   ],
   bulkActions: [
@@ -86,7 +75,7 @@ export const brandTableConfig = (
       icon: 'pi pi-check-circle',
       severity: 'success',
       action: (rows) =>
-        callback.onBulkStatusChange(
+        actions.onBulkStatusChange(
           rows.map((r) => r.id),
           true,
         ),
@@ -96,7 +85,7 @@ export const brandTableConfig = (
       icon: 'pi pi-ban',
       severity: 'warn',
       action: (rows) =>
-        callback.onBulkStatusChange(
+        actions.onBulkStatusChange(
           rows.map((r) => r.id),
           false,
         ),
