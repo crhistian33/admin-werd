@@ -1,15 +1,35 @@
-<app-data-table
-  [data]="store.data()"
-  [totalItems]="store.totalItems()"
-  [first]="firstRowIndex()"
-  [config]="tableConfig"
-  [loading]="store.loadingState().initial"
-  [isSaving]="store.loadingState().updating"
-  (onPageChange)="handlePagination($event)"
-  (searchChange)="handleSearch($event)"
-  (filterDrawer)="drawerVisible.set(true)"
->
-  <ng-container tableDrawer>
-    <app-order-filter [(visible)]="drawerVisible" />
-  </ng-container>
-</app-data-table>
+<p-tabs lazy value="0" class="bg-transparent!">
+  <p-tablist>
+    <p-tab value="0" class="flex items-center gap-2">
+      <lucide-icon name="shopping-bag" class="w-4 h-4" />
+      <span>Pedidos</span>
+      @if (store.totalItems() > 0) {
+        <p-badge [value]="store.totalItems().toString()" severity="secondary" />
+      }
+    </p-tab>
+
+    <p-tab value="1" class="flex items-center gap-2">
+      <lucide-icon name="refresh-ccw" class="w-4 h-4" />
+      <span>Reclamaciones</span>
+      @if (store.pendingClaimsCount() > 0) {
+        <!-- Badge en danger cuando hay solicitudes pendientes de revisión -->
+        <p-badge
+          [value]="store.pendingClaimsCount().toString()"
+          severity="danger"
+          pTooltip="Solicitudes pendientes de revisión"
+          tooltipPosition="top"
+        />
+      }
+    </p-tab>
+  </p-tablist>
+
+  <p-tabpanels>
+    <p-tabpanel value="0">
+      <app-orders-active />
+    </p-tabpanel>
+
+    <p-tabpanel value="1">
+      <app-claims-list />
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>

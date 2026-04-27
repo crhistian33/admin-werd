@@ -1,0 +1,30 @@
+<app-data-table
+  [data]="claims()"
+  [totalItems]="totalItems()"
+  [first]="firstRowIndex()"
+  [config]="tableConfig"
+  [loading]="isLoading()"
+  [activeFiltersCount]="activeFiltersCount()"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
+  (filterDrawer)="drawerVisible.set(true)"
+  (onClear)="handleClearFilters()"
+>
+  <ng-container tableDrawer>
+    <app-filter-dynamic
+      [(visible)]="drawerVisible"
+      [config]="filterFields()"
+      [initialValues]="filter()"
+      (filterChange)="handleFilterChange($event)"
+      (filterClear)="handleClearFilters()"
+    />
+  </ng-container>
+</app-data-table>
+
+<app-order-claim-review-dialog
+  [(visible)]="reviewDialogVisible"
+  [claim]="selectedClaim()"
+  [loading]="isReviewing()"
+  (review)="handleReview($event)"
+  (close)="selectedClaim.set(null)"
+/>

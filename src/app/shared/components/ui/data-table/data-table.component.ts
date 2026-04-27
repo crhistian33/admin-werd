@@ -16,7 +16,6 @@ import {
 } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
-// PrimeNG 20 Modules
 import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -32,10 +31,10 @@ import type {
   TableColumn,
   BadgeConfig,
 } from '../../../types/data-table.type';
-import { CategoryStore } from '@features/catalogs/categories/store/category.store';
 import { LucideAngularModule } from 'lucide-angular';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { MenuItem } from 'primeng/api';
+import { ResolveFnPipe } from '../../../pipes/resolve-fn.pipe';
 
 @Component({
   selector: 'app-data-table',
@@ -57,6 +56,7 @@ import { MenuItem } from 'primeng/api';
     OverlayBadgeModule,
     LucideAngularModule,
     SplitButtonModule,
+    ResolveFnPipe,
   ],
   templateUrl: './data-table.component.html',
 })
@@ -155,7 +155,19 @@ export class DataTableComponent<T extends Record<string, any>> {
    * Obtiene la configuración de badge para un valor en una columna
    */
   getBadge(col: TableColumn<T>, value: any): BadgeConfig | undefined {
-    return col.badges?.find((b) => b.value === value.toString());
+    if (value == null) return undefined;
+
+    if (col.badgeConfig) {
+      const valStr = String(value);
+      return {
+        value: valStr,
+        label: col.badgeConfig.valueMap[valStr] ?? valStr,
+        severity: (col.badgeConfig.severityMap?.[valStr] ??
+          col.badgeConfig.defaultSeverity ??
+          'secondary') as BadgeConfig['severity'],
+      };
+    }
+    return col.badges?.find((b) => b.value === String(value));
   }
 
   /**

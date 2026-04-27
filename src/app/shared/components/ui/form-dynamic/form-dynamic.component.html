@@ -545,7 +545,9 @@
                             field.hint &&
                             field.type !== "file-gallery" &&
                             field.type !== "specs" &&
-                            field.type !== "features"
+                            field.type !== "features" &&
+                            field.type !== "shipping-areas" &&
+                            field.type !== "shipping-rates"
                           ) {
                             <p class="text-xs text-slate-400 mt-1">
                               {{ field.hint }}

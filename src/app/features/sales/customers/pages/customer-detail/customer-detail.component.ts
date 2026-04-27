@@ -18,6 +18,8 @@ export class CustomerDetailComponent implements OnInit {
   private readonly dialog = inject(DialogService);
 
   readonly id = input.required<string>();
+  readonly from = input<string>();
+  readonly orderId = input<string>();
 
   readonly config = CUSTOMER_DETAIL_CONFIG;
 
@@ -26,7 +28,14 @@ export class CustomerDetailComponent implements OnInit {
   }
 
   onBack(): void {
-    this.router.navigate(['/ventas/clientes']);
+    const from = this.from();
+    const orderId = this.orderId();
+
+    if (from === 'order-detail' && orderId) {
+      void this.router.navigate(['/ventas/pedidos', orderId]);
+    } else {
+      void this.router.navigate(['/ventas/clientes']);
+    }
   }
 
   onDelete(): void {

@@ -1,0 +1,43 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Cancelar Pedido"
+  [modal]="true"
+  [style]="{ width: '550px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (order(); as o) {
+    <div class="bg-surface-50 p-4 rounded-lg flex flex-col gap-2 mb-4">
+      <div class="flex justify-between items-center">
+        <span class="font-mono text-sm font-semibold">{{ o.orderNumber }}</span>
+        <p-tag
+          [value]="getStatusLabel(o.status)"
+          [severity]="getStatusSeverity(o.status)"
+        />
+      </div>
+      <p class="text-sm text-surface-600">
+        Total:
+        <strong>{{ o.total | currency: "S/ " : "symbol" : "1.2-2" }}</strong>
+      </p>
+    </div>
+
+    @if (isOrderPaid()) {
+      <div
+        class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 mb-4"
+      >
+        <i class="pi pi-exclamation-triangle mr-1"></i>
+        <strong>Importante:</strong> Este pedido ya fue pagado. Al cancelarlo se
+        deberá procesar un reembolso.
+      </div>
+    }
+  }
+
+  <app-form-dynamic
+    [steps]="formConfig()"
+    [loading]="loading()"
+    [submitLabel]="'Confirmar cancelación'"
+    [size]="'compact'"
+    (submitted)="onFormSubmit($event)"
+    (cancelled)="onCancel()"
+  />
+</p-dialog>

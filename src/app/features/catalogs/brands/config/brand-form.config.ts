@@ -2,6 +2,7 @@ import { Validators } from '@angular/forms';
 import { FormStepConfig } from '@shared/types/form-dynamic.type';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
 import { firstValueFrom } from 'rxjs';
+import { ImageEntityType } from '@shared/images/models/image-entity-type.enum';
 
 export function buildBrandFormConfig(
   imageUpload: ImageUploadService,
@@ -46,9 +47,9 @@ export function buildBrandFormConfig(
           cols: 1,
           // Sube al /temp y retorna el UUID que irá en el payload
           uploadHandler: (file: File) =>
-            firstValueFrom(imageUpload.uploadTemp(file, 'brand', 'logo')).then(
-              (res) => res.data.imageId,
-            ),
+            firstValueFrom(
+              imageUpload.uploadTemp(file, ImageEntityType.BRAND, 'logo'),
+            ).then((res) => res.data.imageId),
         },
       ],
     },

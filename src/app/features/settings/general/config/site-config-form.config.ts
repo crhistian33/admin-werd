@@ -2,6 +2,7 @@ import { Validators } from '@angular/forms';
 import { FormStepConfig } from '@shared/types/form-dynamic.type';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
 import { firstValueFrom } from 'rxjs';
+import { ImageEntityType } from '@shared/images/models/image-entity-type.enum';
 
 export const CURRENCY_OPTIONS = [
   { label: 'Sol peruano (PEN)', value: 'PEN' },
@@ -83,7 +84,11 @@ export function buildSiteConfigFormConfig(
           hint: 'SVG o PNG con fondo transparente. Recomendado: 200x60px',
           uploadHandler: (file: File) =>
             firstValueFrom(
-              imageUpload.uploadTemp(file, 'site_config', 'logo_header'),
+              imageUpload.uploadTemp(
+                file,
+                ImageEntityType.SITE_CONFIG,
+                'logo_header',
+              ),
             ).then((res) => res.data.imageId),
           cols: 2,
         },
@@ -96,7 +101,11 @@ export function buildSiteConfigFormConfig(
           hint: 'SVG o PNG con fondo transparente. Recomendado: 200x60px',
           uploadHandler: (file: File) =>
             firstValueFrom(
-              imageUpload.uploadTemp(file, 'site_config', 'logo_footer'),
+              imageUpload.uploadTemp(
+                file,
+                ImageEntityType.SITE_CONFIG,
+                'logo_footer',
+              ),
             ).then((res) => res.data.imageId),
           cols: 2,
         },

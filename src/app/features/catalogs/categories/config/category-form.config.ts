@@ -1,4 +1,5 @@
 import { Validators } from '@angular/forms';
+import { ImageEntityType } from '@shared/images/models/image-entity-type.enum';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
 import { FormStepConfig } from '@shared/types/form-dynamic.type';
 import { firstValueFrom } from 'rxjs';
@@ -47,7 +48,7 @@ export function buildCategoryFormConfig(
           // Sube al /temp y retorna el UUID que irá en el payload
           uploadHandler: (file: File) =>
             firstValueFrom(
-              imageUpload.uploadTemp(file, 'category', 'main'),
+              imageUpload.uploadTemp(file, ImageEntityType.CATEGORY, 'main'),
             ).then((res) => res.data.imageId),
         },
       ],

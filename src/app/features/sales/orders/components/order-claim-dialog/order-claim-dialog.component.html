@@ -1,0 +1,17 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Registrar Nueva Reclamación"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  <app-form-dynamic
+    [steps]="formConfig()"
+    [loading]="loading()"
+    [submitLabel]="'Registrar Reclamación'"
+    [size]="'compact'"
+    (submitted)="onFormSubmit($event)"
+    (cancelled)="onCancel()"
+  />
+</p-dialog>

@@ -1,0 +1,41 @@
+<app-data-table
+  [data]="store.data()"
+  [totalItems]="store.totalItems()"
+  [first]="firstRowIndex()"
+  [config]="tableConfig"
+  [loading]="store.loadingState().initial"
+  [isUpdating]="store.loadingState().updating"
+  [isSaving]="store.isSaving()"
+  [activeFiltersCount]="store.activeFiltersCount()"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
+  (filterDrawer)="drawerVisible.set(true)"
+  (onClear)="handleClearFilters()"
+>
+  <ng-container tableDrawer>
+    <app-filter-dynamic
+      [(visible)]="drawerVisible"
+      [config]="filterFields()"
+      [initialValues]="store.filter()"
+      (filterChange)="store.setFilter($event)"
+      (filterClear)="handleClearFilters()"
+    />
+  </ng-container>
+</app-data-table>
+
+<!-- ✅ NUEVOS DIÁLOGOS (reemplazan a OrderStatusDialogComponent) -->
+<app-confirm-payment-dialog
+  [(visible)]="confirmPaymentDialogVisible"
+  [order]="selectedOrder()"
+  [loading]="store.isConfirmingPayment()"
+  (confirm)="onConfirmPayment($event)"
+  (close)="confirmPaymentDialogVisible.set(false); selectedOrder.set(null)"
+/>
+
+<app-cancel-order-dialog
+  [(visible)]="cancelOrderDialogVisible"
+  [order]="selectedOrder()"
+  [loading]="store.isCancellingOrder()"
+  (confirm)="onCancelOrder($event)"
+  (close)="cancelOrderDialogVisible.set(false); selectedOrder.set(null)"
+/>

@@ -1,0 +1,100 @@
+<p-dialog
+  [(visible)]="visible"
+  [header]="'Gestionar pedido ' + (order()?.orderNumber ?? '')"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (order()) {
+    <div class="flex flex-col gap-5">
+      <!-- Estado actual -->
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-surface-500 font-medium">Estado actual:</span>
+        <p-tag
+          [value]="ORDER_STATUS_LABELS[order()!.status]"
+          [severity]="$any(statusSeverity(order()!.status))"
+        />
+      </div>
+
+      <!-- Selector de nuevo estado -->
+      @if (hasTransitions()) {
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium">Cambiar estado</label>
+          <p-select
+            [options]="statusOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar nuevo estado..."
+            [ngModel]="selectedStatus()"
+            (ngModelChange)="selectedStatus.set($event)"
+            class="w-full"
+          />
+        </div>
+      } @else {
+        <p class="text-sm text-surface-500 italic">
+          Este pedido está en un estado terminal y no admite más cambios de
+          estado.
+        </p>
+      }
+
+      <!-- Comentario para el historial -->
+      @if (selectedStatus()) {
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium">
+            Comentario para el historial
+            <span class="text-surface-400 font-normal">(opcional)</span>
+          </label>
+          <textarea
+            pTextarea
+            rows="2"
+            [placeholder]="commentPlaceholder()"
+            [ngModel]="statusComment()"
+            (ngModelChange)="statusComment.set($event)"
+            class="w-full"
+          ></textarea>
+        </div>
+      }
+
+      <!-- Notas internas admin -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium">
+          Notas internas
+          <span class="text-surface-400 font-normal"
+            >(reemplaza la nota actual — no visible al cliente)</span
+          >
+        </label>
+        <textarea
+          pTextarea
+          rows="3"
+          placeholder="Notas para el equipo de operaciones..."
+          [ngModel]="adminNotes()"
+          (ngModelChange)="adminNotes.set($event)"
+          class="w-full"
+        ></textarea>
+        @if (order()?.adminNotes && !adminNotes()) {
+          <span class="text-xs text-orange-400">
+            <i class="pi pi-exclamation-triangle mr-1"></i>
+            Dejar vacío borrará la nota actual.
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [text]="true"
+      [disabled]="loading()"
+      (click)="onCancel()"
+    />
+    <p-button
+      label="Guardar cambios"
+      [loading]="loading()"
+      [disabled]="!selectedStatus() && !adminNotes()"
+      (click)="onConfirm()"
+    />
+  </ng-template>
+</p-dialog>

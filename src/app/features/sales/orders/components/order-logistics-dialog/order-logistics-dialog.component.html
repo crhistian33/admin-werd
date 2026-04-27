@@ -1,0 +1,18 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Gestionar Logística del Pedido"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  <app-form-dynamic
+    [steps]="formConfig()"
+    [initialData]="initialData()"
+    [loading]="loading()"
+    [submitLabel]="'Guardar logística'"
+    [size]="'compact'"
+    (submitted)="onFormSubmit($event)"
+    (cancelled)="onCancel()"
+  />
+</p-dialog>

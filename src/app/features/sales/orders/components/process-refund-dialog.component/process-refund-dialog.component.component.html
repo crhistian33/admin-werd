@@ -1,0 +1,88 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Procesar Reembolso"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (order(); as o) {
+    <div class="flex flex-col gap-5">
+      <!-- Info -->
+      <div class="bg-surface-50 p-4 rounded-lg">
+        <p><strong>Pedido:</strong> {{ o.orderNumber }}</p>
+        <p>
+          <strong>Monto a reembolsar:</strong>
+          <span class="text-xl font-bold text-green-600">
+            {{ refund()?.amount | currency: "S/ " : "symbol" : "1.2-2" }}
+          </span>
+        </p>
+        <p>
+          <strong>Motivo de cancelación:</strong>
+          {{ refund()?.cancellationReason || "No especificado" }}
+        </p>
+      </div>
+
+      <!-- Método de reembolso -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium">
+          Método de reembolso <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          [options]="methodOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar método..."
+          [ngModel]="refundMethod()"
+          (ngModelChange)="refundMethod.set($event)"
+          class="w-full"
+        />
+      </div>
+
+      <!-- ID de reembolso -->
+      @if (refundMethod() === "ORIGINAL_PAYMENT_METHOD") {
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium">ID de reembolso en pasarela</label>
+          <input
+            pInputText
+            type="text"
+            placeholder="Ej: ref_abc123xyz"
+            [ngModel]="gatewayRefundId()"
+            (ngModelChange)="gatewayRefundId.set($event)"
+            class="w-full"
+          />
+        </div>
+      }
+
+      <!-- Notas -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium">Notas internas (opcional)</label>
+        <textarea
+          pTextarea
+          rows="2"
+          placeholder="Notas sobre el reembolso..."
+          [ngModel]="adminNotes()"
+          (ngModelChange)="adminNotes.set($event)"
+          class="w-full"
+        ></textarea>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [text]="true"
+      [disabled]="loading()"
+      (click)="onCancel()"
+    />
+    <p-button
+      label="Procesar reembolso"
+      severity="success"
+      [loading]="loading()"
+      [disabled]="!isValid()"
+      (click)="onConfirm()"
+    />
+  </ng-template>
+</p-dialog>

@@ -1,1 +1,1114 @@
-<p>Pedido {{ id() }}</p>
+@if (isLoading()) {
+  <!-- Skeleton mientras carga -->
+  <div class="flex flex-col gap-4 p-4">
+    <p-skeleton height="2rem" width="20rem" />
+    <div class="grid grid-cols-3 gap-4">
+      <p-skeleton height="8rem" />
+      <p-skeleton height="8rem" />
+      <p-skeleton height="8rem" />
+    </div>
+    <p-skeleton height="12rem" />
+  </div>
+} @else if (order(); as o) {
+  <div class="flex flex-col gap-6 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+    <!-- ───────────────────────────────────────────────────────── -->
+    <!-- HEADER                                                     -->
+    <!-- ───────────────────────────────────────────────────────── -->
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
+      <div class="flex items-center gap-3">
+        <p-button
+          icon="pi pi-arrow-left"
+          [text]="true"
+          severity="secondary"
+          (click)="goBack()"
+        />
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight m-0 text-slate-900">
+            {{ o.orderNumber }}
+          </h1>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-sm text-slate-500 font-medium">
+              {{ o.placedAt | date: "dd/MM/yyyy HH:mm" }}
+            </span>
+            <p-tag
+              [value]="getStatusLabel(o.status)"
+              [severity]="statusSeverity(o.status)"
+              inputClass="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 flex-wrap">
+        @for (action of availableActions(); track action.label) {
+          <p-button
+            [label]="action.label"
+            [icon]="action.icon"
+            [severity]="action.severity"
+            [outlined]="true"
+            [loading]="action.loading"
+            (click)="action.action()"
+            styleClass="w-full md:w-auto h-11"
+          />
+        }
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────────────────────────── -->
+    <!-- GRID PRINCIPAL                                             -->
+    <!-- ───────────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- COLUMNA IZQUIERDA (2/3) -->
+      <div class="lg:col-span-2 flex flex-col gap-8">
+        <!-- ÍTEMS DEL PEDIDO -->
+        <div
+          class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+        >
+          <div
+            class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50"
+          >
+            <h2
+              class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+            >
+              Productos del pedido
+            </h2>
+            <span
+              class="text-xs font-semibold text-slate-400 uppercase tracking-widest"
+            >
+              {{ o.items?.length ?? 0 }} PRODUCTOS
+            </span>
+          </div>
+          <div class="p-2 overflow-x-auto">
+            <p-table [value]="o.items ?? []" styleClass="p-datatable-sm">
+              <ng-template pTemplate="header">
+                <tr class="bg-slate-50/30">
+                  <th style="width: 60px"></th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                  >
+                    Producto
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    style="width: 80px"
+                  >
+                    Cant.
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    style="width: 110px"
+                  >
+                    Precio unit.
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-semibold text-orange-500 uppercase tracking-wider"
+                    style="width: 100px"
+                  >
+                    Dcto.
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    style="width: 110px"
+                  >
+                    Subtotal
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item>
+                <tr>
+                  <td>
+                    <img
+                      [src]="getProductImageUrl(item.productImageUrl)"
+                      alt=""
+                      class="w-12 h-12 object-cover rounded"
+                    />
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="font-semibold text-slate-700">
+                      {{ item.productName }}
+                    </div>
+                    <div class="text-xs text-slate-400 font-mono mt-0.5">
+                      SKU: {{ item.productSku }}
+                    </div>
+                    @if (item.refundItems?.length) {
+                      @let refundedQty = getRefundedQuantity(item);
+                      <div
+                        class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-orange-50 border border-orange-100 rounded text-[10px] font-semibold text-orange-600 mt-2 uppercase"
+                      >
+                        <i class="pi pi-replay" style="font-size: 8px"></i>
+                        {{ refundedQty }} Devuelta(s)
+                      </div>
+                    }
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-slate-600">
+                    {{ item.quantity }}
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-slate-600">
+                    {{ item.unitPrice | currency: "S/ " : "symbol" : "1.2-2" }}
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    @if (item.discountAmount > 0) {
+                      <span class="text-orange-500 font-medium">
+                        -{{
+                          item.discountAmount
+                            | currency: "S/ " : "symbol" : "1.2-2"
+                        }}
+                      </span>
+                    } @else {
+                      <span class="text-slate-300">—</span>
+                    }
+                  </td>
+                  <td
+                    class="px-6 py-4 text-right font-semibold text-slate-900 border-l border-slate-50"
+                  >
+                    {{ item.lineTotal | currency: "S/ " : "symbol" : "1.2-2" }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+
+          <!-- TOTALES -->
+          <div
+            class="flex justify-end p-6 bg-slate-50/50 border-t border-slate-100"
+          >
+            <div class="flex flex-col gap-2.5 min-w-[280px]">
+              <div
+                class="flex justify-between items-center text-sm transition-all hover:bg-slate-100/50 p-1 -m-1 rounded"
+              >
+                <span
+                  class="text-slate-500 font-medium text-xs uppercase tracking-wider"
+                  >Subtotal</span
+                >
+                <span class="font-semibold text-slate-700">
+                  {{ o.subtotal | currency: "S/ " : "symbol" : "1.2-2" }}
+                </span>
+              </div>
+              @if (o.discountAmount > 0) {
+                <div
+                  class="flex justify-between items-center text-sm text-orange-500 p-1 -m-1 rounded"
+                >
+                  <span class="font-medium text-xs uppercase tracking-wider"
+                    >Descuentos</span
+                  >
+                  <span class="font-semibold">
+                    -{{
+                      o.discountAmount | currency: "S/ " : "symbol" : "1.2-2"
+                    }}
+                  </span>
+                </div>
+              }
+              @if (o.couponDiscount > 0) {
+                <div
+                  class="flex justify-between items-center text-sm text-orange-500 p-1 -m-1 rounded"
+                >
+                  <span
+                    class="font-medium text-xs uppercase tracking-wider flex items-center gap-2"
+                  >
+                    Cupón
+                    @if (o.coupon) {
+                      <span
+                        class="px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded text-[9px] font-mono font-semibold"
+                      >
+                        {{ o.coupon.code }}
+                      </span>
+                    }
+                  </span>
+                  <span class="font-semibold">
+                    -{{
+                      o.couponDiscount | currency: "S/ " : "symbol" : "1.2-2"
+                    }}
+                  </span>
+                </div>
+              }
+              <div
+                class="flex justify-between items-center text-sm p-1 -m-1 rounded"
+              >
+                <span
+                  class="text-slate-500 font-medium text-xs uppercase tracking-wider"
+                  >Envío</span
+                >
+                <span class="font-semibold text-slate-700">
+                  {{ o.shippingAmount | currency: "S/ " : "symbol" : "1.2-2" }}
+                </span>
+              </div>
+              @if (o.taxAmount > 0) {
+                <div
+                  class="flex justify-between items-center text-sm p-1 -m-1 rounded"
+                >
+                  <span
+                    class="text-slate-500 font-medium text-xs uppercase tracking-wider"
+                    >IGV (18%)</span
+                  >
+                  <span class="font-semibold text-slate-700">
+                    {{ o.taxAmount | currency: "S/ " : "symbol" : "1.2-2" }}
+                  </span>
+                </div>
+              }
+              <div class="h-px bg-slate-200 my-1"></div>
+              <div
+                class="flex justify-between items-center bg-sky-700 text-white p-3 rounded-lg shadow-md -mx-1"
+              >
+                <span
+                  class="text-xs font-semibold uppercase tracking-widest opacity-80"
+                  >Total a pagar</span
+                >
+                <span class="text-xl font-bold tracking-tight">
+                  {{ o.total | currency: "S/ " : "symbol" : "1.2-2" }}
+                </span>
+              </div>
+              @if (totalAlreadyRefunded() > 0) {
+                <div
+                  class="flex justify-between items-center text-sm text-purple-600 bg-purple-50 p-2 rounded border border-purple-100 mt-2"
+                >
+                  <span class="font-semibold text-xs uppercase tracking-wider"
+                    >Total devuelto</span
+                  >
+                  <span class="font-bold">
+                    -{{
+                      totalAlreadyRefunded()
+                        | currency: "S/ " : "symbol" : "1.2-2"
+                    }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIAL DE ESTADOS -->
+        <div
+          class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+        >
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h2
+              class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+            >
+              Historial de estados
+            </h2>
+          </div>
+          <div class="p-8">
+            @if (o.statusHistory?.length) {
+              <p-timeline [value]="o.statusHistory!" align="right">
+                <ng-template pTemplate="opposite" let-event>
+                  <div class="text-xs text-slate-400 font-semibold pt-2">
+                    <span
+                      class="text-xs text-slate-400 font-medium flex items-center gap-1.5"
+                    >
+                      <i class="pi pi-calendar text-[10px]"></i>
+                      {{ event.createdAt | date: "dd/MM/yyyy HH:mm" }}
+                    </span>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="marker" let-event>
+                  <span
+                    class="flex items-center justify-center w-8 h-8 rounded-full text-white text-xs shadow-sm ring-4 ring-white"
+                    [style.background]="getTimelineColor(event)"
+                  >
+                    @if (
+                      event.toStatus === "delivered" ||
+                      event.toStatus === "paid"
+                    ) {
+                      <i class="pi pi-check" style="font-size: 0.6rem"></i>
+                    }
+                    @if (
+                      event.toStatus !== "delivered" &&
+                      event.toStatus !== "paid"
+                    ) {
+                      <i
+                        class="pi pi-circle-fill"
+                        style="font-size: 0.5rem"
+                      ></i>
+                    }
+                  </span>
+                </ng-template>
+                <ng-template pTemplate="content" let-event>
+                  <div class="pb-10 last:pb-0">
+                    <p-tag
+                      [value]="getTimelineLabel(event)"
+                      [severity]="getTimelineSeverity(event)"
+                      styleClass="px-2 py-0.5 mt-1 text-[10px] font-bold uppercase tracking-widest ring-1 ring-inset"
+                    />
+                    @if (event.comment) {
+                      <div
+                        class="my-1 p-3 bg-slate-50 border-l-4 border-slate-200 rounded-r text-sm text-slate-600 italic"
+                      >
+                        "{{ event.comment }}"
+                      </div>
+                    }
+                  </div>
+                </ng-template>
+              </p-timeline>
+            } @else {
+              <div
+                class="flex flex-col items-center justify-center py-10 text-slate-300"
+              >
+                <i class="pi pi-info-circle text-4xl mb-3"></i>
+                <p class="text-sm italic m-0">
+                  Sin historial de estados registrado.
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- TRANSACCIONES DE PAGO -->
+        @if (o.transactions?.length) {
+          <div
+            class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+          >
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+              <h2 class="text-lg font-semibold text-slate-800 m-0">
+                Transacciones de pago
+              </h2>
+            </div>
+            <div class="p-0 overflow-x-auto">
+              <p-table [value]="o.transactions!" styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                  <tr class="bg-slate-50/30">
+                    <th
+                      class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    >
+                      Gateway ID
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    >
+                      Monto
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    >
+                      Estado
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    >
+                      Fecha
+                    </th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-tx>
+                  <tr>
+                    <td
+                      class="px-6 py-4 font-mono text-xs text-blue-600 font-semibold bg-blue-50/20"
+                    >
+                      {{ tx.gatewayTransactionId ?? tx.cipCode ?? "—" }}
+                    </td>
+                    <td class="px-6 py-4 font-bold text-slate-700">
+                      {{ tx.amount | currency: "S/ " : "symbol" : "1.2-2" }}
+                    </td>
+                    <td class="px-6 py-4">
+                      <p-tag
+                        [value]="tx.status"
+                        [severity]="
+                          tx.status === 'completed'
+                            ? 'success'
+                            : tx.status === 'failed'
+                              ? 'danger'
+                              : 'warn'
+                        "
+                        styleClass="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
+                      />
+                    </td>
+                    <td class="px-6 py-4 text-xs text-slate-500 font-medium">
+                      {{ tx.createdAt | date: "dd/MM/yyyy HH:mm" }}
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        }
+
+        <!-- RECLAMACIONES -->
+        @if (hasClaims()) {
+          <div
+            class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+          >
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+              <h2
+                class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+              >
+                Reclamaciones y Devoluciones
+              </h2>
+            </div>
+            <div class="p-4 flex flex-col gap-3">
+              @for (claim of claims(); track claim.id) {
+                <div
+                  class="border border-slate-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <!-- Header -->
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                      <span
+                        class="font-mono text-xs font-semibold text-slate-500"
+                        >{{ claim.claimNumber }}</span
+                      >
+                      <p-tag
+                        [value]="CLAIM_TYPE_LABELS[claim.type]"
+                        [severity]="
+                          claim.type === 'CANCELLATION'
+                            ? 'danger'
+                            : claim.type === 'REFUND'
+                              ? 'warn'
+                              : 'info'
+                        "
+                      />
+                      <p-tag
+                        [value]="CLAIM_STATUS_LABELS[claim.status]"
+                        [severity]="CLAIM_STATUS_SEVERITY[claim.status]"
+                      />
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-slate-400">{{
+                        claim.createdAt | date: "dd/MM/yyyy"
+                      }}</span>
+
+                      <!-- BOTONES SEGÚN ESTADO DEL RECLAMO -->
+                      @if (claim.status === "PENDING") {
+                        <p-button
+                          icon="pi pi-cog"
+                          severity="secondary"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          pTooltip="Revisar reclamación"
+                          (click)="openClaimReviewDialog(claim)"
+                        />
+                      }
+                      @if (
+                        claim.status === "APPROVED" &&
+                        (claim.type === "REFUND" ||
+                          claim.type === "REPLACEMENT")
+                      ) {
+                        <p-button
+                          icon="pi pi-check-circle"
+                          severity="success"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          pTooltip="Registrar recepción del producto"
+                          (click)="openMarkClaimReceivedDialog(claim)"
+                        />
+                      }
+                      @if (
+                        claim.status === "RECEIVED" && claim.type === "REFUND"
+                      ) {
+                        <p-button
+                          icon="pi pi-money-bill"
+                          severity="primary"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          pTooltip="Procesar reembolso"
+                          (click)="openCompleteRefundDialog(claim)"
+                        />
+                      }
+                      @if (
+                        claim.status === "RECEIVED" &&
+                        claim.type === "REPLACEMENT"
+                      ) {
+                        <p-button
+                          icon="pi pi-refresh"
+                          severity="info"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          pTooltip="Generar orden de reemplazo"
+                          (click)="onCompleteReplacement(claim)"
+                        />
+                      }
+                      @if (claim.status === "REJECTED" || claim.status === "CANCELLED") {
+                        <p-button
+                          icon="pi pi-trash"
+                          severity="danger"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          pTooltip="Eliminar reclamación"
+                          (click)="onDeleteClaim(claim)"
+                        />
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Detalles -->
+                  <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span
+                        class="text-slate-400 text-xs uppercase tracking-wider"
+                        >Motivo</span
+                      >
+                      <p class="font-medium text-slate-700 mt-0.5">
+                        {{ claim.reasonCategory }}
+                      </p>
+                    </div>
+                    @if (claim.customerVoucherAmount) {
+                      <div>
+                        <span
+                          class="text-slate-400 text-xs uppercase tracking-wider"
+                          >Voucher del cliente</span
+                        >
+                        <p class="font-semibold text-green-600 mt-0.5">
+                          {{
+                            claim.customerVoucherAmount
+                              | currency: "S/ " : "symbol" : "1.2-2"
+                          }}
+                        </p>
+                      </div>
+                    }
+                  </div>
+
+                  @if (claim.description) {
+                    <div
+                      class="mt-3 p-3 bg-slate-50 rounded border border-slate-100"
+                    >
+                      <p class="text-sm text-slate-600 italic">
+                        "{{ claim.description }}"
+                      </p>
+                    </div>
+                  }
+
+                  @if (claim.reviewNote) {
+                    <div
+                      class="mt-3 p-3 rounded border text-sm"
+                      [class.bg-green-50]="claim.status === 'APPROVED'"
+                      [class.border-green-200]="claim.status === 'APPROVED'"
+                      [class.text-green-800]="claim.status === 'APPROVED'"
+                      [class.bg-red-50]="claim.status === 'REJECTED'"
+                      [class.border-red-200]="claim.status === 'REJECTED'"
+                      [class.text-red-800]="claim.status === 'REJECTED'"
+                    >
+                      <span
+                        class="font-semibold text-xs uppercase tracking-wider"
+                        >Respuesta al cliente:</span
+                      >
+                      <p class="mt-1">"{{ claim.reviewNote }}"</p>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ───────────────────────────────────────────────────────── -->
+      <!-- COLUMNA DERECHA (1/3)                                      -->
+      <!-- ───────────────────────────────────────────────────────── -->
+      <div class="flex flex-col gap-8">
+        <!-- CLIENTE / GUEST -->
+        <div
+          class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+        >
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h2
+              class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+            >
+              {{ o.customerId ? "Cliente Registrado" : "Cliente Invitado" }}
+            </h2>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-4">
+              <div
+                class="shrink-0 w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200 shadow-inner"
+              >
+                <i class="pi pi-user text-xl"></i>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <div class="font-semibold text-lg text-slate-900 truncate">
+                  {{ getCustomerName(o) }}
+                </div>
+                @if (o.customer?.email ?? o.guestEmail; as email) {
+                  <div
+                    class="flex items-center gap-1.5 text-slate-500 text-sm truncate"
+                  >
+                    <i class="pi pi-envelope text-[10px]"></i>
+                    <span class="truncate">{{ email }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+            @if (o.customer; as c) {
+              <div class="mt-6 pt-4 border-t border-slate-50">
+                <a
+                  class="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-50 rounded-lg text-primary text-xs font-semibold transition-all hover:bg-slate-700 hover:text-white group border border-slate-100 cursor-pointer"
+                  (click)="goToCustomerProfile(c.id)"
+                >
+                  Ver perfil detallado
+                  <i
+                    class="pi pi-arrow-right text-[10px] transition-transform group-hover:translate-x-1"
+                  ></i>
+                </a>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- DIRECCIÓN DE ENVÍO -->
+        @if (o.shippingAddress; as addr) {
+          <div
+            class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+          >
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+              <h2
+                class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+              >
+                Dirección de envío
+              </h2>
+            </div>
+            <div class="p-6">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-start gap-3">
+                  <div class="shrink-0 p-2 bg-blue-50 rounded-lg text-blue-500">
+                    <i class="pi pi-map-marker"></i>
+                  </div>
+                  <div class="flex flex-col">
+                    <div class="font-semibold text-slate-800">
+                      {{ addr.recipientName }}
+                    </div>
+                    @if (addr.phone) {
+                      <div class="text-slate-500 text-xs font-medium mt-0.5">
+                        {{ addr.phone }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5 pl-11">
+                  <div
+                    class="text-sm text-slate-600 leading-relaxed font-medium"
+                  >
+                    {{ addr.addressLine }}
+                  </div>
+                  @if (addr.reference) {
+                    <div
+                      class="p-2 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-500 italic"
+                    >
+                      "{{ addr.reference }}"
+                    </div>
+                  }
+                  @if (addr.district && addr.province && addr.department) {
+                    <div
+                      class="text-xs text-slate-400 font-semibold mt-1 uppercase tracking-tighter"
+                    >
+                      {{ addr.district.name }} / {{ addr.province.name }} /
+                      {{ addr.department.name }}
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ENVÍO Y PAGO -->
+        <div
+          class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+        >
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h2
+              class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+            >
+              Métodos de Entrega y Pago
+            </h2>
+          </div>
+          <div class="p-6 flex flex-col gap-6">
+            @if (o.shippingRate; as rate) {
+              <div class="flex items-start gap-3">
+                <div class="shrink-0 p-2 bg-green-50 rounded-lg text-green-500">
+                  <i class="pi pi-truck"></i>
+                </div>
+                <div class="flex flex-col">
+                  <div
+                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest opacity-70"
+                  >
+                    Logística de Envío
+                  </div>
+                  <div class="font-semibold text-slate-800">
+                    {{ rate.name }}
+                  </div>
+                  <div class="text-sm font-bold text-green-600 mt-0.5">
+                    {{ rate.price | currency: "S/ " : "symbol" : "1.2-2" }}
+                  </div>
+                  @if (rate.estimatedMin && rate.estimatedMax) {
+                    <div
+                      class="text-[10px] text-slate-500 font-medium mt-1 inline-flex items-center gap-1"
+                    >
+                      <i class="pi pi-clock text-[9px]"></i>
+                      Estimado: {{ rate.estimatedMin }}–{{ rate.estimatedMax }}
+                      {{ rate.estimatedUnit }}
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="h-px bg-slate-100 -mx-6"></div>
+
+            @if (o.paymentMethod; as pm) {
+              <div class="flex items-start gap-3">
+                <div
+                  class="shrink-0 p-2 bg-purple-50 rounded-lg text-purple-500"
+                >
+                  <i class="pi pi-credit-card"></i>
+                </div>
+                <div class="flex flex-col">
+                  <div
+                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest opacity-70"
+                  >
+                    Modalidad de Pago
+                  </div>
+                  <div class="font-semibold text-slate-800">{{ pm.name }}</div>
+                  <div
+                    class="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold mt-1 uppercase tracking-tighter self-start"
+                  >
+                    {{ pm.type }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- LOGÍSTICA INTERNA -->
+        @if (logistics()) {
+          <div
+            class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+          >
+            <div
+              class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center"
+            >
+              <h2
+                class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+              >
+                Logística de Despacho
+              </h2>
+              <button
+                class="text-primary hover:underline text-xs font-semibold"
+                (click)="openLogisticsDialog()"
+              >
+                Editar
+              </button>
+            </div>
+            <div class="p-6 flex flex-col gap-4">
+              @if (logistics(); as log) {
+                <div class="flex flex-col gap-3">
+                  <div
+                    class="flex justify-between items-center text-sm border-b border-slate-100 pb-2"
+                  >
+                    <span class="text-slate-500">Tipo de despacho</span>
+                    <span class="font-semibold">{{
+                      DELIVERY_TYPE_LABELS[log.deliveryType]
+                    }}</span>
+                  </div>
+                  @if (log.trackingNumber) {
+                    <div
+                      class="flex justify-between items-center text-sm border-b border-slate-100 pb-2"
+                    >
+                      <span class="text-slate-500">Tracking / Guía</span>
+                      <span class="font-mono font-bold">{{
+                        log.trackingNumber
+                      }}</span>
+                    </div>
+                  }
+                  @if (log.actualShippingCost) {
+                    <div
+                      class="flex justify-between items-center text-sm border-b border-slate-100 pb-2"
+                    >
+                      <span class="text-slate-500">Costo real envío</span>
+                      <span class="font-semibold text-slate-800">
+                        {{
+                          log.actualShippingCost
+                            | currency: "S/ " : "symbol" : "1.2-2"
+                        }}
+                      </span>
+                    </div>
+                  }
+                  @if (log.internalTransportCost) {
+                    <div
+                      class="flex justify-between items-center text-sm border-b border-slate-100 pb-2"
+                    >
+                      <span class="text-slate-500">Transporte int.</span>
+                      <span class="font-semibold text-slate-800">
+                        {{
+                          log.internalTransportCost
+                            | currency: "S/ " : "symbol" : "1.2-2"
+                        }}
+                      </span>
+                    </div>
+                  }
+                  @if (log.packingPhotoUrl) {
+                    <a
+                      [href]="log.packingPhotoUrl"
+                      target="_blank"
+                      class="text-primary hover:underline text-xs flex items-center justify-center gap-1 mt-2"
+                    >
+                      <i class="pi pi-camera"></i> Ver foto de empaque
+                    </a>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-4">
+                  <p class="text-sm text-slate-400 italic">
+                    No hay información logística registrada
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- NOTAS -->
+        @if (o.notes || o.adminNotes) {
+          <div
+            class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+          >
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+              <h2
+                class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+              >
+                Notas Adicionales
+              </h2>
+            </div>
+            <div class="p-6 flex flex-col gap-6">
+              @if (o.notes) {
+                <div>
+                  <div
+                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5"
+                  >
+                    Del Cliente
+                  </div>
+                  <div
+                    class="p-3 bg-amber-50 border border-amber-100 rounded-lg text-sm text-amber-800 font-medium"
+                  >
+                    {{ o.notes }}
+                  </div>
+                </div>
+              }
+              @if (o.adminNotes) {
+                <div>
+                  <div
+                    class="text-[10px] text-red-400 font-semibold uppercase tracking-widest mb-1.5"
+                  >
+                    Administrativas (Internas)
+                  </div>
+                  <div
+                    class="p-3 bg-slate-900 text-slate-300 rounded-lg text-sm font-mono leading-relaxed"
+                  >
+                    {{ o.adminNotes }}
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- TIMESTAMPS -->
+        <div
+          class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+        >
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h2
+              class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0"
+            >
+              Tiempos de Procesamiento
+            </h2>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-col gap-4">
+              <div class="flex justify-between items-center text-xs">
+                <span
+                  class="text-slate-400 font-semibold uppercase tracking-tighter"
+                  >Recibido</span
+                >
+                <span class="font-bold text-slate-700">{{
+                  o.placedAt | date: "dd/MM/yyyy HH:mm"
+                }}</span>
+              </div>
+              @if (o.paidAt) {
+                <div class="flex justify-between items-center text-xs">
+                  <span
+                    class="text-green-500 font-semibold uppercase tracking-tighter"
+                    >Verificado</span
+                  >
+                  <span
+                    class="font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded"
+                  >
+                    {{ o.paidAt | date: "dd/MM/yyyy HH:mm" }}
+                  </span>
+                </div>
+              }
+              @if (o.shippedAt) {
+                <div class="flex justify-between items-center text-xs">
+                  <span
+                    class="text-blue-500 font-semibold uppercase tracking-tighter"
+                    >Despachado</span
+                  >
+                  <span
+                    class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded"
+                  >
+                    {{ o.shippedAt | date: "dd/MM/yyyy HH:mm" }}
+                  </span>
+                </div>
+              }
+              @if (o.deliveredAt) {
+                <div class="flex justify-between items-center text-xs">
+                  <span
+                    class="text-emerald-500 font-semibold uppercase tracking-tighter"
+                    >Completado</span
+                  >
+                  <span
+                    class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded"
+                  >
+                    {{ o.deliveredAt | date: "dd/MM/yyyy HH:mm" }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- RENTABILIDAD (ADMIN ONLY) -->
+        <div
+          class="bg-slate-900 border border-slate-700 rounded-xl shadow-sm flex flex-col overflow-hidden"
+        >
+          <div class="px-6 py-4 border-b border-slate-700 bg-slate-800/80">
+            <h2
+              class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0 flex items-center gap-2"
+            >
+              <i class="pi pi-chart-pie"></i> Rentabilidad Neta
+            </h2>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400 text-sm">Margen estimado</span>
+              <span
+                class="text-xl font-bold"
+                [class.text-green-400]="netProfit() >= 0"
+                [class.text-red-400]="netProfit() < 0"
+              >
+                {{ netProfit() > 0 ? "+" : ""
+                }}{{ netProfit() | currency: "S/ " : "symbol" : "1.2-2" }}
+              </span>
+            </div>
+            <p class="text-[10px] text-slate-500 mt-2 leading-relaxed italic">
+              Calculado como Venta Total menos Costos de Producto, Envío Real,
+              Transporte Int., y Reembolsos extras por fallas/errores (asumidos
+              por tienda).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────────────────── -->
+  <!-- DIÁLOGOS                                                   -->
+  <!-- ───────────────────────────────────────────────────────── -->
+
+  <!-- Diálogo de cambio de estado -->
+  <app-order-status-dialog
+    [(visible)]="statusDialogVisible"
+    [order]="order()"
+    [loading]="store.isUpdatingStatus()"
+    (statusChange)="onStatusChange($event)"
+    (close)="statusDialogVisible.set(false)"
+  />
+
+  <!-- Diálogo de logística -->
+  <app-order-logistics-dialog
+    [(visible)]="logisticsDialogVisible"
+    [order]="order()"
+    [loading]="store.isUpdatingLogistics()"
+    (save)="onLogisticsSave($event)"
+    (close)="logisticsDialogVisible.set(false)"
+  />
+
+  <!-- Diálogo de nueva reclamación -->
+  <app-order-claim-dialog
+    [(visible)]="claimDialogVisible"
+    [order]="order()"
+    [loading]="store.isCreatingClaim()"
+    (save)="onClaimSave($event)"
+    (close)="claimDialogVisible.set(false)"
+  />
+
+  <!-- Diálogo de revisión de reclamación -->
+  <app-order-claim-review-dialog
+    [(visible)]="claimReviewDialogVisible"
+    [claim]="selectedClaimForReview()"
+    [loading]="store.isUpdatingClaimStatus()"
+    (review)="onClaimReview($event)"
+    (close)="selectedClaimForReview.set(null)"
+  />
+
+  <app-confirm-payment-dialog
+    [(visible)]="confirmPaymentDialogVisible"
+    [order]="order()"
+    [loading]="store.isConfirmingPayment()"
+    (confirm)="onConfirmPayment($event)"
+    (close)="confirmPaymentDialogVisible.set(false)"
+  />
+
+  <!-- Diálogo de cancelación de pedido -->
+  <app-cancel-order-dialog
+    [(visible)]="cancelOrderDialogVisible"
+    [order]="order()"
+    [loading]="store.isCancellingOrder()"
+    (confirm)="onCancelOrder($event)"
+    (close)="cancelOrderDialogVisible.set(false)"
+  />
+
+  <app-deliver-order-dialog
+    [(visible)]="deliverOrderDialogVisible"
+    [order]="order()"
+    [loading]="store.isMarkingDelivered()"
+    (confirm)="onDeliverOrder($event)"
+    (close)="deliverOrderDialogVisible.set(false)"
+  />
+
+  <!-- Diálogo de recepción de producto devuelto -->
+  <app-mark-claim-received-dialog
+    [(visible)]="markClaimReceivedDialogVisible"
+    [claim]="selectedClaimForAction()"
+    [loading]="store.isUpdatingClaimStatus()"
+    (confirm)="onMarkClaimReceived($event)"
+    (close)="
+      markClaimReceivedDialogVisible.set(false);
+      selectedClaimForAction.set(null)
+    "
+  />
+
+  <!-- Diálogo de reembolso (Unificado para reclamos y cancelaciones) -->
+  <app-complete-refund-dialog
+    [(visible)]="completeRefundDialogVisible"
+    [claim]="selectedClaimForAction()"
+    [refund]="selectedRefundForAction()"
+    [loading]="store.isUpdatingClaimStatus() || store.isProcessingRefund()"
+    (confirm)="onCompleteRefund($event)"
+    [isCardPaymentInput]="isCardForRefund()"
+    [originalPaymentMethodInput]="paymentMethodForRefund()"
+    (close)="
+      completeRefundDialogVisible.set(false);
+      selectedClaimForAction.set(null);
+      selectedRefundForAction.set(null)
+    "
+  />
+} @else {
+  <!-- Estado de "no encontrado" -->
+  <div class="flex flex-col justify-center items-center h-96 text-slate-300">
+    <i class="pi pi-search text-6xl mb-4"></i>
+    <span class="text-lg font-semibold">Pedido no encontrado</span>
+    <p-button
+      label="Volver al listado"
+      icon="pi pi-arrow-left"
+      [text]="true"
+      (click)="goBack()"
+      styleClass="mt-4"
+    />
+  </div>
+}

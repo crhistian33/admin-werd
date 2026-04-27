@@ -72,6 +72,7 @@ import {
   Warehouse,
   X,
   Zap,
+  RefreshCcw,
 } from 'lucide-angular';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { mockInterceptor } from './core/interceptors/mock.interceptor';
@@ -219,6 +220,7 @@ export const appConfig: ApplicationConfig = {
         SearchX,
         Image,
         Share2,
+        RefreshCcw,
       }),
     ),
     provideStore(

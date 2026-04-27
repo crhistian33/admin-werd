@@ -16,7 +16,7 @@ export function buildShippingZoneFormConfig(): FormStepConfig[] {
           type: 'text',
           placeholder: 'Ej: Lima Metropolitana o Envío Nacional',
           validators: [Validators.required, Validators.minLength(3)],
-          cols: 3,
+          cols: 4,
         },
         {
           key: 'description',

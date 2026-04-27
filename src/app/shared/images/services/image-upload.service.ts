@@ -5,13 +5,17 @@ import { environment } from '../../../../environments/environment';
 import { TempImageResponse } from '../interfaces/image.interface';
 import { ApiResponse } from '@shared/models/api-response.model';
 
-export type ImageEntityKey =
-  | 'product'
-  | 'category'
-  | 'brand'
-  | 'hero_slide'
-  | 'site_config'
-  | 'user';
+export type ImageEntityType =
+  | 'PRODUCT'
+  | 'CATEGORY'
+  | 'BRAND'
+  | 'HERO_SLIDE'
+  | 'SITE_CONFIG'
+  | 'USER'
+  | 'ORDER_LOGISTICS'
+  | 'ORDER_CLAIM'
+  | 'ORDER_DELIVERY'
+  | 'ORDER_REFUND';
 
 @Injectable({ providedIn: 'root' })
 export class ImageUploadService {
@@ -23,7 +27,7 @@ export class ImageUploadService {
   // en el create/update del módulo como tempImageId
   uploadTemp(
     file: File,
-    entityKey: ImageEntityKey,
+    entityType: ImageEntityType,
     imageRole: string,
   ): Observable<ApiResponse<TempImageResponse>> {
     const formData = new FormData();
@@ -32,11 +36,11 @@ export class ImageUploadService {
 
     // Enviar entityKey e imageRole como HttpParams
     const params = new HttpParams()
-      .set('entityKey', entityKey)
+      .set('entityType', entityType)
       .set('imageRole', imageRole);
 
     return this.http.post<ApiResponse<TempImageResponse>>(
-      `${this.baseUrl}/upload`,
+      `${this.baseUrl}/upload/temp`,
       formData,
       { params },
     );

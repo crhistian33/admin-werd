@@ -40,6 +40,12 @@ export type TableColumn<T = any> = {
   width?: string;
   /** Configuración de badges para type: 'badge' */
   badges?: BadgeConfig[];
+  /** Configuración de badges (vía Constantes Record<K,V>) */
+  badgeConfig?: {
+    valueMap: Record<string | number, string>;
+    severityMap?: Record<string | number, string>;
+    defaultSeverity?: BadgeConfig['severity'];
+  };
   /** Función para formatear el valor (ej: toUpperCase, custom format) */
   format?: (value: any, row: T) => string;
   filter?: {
@@ -57,11 +63,13 @@ export type TableAction<T = any> = {
   /** Clase del ícono (ej: 'pi pi-pencil') */
   icon: string;
   /** Texto del tooltip */
-  tooltip: string;
+  tooltip: string | ((row: T) => string);
   /** Severidad del botón (default: 'secondary') */
   severity?: 'success' | 'warn' | 'danger' | 'info' | 'secondary';
   /** Control de visibilidad condicional (default: siempre visible) */
   visible?: (row: T) => boolean;
+  /** Control de disabled condicional (default: siempre visible) */
+  disabled?: (row: T) => boolean;
   /** Función ejecutada al hacer clic */
   action: (row: T) => void;
   isAsync?: boolean;

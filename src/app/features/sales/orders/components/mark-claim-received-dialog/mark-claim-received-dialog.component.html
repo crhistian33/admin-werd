@@ -1,0 +1,40 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Registrar Recepción del Producto"
+  [modal]="true"
+  [style]="{ width: '550px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (claim(); as c) {
+    <div class="bg-surface-50 p-4 rounded-lg flex flex-col gap-2 mb-4">
+      <div class="flex justify-between items-center">
+        <span class="font-mono text-sm font-semibold">{{ c.claimNumber }}</span>
+        <p-tag
+          [value]="CLAIM_TYPE_LABELS[c.type]"
+          [severity]="getClaimTypeSeverity(c.type)"
+        />
+      </div>
+      <div class="text-sm text-surface-600">
+        <p>Pedido: {{ c.order?.orderNumber }}</p>
+        <p class="mt-1"><strong>Ítems a devolver:</strong></p>
+        <ul class="list-disc list-inside">
+          @for (item of c.items; track item.id) {
+            <li>
+              {{ item.orderItem?.productName }} ({{ item.quantity }} unidad(es))
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+
+  <app-form-dynamic
+    [steps]="formConfig()"
+    [loading]="loading()"
+    [submitLabel]="'Confirmar recepción'"
+    [size]="'compact'"
+    (submitted)="onFormSubmit($event)"
+    (cancelled)="onCancel()"
+  />
+</p-dialog>

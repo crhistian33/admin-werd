@@ -1,9 +1,10 @@
 import type { BaseFilter } from '@shared/models/base-filter.model';
-import type { OrderStatus } from './order.model';
+import { OrderStatus } from './orders.enum';
 
 export interface OrderFilter extends BaseFilter {
   status: OrderStatus | null;
-  dateRange: [Date, Date | null] | null;
+  customerId: string | null;
+  paymentMethodId: string | null;
 }
 
 export const orderFilterDefaults = (): OrderFilter => ({
@@ -11,5 +12,6 @@ export const orderFilterDefaults = (): OrderFilter => ({
   limit: 10,
   search: '',
   status: null,
-  dateRange: null,
+  customerId: null,
+  paymentMethodId: null,
 });

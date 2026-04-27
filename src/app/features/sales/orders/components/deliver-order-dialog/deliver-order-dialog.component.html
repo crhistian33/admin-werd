@@ -1,0 +1,58 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Confirmar Entrega"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (order(); as o) {
+    <div class="bg-surface-50 p-4 rounded-lg flex flex-col gap-2 mb-4">
+      <div class="flex justify-between items-center">
+        <span class="font-mono text-sm font-semibold">{{ o.orderNumber }}</span>
+        <p-tag
+          [value]="getStatusLabel(o.status)"
+          [severity]="getStatusSeverity(o.status)"
+        />
+      </div>
+      <div class="text-sm text-surface-600">
+        <p>Cliente: {{ getCustomerName(o) }}</p>
+        <p class="font-medium">
+          Dirección: {{ o.shippingAddress?.addressLine }}
+        </p>
+      </div>
+      <div class="text-right mt-2">
+        <span class="text-sm text-surface-500">Total del pedido:</span>
+        <span class="text-xl font-bold text-primary ml-2">
+          {{ o.total | currency: "S/ " : "symbol" : "1.2-2" }}
+        </span>
+      </div>
+    </div>
+
+    @if (o.logistics) {
+      <div
+        class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm mb-4"
+      >
+        <p>
+          <strong>Tipo de despacho:</strong>
+          {{ getDeliveryTypeLabel(o.logistics.deliveryType) }}
+        </p>
+        @if (o.logistics.trackingNumber) {
+          <p><strong>Tracking:</strong> {{ o.logistics.trackingNumber }}</p>
+        }
+        @if (o.logistics.courierName) {
+          <p><strong>Courier:</strong> {{ o.logistics.courierName }}</p>
+        }
+      </div>
+    }
+  }
+
+  <app-form-dynamic
+    [steps]="formConfig()"
+    [loading]="loading()"
+    [submitLabel]="'Confirmar entrega'"
+    [size]="'compact'"
+    (submitted)="onFormSubmit($event)"
+    (cancelled)="onCancel()"
+  />
+</p-dialog>

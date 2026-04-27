@@ -215,9 +215,12 @@
                           [rounded]="true"
                           [loading]="action.isAsync"
                           size="small"
-                          [pTooltip]="action.tooltip"
+                          [pTooltip]="action.tooltip | resolveFn: row"
                           tooltipPosition="top"
                           (onClick)="action.action(row)"
+                          [disabled]="
+                            action.disabled ? action.disabled(row) : false
+                          "
                         />
                       }
                     }

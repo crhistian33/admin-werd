@@ -4,6 +4,7 @@ import { Category } from '@features/catalogs/categories/models/category.model';
 import { Brand } from '@features/catalogs/brands/models/brand.model';
 import { ImageUploadService } from '@shared/images/services/image-upload.service';
 import { firstValueFrom } from 'rxjs';
+import { ImageEntityType } from '@shared/images/models/image-entity-type.enum';
 
 /**
  * Configuración del formulario de producto.
@@ -188,7 +189,7 @@ export function buildProductFormConfig(
           maxFileSize: 5_000_000,
           uploadHandler: (file: File) =>
             firstValueFrom(
-              imageUpload.uploadTemp(file, 'product', 'main'),
+              imageUpload.uploadTemp(file, ImageEntityType.PRODUCT, 'main'),
             ).then((res) => res.data.imageId),
           cols: 2,
         },
@@ -200,7 +201,7 @@ export function buildProductFormConfig(
           maxFileSize: 5_000_000,
           uploadHandler: (file: File) =>
             firstValueFrom(
-              imageUpload.uploadTemp(file, 'product', 'gallery'),
+              imageUpload.uploadTemp(file, ImageEntityType.PRODUCT, 'gallery'),
             ).then((res) => res.data.imageId),
           hint: 'Puedes subir hasta 3 imágenes adicionales',
           cols: 2, // 2 de 3
