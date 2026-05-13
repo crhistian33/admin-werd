@@ -1,0 +1,195 @@
+<div
+  class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+>
+  <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0">
+      Historial de estados
+    </h2>
+  </div>
+
+  <div class="p-8">
+    @if (events().length) {
+      <p-timeline [value]="events()" align="right">
+        <!-- Fecha (lado opuesto) -->
+        <ng-template pTemplate="opposite" let-event>
+          <div class="flex flex-col items-end gap-3">
+            <div class="text-xs text-slate-400 font-semibold pt-2">
+              <span
+                class="text-xs text-slate-400 font-medium flex items-center gap-1.5 justify-end"
+              >
+                <i class="pi pi-calendar text-[10px]"></i>
+                {{ event.createdAt | date: "dd/MM/yyyy HH:mm" }}
+              </span>
+            </div>
+            <!-- ✅ Imágenes aquí (solo en opposite) -->
+            @if (getEventImages(event); as imgs) {
+              @if (imgs.length > 0) {
+                <div
+                  class="flex gap-1 overflow-x-auto py-1 scrollbar-hide max-w-[200px]"
+                >
+                  @for (img of imgs; track $index) {
+                    <img
+                      [src]="getProductImageUrl()(img)"
+                      (click)="
+                        openImage(getProductImageUrl()(img), 'Evidencia')
+                      "
+                      class="w-12 h-12 rounded object-cover border border-slate-200 cursor-pointer hover:border-primary transition-colors shrink-0"
+                      alt="Evidencia"
+                    />
+                  }
+                </div>
+              }
+            }
+          </div>
+        </ng-template>
+
+        <!-- Marcador (ícono circular) -->
+        <ng-template pTemplate="marker" let-event>
+          <span
+            class="flex items-center justify-center w-8 h-8 rounded-full text-white text-xs shadow-sm ring-4 ring-white cursor-pointer hover:scale-110 transition-transform"
+            [style.background]="getTimelineColor(event)"
+            (click)="showDetail.emit(event)"
+          >
+            @if (event.toStatus === "delivered" || event.toStatus === "paid") {
+              <i class="pi pi-check" style="font-size: 0.6rem"></i>
+            } @else {
+              <i class="pi pi-circle-fill" style="font-size: 0.5rem"></i>
+            }
+          </span>
+        </ng-template>
+
+        <!-- Contenido -->
+        <ng-template pTemplate="content" let-event>
+          <div class="pb-10 last:pb-0 mb-6">
+            <div class="flex flex-col gap-1">
+              <!-- Tag del estado + ícono de detalles -->
+              <div class="flex items-center gap-3">
+                <p-tag
+                  [value]="getTimelineLabel(event)"
+                  [severity]="getTimelineSeverity(event)"
+                  [style]="{
+                    cursor: hasTimelineDetails(event) ? 'pointer' : 'default',
+                  }"
+                  (click)="hasTimelineDetails(event) && showDetail.emit(event)"
+                  class="px-2 py-1 text-[10px] font-bold uppercase tracking-widest ring-1 ring-inset transition-transform active:scale-95"
+                />
+                @if (event.changedBy) {
+                  <span
+                    class="text-[10px] text-slate-400 font-medium bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100"
+                  >
+                    por {{ event.changedBy.name }}
+                  </span>
+                }
+                @if (hasTimelineDetails(event)) {
+                  <i
+                    class="pi pi-info-circle text-slate-400 text-xs cursor-pointer hover:text-primary transition-colors"
+                    (click)="showDetail.emit(event)"
+                  ></i>
+                }
+              </div>
+
+              <!-- Imágenes de evidencia (si existen) -->
+              <!-- @if (getEventImages(event); as imgs) {
+                @if (imgs.length > 0) {
+                  <div class="flex gap-1 overflow-x-auto py-1 scrollbar-hide">
+                    @for (img of imgs; track $index) {
+                      <img
+                        [src]="getProductImageUrl()(img)"
+                        (click)="showDetail.emit(event)"
+                        class="w-12 h-12 rounded object-cover border border-slate-200 cursor-pointer hover:border-primary transition-colors shrink-0"
+                        alt="Evidencia"
+                      />
+                    }
+                  </div>
+                }
+              } -->
+
+              <!-- Comentario del evento -->
+              @if (event.comment) {
+                <div
+                  class="p-3 bg-slate-50 border-l-4 border-slate-200 rounded-r text-sm text-slate-600 italic"
+                >
+                  "{{ event.comment }}"
+                </div>
+              }
+
+              <!-- Detalles Enriquecidos (Phase 3) -->
+              @switch (getTimelineDetailType(event)) {
+                @case ("CLAIM") {
+                  @if (getClaimByEvent(event); as claim) {
+                    <div
+                      class="text-xs border border-slate-200 rounded-lg p-3 bg-white"
+                    >
+                      <div class="flex items-center justify-end gap-2 mb-2">
+                        <span class="font-mono font-medium text-slate-600">{{
+                          claim.claimNumber
+                        }}</span>
+                        <p-tag
+                          [value]="claimTypeLabels[claim.type]"
+                          [severity]="claimTypeSeverities[claim.type]"
+                          [style]="{
+                            fontSize: '10px',
+                            padding: '0.25rem 0.5rem',
+                          }"
+                        />
+                      </div>
+                      <div class="text-slate-500">
+                        <p>
+                          Se registraron
+                          {{ claim.items?.length || 0 }} productos afectados.
+                        </p>
+                        <p>
+                          Motivo:
+                          <span class="font-medium text-slate-700">{{
+                            reasonCategoryLabels[claim.reasonCategory]
+                          }}</span>
+                        </p>
+                      </div>
+                    </div>
+                  }
+                }
+                @case ("LOGISTICS") {
+                  @if (order().logistics; as logistics) {
+                    <div
+                      class="mt-2 flex flex-col gap-1 text-xs p-3 bg-slate-50 border border-slate-100 rounded-lg"
+                    >
+                      <div class="text-slate-500">
+                        Transportista:
+                        <span class="font-semibold text-slate-700">{{
+                          logistics.courierName || "No asignado"
+                        }}</span>
+                      </div>
+                      @if (logistics.trackingNumber) {
+                        <div class="text-slate-500">
+                          Tracking:
+                          <span class="font-mono text-slate-700">{{
+                            logistics.trackingNumber
+                          }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+                @case ("PAYMENT") {
+                  <div
+                    class="mt-2 text-xs p-3 bg-green-50 border border-green-100 rounded-lg text-green-800"
+                  >
+                    Monto pagado:
+                    <span class="font-semibold">{{
+                      order().total | currency: "S/ " : "symbol" : "1.2-2"
+                    }}</span>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        </ng-template>
+      </p-timeline>
+    }
+  </div>
+</div>
+<app-image-viewer
+  [(visible)]="imageViewerVisible"
+  [src]="selectedImageUrl()"
+  [alt]="selectedImageAlt()"
+/>

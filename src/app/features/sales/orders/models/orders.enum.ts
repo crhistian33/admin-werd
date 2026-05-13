@@ -31,11 +31,8 @@ export type ClaimStatus =
   | 'COMPLETED'
   | 'CANCELLED';
 
-export type RefundStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+export type RefundStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
-export type RefundMethod =
-  | 'ORIGINAL_PAYMENT_METHOD'
-  | 'STORE_CREDIT'
-  | 'BANK_TRANSFER';
+export type RefundMethod = 'CARD' | 'WALLET' | 'STORE_CREDIT' | 'BANK_TRANSFER';
 
 export type ReturnedProductCondition = 'RESELLABLE' | 'DAMAGED' | 'DESTROYED';

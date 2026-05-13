@@ -1,3 +1,4 @@
+import { ImageRecord } from '@shared/images/interfaces/image.interface';
 import { DeliveryType } from './orders.enum';
 
 export const DELIVERY_TYPE_LABELS: Record<DeliveryType, string> = {
@@ -18,11 +19,12 @@ export interface OrderLogistics {
   dispatchedById?: string; // ✅ AGREGADO
   deliveredAt?: string; // ✅ AGREGADO
   deliveredById?: string; // ✅ AGREGADO
-  receivedBy?: string; // ✅ AGREGADO
+  deliveredBy?: { id: string; name: string }; // ✅ AGREGADO
   deliveryPhotoUrl?: string; // ✅ AGREGADO
-  deliveryNotes?: string; // ✅ AGREGADO
+  deliveryEvidenceNote?: string; // ✅ AGREGADO
   packingPhotoUrl?: string; // Legacy - mantener compatibilidad
   notes?: string; // Legacy - mantener compatibilidad
+  images?: ImageRecord[];
   createdAt: string;
   updatedAt: string;
 }

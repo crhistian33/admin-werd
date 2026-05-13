@@ -11,6 +11,7 @@ import {
 import { OrderLogistics } from './order-logistics.model';
 import { OrderClaim } from './order-claim.model';
 import { OrderStatus } from './orders.enum';
+import { ImageRecord } from '@shared/images/interfaces/image.interface';
 
 // ─────────────────────────────────────────────────────────────
 // SUB-MODELOS
@@ -59,14 +60,16 @@ export interface OrderRefundItem {
 export interface OrderRefund {
   id: string;
   orderId: string;
+  claimId: string;
   amount: number;
   reason?: string;
-  cancellationReason?: string; // ✅ AGREGADO
+  //cancellationReason?: string; // ✅ AGREGADO
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
   method?: 'ORIGINAL_PAYMENT_METHOD' | 'STORE_CREDIT' | 'BANK_TRANSFER';
   createdAt: string;
   processedAt?: string;
   items?: OrderRefundItem[];
+  images: ImageRecord[];
   totalRefunded?: number;
 }
 
@@ -76,6 +79,7 @@ export interface OrderPaymentTransaction {
   paymentMethodId: string;
   status: 'pending' | 'completed' | 'failed' | 'refunded';
   amount: number;
+  paidAmount?: number;
   currency: string;
   gatewayTransactionId?: string;
   cipCode?: string;
@@ -90,6 +94,7 @@ export interface OrderStatusHistory {
   fromStatus?: OrderStatus;
   toStatus: OrderStatus;
   changedById?: string;
+  changedBy?: { id: string; name: string };
   comment?: string;
   createdAt: string;
 }
@@ -156,13 +161,18 @@ export interface Order extends BaseModel {
   cancelledAt?: string;
   refundedAt?: string;
 
+  paymentExpiresAt?: string;
+  paymentReminderSentAt?: string;
+  paymentConfirmedAt?: string;
+  parentOrderId?: string;
+
   // Relaciones completas (en vista de detalle)
   items?: OrderItem[];
   transactions?: OrderPaymentTransaction[];
   statusHistory?: OrderStatusHistory[];
   refunds?: OrderRefund[];
 
-  // Logística y reclamaciones (NUEVO SISTEMA UNIFICADO)
+  // Logística y reclamos (NUEVO SISTEMA UNIFICADO)
   logistics?: OrderLogistics;
   claims?: OrderClaim[];
 }
@@ -172,7 +182,7 @@ export interface Order extends BaseModel {
 // ─────────────────────────────────────────────────────────────
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  pending_payment: 'Pendiente de pago',
+  pending_payment: 'Pendiente pago',
   paid: 'Pagado',
   processing: 'En proceso',
   shipped: 'Enviado',
@@ -184,10 +194,10 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 /** Transiciones válidas — espejo de VALID_TRANSITIONS del backend */
 export const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   pending_payment: ['paid', 'cancelled'],
-  paid: ['processing', 'cancelled', 'refunded'],
+  paid: ['processing', 'cancelled'],
   processing: ['shipped', 'cancelled'],
   shipped: ['delivered'],
-  delivered: ['refunded'],
+  delivered: [],
   cancelled: [],
   refunded: [],
 };

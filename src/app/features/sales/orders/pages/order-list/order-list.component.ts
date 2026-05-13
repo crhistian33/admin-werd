@@ -4,8 +4,8 @@ import { BadgeModule } from 'primeng/badge';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { OrderStore } from '../../store/order.store';
-import { OrdersActiveComponent } from '../../components/orders-active/orders-active.component';
-import { ClaimsListComponent } from '../../components/claims-list/claims-list.component';
+import { OrderActivesTableComponent } from '../../components/tables/order-actives-table/order-actives-table.component';
+import { OrderClaimsTableComponent } from '../../components/tables/order-claims-table/order-claims-table.component';
 
 @Component({
   selector: 'app-order-list',
@@ -14,8 +14,8 @@ import { ClaimsListComponent } from '../../components/claims-list/claims-list.co
     TabsModule,
     BadgeModule,
     LucideAngularModule,
-    OrdersActiveComponent,
-    ClaimsListComponent,
+    OrderActivesTableComponent,
+    OrderClaimsTableComponent,
   ],
   providers: [OrderStore],
   templateUrl: './order-list.component.html',

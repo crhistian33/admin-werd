@@ -66,18 +66,25 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               'El elemento que buscas ya no existe o cambió de ubicación.';
             break;
           case 409:
-            errorTitle = 'No se puede eliminar';
-            errorMessage = '';
-            if (typeof error.error?.details === 'object') {
+            if (error.error?.details && Array.isArray(error.error.details)) {
+              // Formato 1: Error con detalles (eliminación con relaciones)
+              errorTitle = 'No se puede eliminar';
+              errorMessage = '';
               if (error.error.details.length > 1) {
                 error.error.details.forEach((element: any) => {
-                  errorMessage += `${element.name} ${element.reason}\n`;
+                  errorMessage += `${element.name}: ${element.reason}\n`;
                 });
               } else {
                 errorMessage =
-                  error.error?.details[0].reason ||
-                  'El elemento que buscas ya no existe o cambió de ubicación.';
+                  error.error.details[0]?.reason ||
+                  'El elemento tiene dependencias que impiden su eliminación.';
               }
+            } else {
+              // Formato 2: Error simple (conflicto de estado)
+              errorTitle = 'Conflicto';
+              errorMessage =
+                error.error?.message ||
+                'Ya existe un registro que impide esta operación.';
             }
             break;
           case 422:

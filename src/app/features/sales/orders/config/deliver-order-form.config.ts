@@ -7,8 +7,22 @@ import { firstValueFrom } from 'rxjs';
 export function buildDeliverOrderFormConfig(
   imageUpload: ImageUploadService,
   isCashOnDelivery: boolean,
+  totalAmount: number = 0,
 ): FormStepConfig[] {
   const fields: FormStepConfig['fields'] = [
+    {
+      key: 'cashCollectedAmount',
+      label: 'Monto cobrado al cliente',
+      type: 'number-decimal',
+      placeholder: '0.00',
+      validators: [Validators.required, Validators.min(0)],
+      min: 0,
+      minFractionDigits: 2,
+      defaultValue: totalAmount,
+      hint: 'Total del pedido que se cobró al cliente',
+      visibleWhen: () => isCashOnDelivery,
+      cols: 4,
+    },
     {
       key: 'deliveryEvidenceNote',
       label: 'Nota de entrega',
@@ -21,7 +35,7 @@ export function buildDeliverOrderFormConfig(
     {
       key: 'tempImageIds',
       label: 'Evidencia de entrega',
-      type: 'file-image',
+      type: 'file-gallery',
       accept: 'image/*',
       maxFileSize: 5_000_000,
       uploadHandler: (file: File) =>
@@ -33,23 +47,9 @@ export function buildDeliverOrderFormConfig(
           ),
         ).then((res) => res.data.imageId),
       hint: 'Foto del paquete entregado, firma o cliente recibiendo',
-      cols: 2,
+      cols: 4,
     },
   ];
-
-  if (isCashOnDelivery) {
-    fields.push({
-      key: 'cashCollectedAmount',
-      label: 'Monto cobrado al cliente',
-      type: 'number-decimal',
-      placeholder: '0.00',
-      validators: [Validators.required, Validators.min(0)],
-      min: 0,
-      minFractionDigits: 2,
-      hint: 'Total del pedido que se cobró al cliente',
-      cols: 2,
-    });
-  }
 
   return [
     {

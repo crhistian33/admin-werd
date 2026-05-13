@@ -1,0 +1,25 @@
+<p-dialog
+  [(visible)]="visible"
+  header="Registrar Nuevo Reclamo"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (order()) {
+    <app-order-items-selector
+      [items]="order()!.items ?? []"
+      [(selection)]="selectedItems"
+      [loading]="loading()"
+    />
+  }
+
+  <app-form-dynamic
+    [steps]="formConfig()"
+    [loading]="loading()"
+    [submitLabel]="'Registrar Reclamo'"
+    [size]="'compact'"
+    (submitted)="onFormSubmit($event)"
+    (cancelled)="onCancel()"
+  />
+</p-dialog>

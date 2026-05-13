@@ -3,7 +3,8 @@ export type PaymentMethodType =
   | 'card'
   | 'wallet'
   | 'cash_code'
-  | 'cash_on_delivery';
+  | 'cash_on_delivery'
+  | 'bank_transfer';
 
 // Define las estructuras posibles para el campo JSON 'config'
 export interface PaymentMethodConfig {

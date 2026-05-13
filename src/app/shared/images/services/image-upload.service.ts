@@ -15,7 +15,8 @@ export type ImageEntityType =
   | 'ORDER_LOGISTICS'
   | 'ORDER_CLAIM'
   | 'ORDER_DELIVERY'
-  | 'ORDER_REFUND';
+  | 'ORDER_REFUND'
+  | 'ORDER_ITEM_RETURN';
 
 @Injectable({ providedIn: 'root' })
 export class ImageUploadService {

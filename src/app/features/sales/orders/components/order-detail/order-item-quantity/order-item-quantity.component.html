@@ -1,0 +1,28 @@
+<div class="flex flex-col">
+  @if (isModified()) {
+    <span class="text-slate-400 line-through text-xs mr-1">
+      {{ originalQuantity() }}
+    </span>
+    <div class="flex items-center gap-1">
+      <span class="text-primary font-bold">{{ effectiveQuantity() }}</span>
+    </div>
+    <div class="flex flex-col items-end text-[10px] mt-0.5">
+      @if (cancelledQuantity() > 0) {
+        <span class="text-red-500 font-medium">
+          ({{ cancelledQuantity() }} cancelado{{
+            cancelledQuantity() > 1 ? "s" : ""
+          }})
+        </span>
+      }
+      @if (refundedQuantity() > 0) {
+        <span class="text-orange-500 font-medium">
+          ({{ refundedQuantity() }} devuelto{{
+            refundedQuantity() > 1 ? "s" : ""
+          }})
+        </span>
+      }
+    </div>
+  } @else {
+    <span class="font-medium">{{ effectiveQuantity() }}</span>
+  }
+</div>

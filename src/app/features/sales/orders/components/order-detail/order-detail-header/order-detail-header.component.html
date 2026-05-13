@@ -1,0 +1,52 @@
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <!-- Lado izquierdo: Volver + Info del pedido -->
+  <div class="flex items-center gap-3">
+    <p-button
+      icon="pi pi-arrow-left"
+      [text]="true"
+      severity="secondary"
+      (click)="back.emit()"
+      pTooltip="Volver al listado"
+    />
+    <div>
+      <h1 class="text-3xl font-semibold tracking-tight m-0 text-slate-900">
+        {{ order().orderNumber }}
+      </h1>
+      <!-- ✅ Badge de reemplazo + orden padre -->
+      @if (order().parentOrderId) {
+        <div class="flex items-center gap-2 my-1">
+          <p-tag
+            [value]="'Reemplazo de ' + parentOrder()"
+            severity="info"
+            class="px-2 py-0.5 text-[10px] font-semibold"
+          />
+        </div>
+      }
+      <div class="flex items-center gap-2 mt-1">
+        <span class="text-sm text-slate-500 font-medium">
+          {{ order().placedAt | date: "dd/MM/yyyy HH:mm" }}
+        </span>
+        <p-tag
+          [value]="statusLabel()"
+          [severity]="statusSeverity()"
+          class="px-2 py-0.5 text-xs font-semibold tracking-wider"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Lado derecho: Botones de acción -->
+  <div class="flex gap-3 flex-wrap">
+    @for (action of actions(); track action.label) {
+      <p-button
+        [label]="action.label"
+        [icon]="action.icon"
+        [severity]="action.severity"
+        [outlined]="true"
+        [loading]="action.loading"
+        (click)="action.action()"
+        styleClass="w-full md:w-auto h-11"
+      />
+    }
+  </div>
+</div>

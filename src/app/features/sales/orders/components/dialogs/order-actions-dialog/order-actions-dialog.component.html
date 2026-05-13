@@ -1,0 +1,54 @@
+<p-dialog
+  [(visible)]="visible"
+  [header]="config()?.title || ''"
+  [modal]="true"
+  [style]="{ width: config()?.width || '550px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (config(); as conf) {
+    <!-- Info contextual (opcional) -->
+    @if (conf.contextInfo; as ctx) {
+      <div
+        class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-200 flex flex-wrap justify-between items-center gap-4 mb-2"
+      >
+        @for (item of ctx; track item.label) {
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-slate-500"
+              >{{ item.label }}:</span
+            >
+            @if (item.severity) {
+              <p-tag
+                [severity]="$any(item.severity)"
+                [value]="item.value"
+                class="text-xs px-2 py-0.5"
+              />
+            } @else {
+              <span class="text-sm font-semibold text-slate-800">{{
+                item.value
+              }}</span>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <app-form-dynamic
+      [steps]="conf.formSteps"
+      [claims]="claims()"
+      [initialData]="conf.initialData || null"
+      [loading]="loading()"
+      [submitLabel]="conf.submitLabel || 'Guardar'"
+      [size]="'full'"
+      (submitted)="onFormSubmit($event)"
+      (cancelled)="onCancel()"
+    />
+  } @else if (loading()) {
+    <div class="flex flex-col gap-4 p-4">
+      <p-skeleton height="4rem" styleClass="mb-2" />
+      <p-skeleton height="2rem" />
+      <p-skeleton height="2rem" />
+      <p-skeleton height="3rem" styleClass="mt-4" />
+    </div>
+  }
+</p-dialog>

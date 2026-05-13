@@ -1,0 +1,14 @@
+<div class="flex flex-col items-end">
+  @if (isModified()) {
+    <span class="text-slate-400 line-through text-[10px]">
+      {{ originalTotal() | currency: "S/ " : "symbol" : "1.2-2" }}
+    </span>
+    <span class="text-primary font-bold">
+      {{ effectiveTotal() | currency: "S/ " : "symbol" : "1.2-2" }}
+    </span>
+  } @else {
+    <span class="font-semibold text-slate-900">
+      {{ effectiveTotal() | currency: "S/ " : "symbol" : "1.2-2" }}
+    </span>
+  }
+</div>

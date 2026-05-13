@@ -1,0 +1,223 @@
+<div
+  class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+>
+  <div
+    class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50"
+  >
+    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0">
+      Productos del pedido
+    </h2>
+    <div class="flex items-center gap-3">
+      <span
+        class="text-xs font-semibold text-slate-400 uppercase tracking-widest"
+      >
+        @if (store.hasQuantityModifications()) {
+          {{ store.totalActiveQuantity() }}
+          <span class="text-slate-400 line-through text-[10px]"
+            >/ {{ store.totalOriginalQuantity() }}</span
+          >
+        } @else {
+          {{ store.totalOriginalQuantity() }}
+        }
+        UNIDAD(ES)
+      </span>
+      <span class="text-slate-300">|</span>
+      <span
+        class="text-xs font-semibold text-slate-400 uppercase tracking-widest"
+      >
+        {{ store.uniqueProductsCount() }} PRODUCTO(S)
+      </span>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <p-table [value]="store.enrichedItems()" class="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 60px"></th>
+          <th
+            class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            Producto
+          </th>
+          <th
+            class="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider"
+            style="width: 100px"
+          >
+            Cant.
+          </th>
+          <th
+            class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
+            style="width: 120px"
+          >
+            Precio Unit.
+          </th>
+          <th
+            class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
+            style="width: 90px"
+          >
+            Dcto.
+          </th>
+          <th
+            class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
+            style="width: 120px"
+          >
+            Subtotal
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item>
+        <tr [class.bg-amber-50]="item.isModified">
+          <td class="px-3 py-3">
+            <img
+              [src]="getProductImageUrl()(item.productImageUrl)"
+              [alt]="item.productName"
+              class="w-10 h-10 object-cover rounded border border-slate-100"
+            />
+          </td>
+          <td class="px-4 py-3">
+            <div class="font-semibold text-slate-800">
+              {{ item.productName }}
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono mt-0.5">
+              SKU: {{ item.productSku }}
+            </div>
+            @if (item.claimBadges?.length) {
+              <div class="flex flex-wrap gap-1.5 mt-2">
+                @for (badge of item.claimBadges; track badge.icon) {
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border cursor-pointer hover:opacity-80 transition-opacity"
+                    [ngClass]="{
+                      'bg-red-50 border-red-200 text-red-700':
+                        badge.severity === 'danger',
+                      'bg-orange-50 border-orange-200 text-orange-700':
+                        badge.severity === 'warn',
+                      'bg-blue-50 border-blue-200 text-blue-700':
+                        badge.severity === 'info',
+                      'bg-slate-50 border-slate-200 text-slate-600':
+                        badge.severity === 'secondary',
+                    }"
+                    [pTooltip]="badge.tooltip"
+                    tooltipPosition="top"
+                    (click)="scrollToClaims.emit()"
+                  >
+                    <i [class]="badge.icon" style="font-size: 9px"></i>
+                    {{ badge.label }} ({{ badge.qty }})
+                  </button>
+                }
+              </div>
+            }
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex flex-col">
+              @if (item.isModified) {
+                <span class="text-slate-400 line-through text-xs">{{
+                  item.originalQuantity
+                }}</span>
+                <span class="text-primary font-bold text-base">{{
+                  item.effectiveQuantity
+                }}</span>
+              } @else {
+                <span class="font-semibold text-slate-700">{{
+                  item.effectiveQuantity
+                }}</span>
+              }
+            </div>
+          </td>
+          <td class="px-4 py-3 text-right font-medium text-slate-700">
+            {{ item.unitPrice | currency: "S/ " : "symbol" : "1.2-2" }}
+          </td>
+          <td class="px-4 py-3 text-right">
+            @if (item.discountAmount > 0 && !store.isReplacement()) {
+              <span class="text-orange-500 font-medium text-sm"
+                >-{{
+                  item.discountAmount | currency: "S/ " : "symbol" : "1.2-2"
+                }}</span
+              >
+            } @else {
+              <span class="text-slate-300">—</span>
+            }
+          </td>
+          <td class="px-4 py-3 text-right">
+            @if (store.isReplacement()) {
+              <span class="text-slate-300">—</span>
+            } @else if (item.isTotalModified) {
+              <span class="text-slate-400 line-through text-xs block">{{
+                item.originalLineTotal | currency: "S/ " : "symbol" : "1.2-2"
+              }}</span>
+              <span class="text-primary font-bold">{{
+                item.effectiveLineTotal | currency: "S/ " : "symbol" : "1.2-2"
+              }}</span>
+            } @else {
+              <span class="font-semibold text-slate-900">{{
+                item.effectiveLineTotal | currency: "S/ " : "symbol" : "1.2-2"
+              }}</span>
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Totales -->
+  <div class="flex justify-end p-6 bg-slate-50/50 border-t border-slate-100">
+    <div class="flex flex-col gap-2.5 min-w-[280px]">
+      <div class="flex justify-between items-center text-sm">
+        <span
+          class="text-slate-500 font-medium text-xs uppercase tracking-wider"
+          >Subtotal</span
+        >
+        <span class="font-semibold text-slate-700">{{
+          !store.isReplacement()
+            ? (store.currentOrder()?.subtotal
+              | currency: "S/ " : "symbol" : "1.2-2")
+            : "0.00"
+        }}</span>
+      </div>
+      @if (store.totalAdjustments() > 0 && !store.isReplacement()) {
+        <div class="flex justify-between items-center text-sm text-red-500">
+          <span class="font-medium text-xs uppercase tracking-wider"
+            >Ajustes</span
+          >
+          <span class="font-semibold"
+            >-{{
+              store.totalAdjustments() | currency: "S/ " : "symbol" : "1.2-2"
+            }}</span
+          >
+        </div>
+      }
+      <div class="flex justify-between items-center text-sm">
+        <span
+          class="text-slate-500 font-medium text-xs uppercase tracking-wider"
+          >Envío</span
+        >
+        <span class="font-semibold text-slate-700">{{
+          store.currentOrder()?.shippingAmount
+            | currency: "S/ " : "symbol" : "1.2-2"
+        }}</span>
+      </div>
+      <div class="border-t border-slate-200 my-1"></div>
+      <div
+        class="flex justify-between items-center border border-slate-300 bg-white p-3 rounded-lg -mx-1 shadow-sm"
+      >
+        <span
+          class="text-xs font-semibold uppercase tracking-widest text-slate-600"
+          >Total</span
+        >
+        <span class="text-lg font-bold tracking-tight text-slate-900">{{
+          store.adjustedGrandTotal() | currency: "S/ " : "symbol" : "1.2-2"
+        }}</span>
+      </div>
+      @if (store.totalAdjustments() > 0 && !store.isReplacement()) {
+        <div class="text-center text-xs text-slate-400">
+          Total original:
+          {{
+            store.currentOrder()?.total | currency: "S/ " : "symbol" : "1.2-2"
+          }}
+        </div>
+      }
+    </div>
+  </div>
+</div>

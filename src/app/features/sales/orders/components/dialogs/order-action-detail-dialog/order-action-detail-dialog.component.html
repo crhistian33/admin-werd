@@ -1,0 +1,397 @@
+<p-dialog
+  [(visible)]="visible"
+  [header]="header()"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="onHide()"
+>
+  @if (event(); as ev) {
+    <div class="flex flex-col gap-4">
+      <!-- INFO BÁSICA -->
+      <div
+        class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-200 flex flex-wrap justify-between items-center gap-4"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium text-slate-500"
+            >Fecha de registro:</span
+          >
+          <span class="text-sm font-semibold text-slate-800">
+            {{ ev.createdAt | date: "dd/MM/yyyy HH:mm" }}
+          </span>
+          @if (ev.changedBy) {
+            <span
+              class="text-xs text-slate-400 font-medium ml-2 border-l border-slate-200 pl-2"
+            >
+              por {{ ev.changedBy.name }}
+            </span>
+          }
+        </div>
+        @if (detailType() === "CLAIM" && claim(); as c) {
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-slate-500">Estado:</span>
+            <p-tag
+              [value]="CLAIM_STATUS_LABELS[c.status]"
+              [severity]="CLAIM_STATUS_SEVERITY[c.status]"
+              class="text-xs px-2 py-0.5"
+            />
+          </div>
+        }
+      </div>
+
+      <!-- COMENTARIO -->
+      @if (formattedComment()) {
+        <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+          <span
+            class="text-[10px] font-bold uppercase text-amber-800 block mb-1"
+            >Acción Realizada / Nota</span
+          >
+          <p class="m-0 text-slate-700 italic font-medium leading-relaxed">
+            "{{ formattedComment() }}"
+          </p>
+        </div>
+      }
+
+      <!-- LOGÍSTICA -->
+      @if (detailType() === "LOGISTICS") {
+        @if (logistics(); as log) {
+          <div class="flex flex-col gap-4">
+            <h3
+              class="text-sm font-bold text-slate-800 m-0 border-b border-slate-100 pb-2"
+            >
+              Información de Envío
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Courier</span
+                >
+                <p class="m-0 font-medium text-slate-800">
+                  {{ log.courierName || "No especificado" }}
+                </p>
+              </div>
+              <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Tracking</span
+                >
+                <p class="m-0 font-mono font-semibold text-sky-600">
+                  {{ log.trackingNumber || "No especificado" }}
+                </p>
+              </div>
+              <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Costo Real</span
+                >
+                <p class="m-0 font-medium text-slate-800">
+                  {{ log.actualShippingCost | currency: "S/ " }}
+                </p>
+              </div>
+              <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Transporte Int.</span
+                >
+                <p class="m-0 font-medium text-slate-800">
+                  {{ log.internalTransportCost | currency: "S/ " }}
+                </p>
+              </div>
+            </div>
+
+            @if (logisticsImages() && logisticsImages().length > 0) {
+              <div class="mt-2 flex flex-col gap-2">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Evidencia de Envío (Empaque)</span
+                >
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  @for (img of logisticsImages(); track img.id) {
+                    <img
+                      [src]="getProductImageUrl(img.url)"
+                      (click)="
+                        openImage(
+                          getProductImageUrl(img.url),
+                          'Evidencia de envío'
+                        )
+                      "
+                      class="w-full aspect-square object-cover rounded-lg border border-slate-200 cursor-pointer hover:opacity-90 hover:scale-105 transition-all"
+                      alt="Evidencia de envío"
+                    />
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div
+            class="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-center text-slate-400 text-xs italic"
+          >
+            No se encontró información técnica de logística para este envío.
+          </div>
+        }
+      }
+
+      <!-- ENTREGA -->
+      @if (detailType() === "DELIVERY") {
+        @if (logistics(); as log) {
+          <div class="flex flex-col gap-4">
+            <h3
+              class="text-sm font-bold text-slate-800 m-0 border-b border-slate-100 pb-2"
+            >
+              Confirmación de Entrega
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Fecha de Entrega</span
+                >
+                <p class="m-0 font-medium text-slate-800">
+                  {{
+                    log.deliveredAt || ev.createdAt | date: "dd/MM/yyyy HH:mm"
+                  }}
+                </p>
+              </div>
+              <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Gestionado por</span
+                >
+                <p
+                  class="m-0 font-medium text-slate-800 text-ellipsis overflow-hidden whitespace-nowrap"
+                >
+                  {{
+                    log.deliveredBy?.name ||
+                      ev.changedBy?.name ||
+                      "Administrador"
+                  }}
+                </p>
+              </div>
+            </div>
+
+            @if (log.deliveryEvidenceNote) {
+              <div
+                class="p-3 bg-sky-50 rounded-lg border border-sky-200 text-sm"
+              >
+                <span
+                  class="text-[10px] font-bold uppercase text-sky-800 block mb-1"
+                  >Nota de Entrega</span
+                >
+                <p
+                  class="m-0 italic text-sky-900 border-l-2 border-sky-300 pl-3"
+                >
+                  "{{ log.deliveryEvidenceNote }}"
+                </p>
+              </div>
+            }
+
+            @if (
+              (logisticsImages() && logisticsImages().length > 0) ||
+              log.deliveryPhotoUrl
+            ) {
+              <div class="mt-2 flex flex-col gap-2">
+                <span class="text-[10px] text-slate-400 font-bold uppercase"
+                  >Evidencia de Entrega</span
+                >
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  @if (log.deliveryPhotoUrl) {
+                    <img
+                      [src]="getProductImageUrl(log.deliveryPhotoUrl)"
+                      (click)="
+                        openImage(
+                          getProductImageUrl(log.deliveryPhotoUrl),
+                          'Evidencia de entrega'
+                        )
+                      "
+                      class="w-full aspect-square object-cover rounded-lg border border-slate-200 cursor-pointer hover:opacity-90 hover:scale-105 transition-all"
+                      alt="Evidencia de entrega"
+                    />
+                  }
+                  @for (img of logisticsImages(); track img.id) {
+                    @if (img.url && img.url !== log.deliveryPhotoUrl) {
+                      <img
+                        [src]="getProductImageUrl(img.url)"
+                        (click)="
+                          openImage(
+                            getProductImageUrl(img.url),
+                            'Evidencia de entrega'
+                          )
+                        "
+                        class="w-full aspect-square object-cover rounded-lg border border-slate-200 cursor-pointer hover:opacity-90 hover:scale-105 transition-all"
+                        alt="Evidencia de entrega"
+                      />
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div
+            class="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-center text-slate-400 text-xs italic"
+          >
+            No se encontró información de entrega registrada para este pedido.
+          </div>
+        }
+      }
+
+      <!-- RECLAMO -->
+      @if (detailType() === "CLAIM" && claim(); as c) {
+        <div class="flex flex-col gap-2">
+          <div class="p-3 bg-sky-50 rounded-lg border border-sky-200 text-sm">
+            <span class="text-[10px] font-bold uppercase leading-none"
+              >Motivo Original:
+              {{ REASON_CATEGORY_LABELS[c.reasonCategory] }}</span
+            >
+            @if (c.description) {
+              <p class="mt-2 mb-0 text-slate-500 italic">
+                "{{ c.description }}"
+              </p>
+            }
+          </div>
+
+          @if (c.items && c.items.length > 0) {
+            <div class="flex flex-col gap-2 mt-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase"
+                >Productos afectados</span
+              >
+              <div
+                class="border border-slate-200 rounded-lg divide-y divide-slate-100 bg-white overflow-hidden"
+              >
+                @for (item of c.items; track item.id) {
+                  <div class="p-3 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                      <img
+                        [src]="
+                          getProductImageUrl(item.orderItem?.productImageUrl)
+                        "
+                        class="w-12 h-12 object-cover rounded-lg"
+                        alt="Producto"
+                      />
+                      <div class="flex flex-col">
+                        <span class="text-sm font-semibold text-slate-800">{{
+                          item.orderItem?.productName
+                        }}</span>
+                        <span class="text-xs text-slate-500 font-mono"
+                          >SKU: {{ item.orderItem?.productSku }}</span
+                        >
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end">
+                      <span
+                        class="text-xs text-slate-400 uppercase font-semibold"
+                        >Cant. afectada</span
+                      >
+                      <span class="font-bold text-primary">{{
+                        item.quantity
+                      }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (c.reviewNote) {
+            <div
+              class="p-4 bg-sky-50 border border-sky-200 rounded-lg text-sm text-sky-900"
+            >
+              <span class="font-bold text-[10px] uppercase text-sky-800"
+                >Respuesta de Gestión:</span
+              >
+              <p class="mt-1 mb-0 italic">"{{ c.reviewNote }}"</p>
+            </div>
+          }
+
+          <!-- ✅ Imágenes con viewer -->
+          @if (claimImages().length > 0) {
+            <div class="mt-2 flex flex-col gap-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase">
+                @if (isRefundEvent()) {
+                  Comprobante de Reembolso
+                } @else if (isShipmentEvent()) {
+                  Evidencia de Envío
+                } @else if (isReceptionEvent()) {
+                  Fotos del Producto Recibido
+                } @else {
+                  Fotos de Evidencia
+                }
+              </span>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                @for (img of claimImages(); track img.id) {
+                  @if (img.url) {
+                    <img
+                      [src]="getProductImageUrl(img.url)"
+                      (click)="openImage(getProductImageUrl(img.url))"
+                      class="w-full aspect-square object-cover rounded-lg border border-slate-200 cursor-pointer hover:opacity-90 hover:scale-105 transition-all"
+                      alt="Evidencia"
+                    />
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- PAGO -->
+      @if (detailType() === "PAYMENT") {
+        <div class="flex flex-col gap-4">
+          <h3
+            class="text-sm font-bold text-slate-800 m-0 border-b border-slate-100 pb-2"
+          >
+            Información de Pago
+          </h3>
+          <div class="flex flex-col gap-2">
+            @for (tx of transactions(); track tx.id) {
+              <div
+                class="p-3 border border-slate-200 rounded-lg flex justify-between items-center bg-slate-50"
+              >
+                <div class="flex flex-col">
+                  <span class="text-[10px] text-slate-400 font-bold uppercase"
+                    >Transacción</span
+                  >
+                  <p class="m-0 font-mono text-xs text-blue-600 font-semibold">
+                    {{ tx.gatewayTransactionId ?? tx.cipCode ?? "Manual" }}
+                  </p>
+                </div>
+                <div class="flex flex-col items-end">
+                  <span class="text-[10px] text-slate-400 font-bold uppercase"
+                    >Monto</span
+                  >
+                  <p class="m-0 font-bold text-slate-800">
+                    {{ tx.amount | currency: "S/ " }}
+                  </p>
+                </div>
+              </div>
+            } @empty {
+              <div
+                class="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-center text-slate-400 text-xs italic"
+              >
+                No se encontraron transacciones detalladas para este evento.
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (adminNotes()) {
+      <div
+        class="bg-amber-100 p-3 mt-3 rounded-lg border border-amber-200 flex flex-col gap-2"
+      >
+        <div
+          class="mt-1 p-3 bg-amber-100 border border-amber-200 rounded text-xs"
+        >
+          <span class="font-bold uppercase text-[10px] block mb-1"
+            >Nota interna (Admin):</span
+          >
+          {{ adminNotes() }}
+        </div>
+      </div>
+    }
+  }
+</p-dialog>
+
+<!-- ✅ Visor de imagen -->
+<app-image-viewer
+  [(visible)]="imageViewerVisible"
+  [src]="selectedImageUrl()"
+  [alt]="selectedImageAlt()"
+/>

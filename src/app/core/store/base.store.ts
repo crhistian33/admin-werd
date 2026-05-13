@@ -178,6 +178,8 @@ export abstract class BaseStore<
     return this.detailResource.value()?.data ?? null;
   });
 
+  readonly isDetailLoading = computed(() => this.detailResource.isLoading());
+
   getById(id: string): void {
     this.selectedId.set(id);
     this.detailResource.reload();

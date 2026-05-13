@@ -22,9 +22,27 @@ export interface ConfirmPaymentPayload {
   adminNotes?: string;
 }
 
+export interface SelectedOrderItem {
+  orderItemId: string;
+  quantity: number;
+}
+
 export interface CancelOrderPayload {
-  reason: string;
+  reason:
+    | 'customer_request'
+    | 'no_payment'
+    | 'no_stock'
+    | 'fraud'
+    | 'wrong_address'
+    | 'damaged_in_warehouse'
+    | 'other';
+  reasonDetail?: string;
   adminNotes?: string;
+  isFullCancellation?: boolean;
+  autoApprove?: boolean;
+  items?: SelectedOrderItem[];
+  refundMethod?: string;
+  refundAccountDetails?: string;
 }
 
 export interface ShipOrderPayload {
@@ -34,7 +52,6 @@ export interface ShipOrderPayload {
   actualShippingCost?: number;
   internalTransportCost?: number;
   tempImageIds?: string[];
-  internalNotes?: string;
 }
 
 export interface DeliverOrderPayload {

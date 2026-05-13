@@ -1,0 +1,218 @@
+<div
+  class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+>
+  <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest m-0">
+      Transacciones de pago
+    </h2>
+  </div>
+  <div class="p-0 overflow-x-auto">
+    <p-table [value]="transactions()" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr class="bg-slate-50/30">
+          <th
+            class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            Gateway ID
+          </th>
+          <th
+            class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            Monto
+          </th>
+          <th
+            class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            Estado
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            Fecha
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-tx>
+        <tr [class.bg-green-50]="tx.status === 'completed'">
+          <td
+            class="px-6 py-4 font-mono text-xs text-blue-600 font-semibold bg-blue-50/20"
+          >
+            {{ tx.gatewayTransactionId ?? tx.cipCode ?? "—" }}
+          </td>
+          <td class="px-6 py-4 text-right">
+            <span class="font-bold text-green-600">
+              {{
+                tx.paidAmount || tx.amount
+                  | currency: "S/ " : "symbol" : "1.2-2"
+              }}
+            </span>
+            @if (tx.paidAmount && tx.paidAmount !== tx.amount) {
+              <div class="text-[10px] text-slate-400 line-through">
+                {{ tx.amount | currency: "S/ " : "symbol" : "1.2-2" }}
+              </div>
+            }
+          </td>
+          <td class="px-6 py-4 text-center">
+            <p-tag
+              [value]="tx.status === 'completed' ? 'Completado' : tx.status"
+              [severity]="tx.status === 'completed' ? 'success' : 'info'"
+              styleClass="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
+            />
+          </td>
+          <td class="px-6 py-4 text-xs text-slate-500 font-medium">
+            {{ tx.paidAt || tx.createdAt | date: "dd/MM/yyyy HH:mm" }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- ✅ Resumen financiero real y conciliación -->
+    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100">
+      <div class="flex justify-end">
+        <div class="flex flex-col gap-2 min-w-[320px]">
+          <!-- Total pagado -->
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-slate-500">Total pagado</span>
+            <span class="font-semibold text-green-600">
+              {{ totalPaid() | currency: "S/ " : "symbol" : "1.2-2" }}
+            </span>
+          </div>
+
+          <!-- Total reembolsado con desglose (solo si ya hay reembolsos) -->
+          @if (store.totalRefunded() > 0) {
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-red-500">Total reembolsado</span>
+              <span class="font-semibold text-red-500">
+                -{{
+                  store.totalRefunded() | currency: "S/ " : "symbol" : "1.2-2"
+                }}
+              </span>
+            </div>
+
+            <!-- ✅ Desglose: productos + envío (solo si hay envío reembolsado) -->
+            @if (store.totalShippingRefunded() > 0) {
+              <div
+                class="text-[10px] text-slate-400 pl-4 border-l-2 border-slate-200 space-y-0.5"
+              >
+                <div class="flex justify-between">
+                  <span>Productos</span>
+                  <span
+                    >-{{
+                      store.totalProductRefunded()
+                        | currency: "S/ " : "symbol" : "1.2-2"
+                    }}</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span>Envío (asumido por tienda)</span>
+                  <span
+                    >-{{
+                      store.totalShippingRefunded()
+                        | currency: "S/ " : "symbol" : "1.2-2"
+                    }}</span
+                  >
+                </div>
+              </div>
+            }
+
+            <div class="border-t border-slate-200 my-1"></div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-semibold text-slate-700">
+                @if (netFinal() >= 0) {
+                  Neto recibido
+                } @else {
+                  Costo neto para la tienda
+                }
+              </span>
+              <span
+                class="text-lg font-bold"
+                [class.text-green-600]="netFinal() >= 0"
+                [class.text-red-500]="netFinal() < 0"
+              >
+                {{ netFinal() | currency: "S/ " : "symbol" : "1.2-2" }}
+              </span>
+            </div>
+          }
+
+          <!-- Si NO hay reembolso pero hay devolución pendiente -->
+          @if (store.totalRefunded() === 0 && store.totalPendingRefund() > 0) {
+            <div
+              class="flex justify-between items-center text-sm text-amber-600"
+            >
+              <span>Pendiente de reembolso</span>
+              <span class="font-semibold">
+                {{
+                  store.totalPendingRefund()
+                    | currency: "S/ " : "symbol" : "1.2-2"
+                }}
+              </span>
+            </div>
+          }
+
+          <!-- Conciliación con el Pedido -->
+          <div
+            class="mt-2 p-3 rounded-lg border border-slate-200 bg-white shadow-inner"
+          >
+            <div
+              class="flex justify-between items-center text-[10px] text-slate-400 uppercase font-bold mb-1"
+            >
+              <span>Importe Final del Pedido</span>
+              <span>{{
+                store.adjustedGrandTotal()
+                  | currency: "S/ " : "symbol" : "1.2-2"
+              }}</span>
+            </div>
+
+            <div class="border-t border-slate-100 my-1"></div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-semibold text-slate-500"
+                >Diferencia</span
+              >
+              <span class="text-sm font-bold text-slate-700">
+                {{
+                  adjustedGrandTotalDiff()
+                    | currency: "S/ " : "symbol" : "1.2-2"
+                }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nota explicativa condicional -->
+    @if (store.totalShippingRefunded() > 0) {
+      <div class="px-6 py-3 bg-amber-50 border-t border-amber-100">
+        <div class="flex items-start gap-2 text-[10px] text-amber-700">
+          <i class="pi pi-info-circle mt-0.5"></i>
+          <p>
+            El reembolso incluye
+            <strong
+              >S/
+              {{
+                store.totalShippingRefunded()
+                  | currency: "S/ " : "symbol" : "1.2-2"
+              }}</strong
+            >
+            por costo de envío asumido por la tienda (error de tienda o falla
+            del producto).
+          </p>
+        </div>
+      </div>
+    }
+
+    @if (store.totalRefunded() === 0 && store.totalPendingRefund() > 0) {
+      <div class="px-6 py-3 bg-amber-50 border-t border-amber-100">
+        <div class="flex items-start gap-2 text-[10px] text-amber-700">
+          <i class="pi pi-info-circle mt-0.5"></i>
+          <p>
+            Hay un reembolso pendiente de procesar. El importe final del pedido
+            ya refleja la devolución.
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -73,6 +73,7 @@ import {
   X,
   Zap,
   RefreshCcw,
+  Info,
 } from 'lucide-angular';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { mockInterceptor } from './core/interceptors/mock.interceptor';
@@ -221,6 +222,7 @@ export const appConfig: ApplicationConfig = {
         Image,
         Share2,
         RefreshCcw,
+        Info,
       }),
     ),
     provideStore(

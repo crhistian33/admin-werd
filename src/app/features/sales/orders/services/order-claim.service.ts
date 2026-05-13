@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '@env/environment';
 import { BaseService } from '@core/services/base.service';
 import { ApiResponse } from '@core/models/api-response.model';
 import type {
   CompleteRefundPayload,
+  ConfirmReturnShipmentPayload,
   MarkClaimReceivedPayload,
   OrderClaim,
 } from '../models';
@@ -15,25 +17,25 @@ export class OrderClaimService extends BaseService<OrderClaim> {
 
   // ── Operaciones anidadas al pedido ──────────────────────────
 
-  getByOrder(orderId: string): Observable<ApiResponse<OrderClaim[]>> {
-    return this.http.get<ApiResponse<OrderClaim[]>>(
-      `${this.url}/orders/${orderId}/claims`,
-      { context: this.context },
-    );
-  }
+  // getByOrder(orderId: string): Observable<ApiResponse<OrderClaim[]>> {
+  //   return this.http.get<ApiResponse<OrderClaim[]>>(
+  //     this.url,
+  //     { params: { orderId }, context: this.context },
+  //   );
+  // }
 
   createClaim(
     orderId: string,
     payload: CreateClaimPayload,
   ): Observable<ApiResponse<OrderClaim>> {
     return this.http.post<ApiResponse<OrderClaim>>(
-      `${this.url}/orders/${orderId}/claims`,
+      `${environment.apiUrl}/orders/admin/${orderId}/claims`,
       payload,
       { context: this.context },
     );
   }
 
-  // ── Operaciones directas sobre la reclamación ───────────────
+  // ── Operaciones directas sobre el reclamo ───────────────
 
   reviewClaim(
     claimId: string,
@@ -103,13 +105,30 @@ export class OrderClaimService extends BaseService<OrderClaim> {
   }
 
   /**
-   * Eliminar definitivamente una reclamación (solo válidos estados finales como CANCELLED o REJECTED)
-   * Endpoint: DELETE /orders/claims/:claimId
+   * Registra datos de envío de retorno (admin)
+   * Endpoint: PATCH /orders/admin/claims/:claimId/register-return-shipment
    */
-  deleteClaim(claimId: string): Observable<ApiResponse<{ success: boolean; claimId: string }>> {
-    return this.http.delete<ApiResponse<{ success: boolean; claimId: string }>>(
-      `${this.url}/${claimId}`,
+  registerReturnShipment(
+    claimId: string,
+    payload: ConfirmReturnShipmentPayload,
+  ): Observable<ApiResponse<OrderClaim>> {
+    return this.http.patch<ApiResponse<OrderClaim>>(
+      `${environment.apiUrl}/orders/admin/claims/${claimId}/register-return-shipment`,
+      payload,
       { context: this.context },
     );
   }
+
+  /**
+   * Eliminar definitivamente un reclamo (solo válidos estados finales como CANCELLED o REJECTED)
+   * Endpoint: DELETE /orders/claims/:claimId
+   */
+  // deleteClaim(
+  //   claimId: string,
+  // ): Observable<ApiResponse<{ success: boolean; claimId: string }>> {
+  //   return this.http.delete<ApiResponse<{ success: boolean; claimId: string }>>(
+  //     `${this.url}/${claimId}`,
+  //     { context: this.context },
+  //   );
+  // }
 }

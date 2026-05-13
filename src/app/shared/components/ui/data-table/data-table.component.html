@@ -81,6 +81,8 @@
         <p-button label="Nuevo" icon="pi pi-plus" routerLink="nuevo" />
       }
     </div>
+
+    <ng-content select="[TableTotals]" />
   </div>
 
   <!-- Tabla PrimeNG -->
@@ -119,7 +121,7 @@
       >
       <!-- Header -->
       <ng-template #header>
-        <tr class="bg-slate-200 border-b border-slate-300">
+        <tr class="bg-slate-200 border-b border-slate-300 text-[13px]!">
           @if (config().selectable) {
             <th class="py-3! px-4! border-0! bg-transparent! w-12">
               <p-tableHeaderCheckbox />
@@ -149,7 +151,7 @@
 
       <!-- Body -->
       <ng-template #body let-row>
-        <tr class="hover:bg-surface-hover transition-colors">
+        <tr class="hover:bg-surface-hover transition-colors text-[13px]!">
           @if (config().selectable) {
             <td>
               <p-tableCheckbox [value]="row" />
@@ -185,6 +187,13 @@
                   <span>{{ getValue(row, col) | date: "dd/MM/yyyy" }}</span>
                 }
 
+                <!-- Fecha y Hora -->
+                @case ("datetime") {
+                  <span>{{
+                    getValue(row, col) | date: "dd/MM/yyyy HH:mm"
+                  }}</span>
+                }
+
                 <!-- Badge -->
                 @case ("badge") {
                   @if (getBadge(col, getValue(row, col)); as badge) {
@@ -201,6 +210,11 @@
                     [alt]="col.header"
                     class="h-10 w-10 rounded-md object-cover"
                   />
+                }
+
+                <!-- HTML Personalizado -->
+                @case ("html") {
+                  <span [innerHTML]="getValue(row, col)"></span>
                 }
 
                 <!-- Acciones -->
@@ -225,6 +239,28 @@
                       }
                     }
                   </div>
+                }
+              }
+              @if (col.children) {
+                @for (child of col.children; track child.field) {
+                  @switch (child.type ?? "text") {
+                    <!-- Texto plano -->
+                    @case ("text") {
+                      <span>{{ getValue(row, child) }}</span>
+                    }
+                    <!-- Badge -->
+                    @case ("badge") {
+                      @if (getBadge(child, getValue(row, child)); as badge) {
+                        <p-tag
+                          [value]="badge.label"
+                          [severity]="badge.severity"
+                          [style]="{ 'font-size': '10px' }"
+                        />
+                      } @else {
+                        <span>{{ getValue(row, child) }}</span>
+                      }
+                    }
+                  }
                 }
               }
             </td>

@@ -19,25 +19,7 @@ export class OrderService extends BaseService<Order> {
   // El CMS apunta al endpoint de admin
   protected readonly endpoint = 'orders';
 
-  // ── Por número de pedido ──────────────────────────────────
-  getByNumber(orderNumber: string): Observable<ApiResponse<Order>> {
-    return this.http.get<ApiResponse<Order>>(
-      `${this.url}/number/${orderNumber}`,
-      { context: this.context },
-    );
-  }
 
-  // ── Cambio de estado ──────────────────────────────────────
-  updateStatus(
-    id: string,
-    payload: UpdateOrderStatusPayload,
-  ): Observable<ApiResponse<Order>> {
-    return this.http.patch<ApiResponse<Order>>(
-      `${this.url}/${id}/status`,
-      payload,
-      { context: this.context },
-    );
-  }
 
   // ── Devolución ────────────────────────────────────────────
   createRefund(
@@ -52,12 +34,6 @@ export class OrderService extends BaseService<Order> {
   }
 
   // ── Logística ─────────────────────────────────────────────
-  getLogistics(id: string): Observable<ApiResponse<OrderLogistics>> {
-    return this.http.get<ApiResponse<OrderLogistics>>(
-      `${this.url}/${id}/logistics`,
-      { context: this.context },
-    );
-  }
 
   updateLogistics(
     id: string,

@@ -8,8 +8,10 @@ export type ColumnType =
   | 'number'
   | 'currency'
   | 'date'
+  | 'datetime'
   | 'badge'
   | 'image'
+  | 'html'
   | 'actions';
 
 /**
@@ -53,6 +55,7 @@ export type TableColumn<T = any> = {
     type: FilterFieldType;
     options?: FilterOption[];
   };
+  children?: TableColumn<T>[];
 };
 
 /**

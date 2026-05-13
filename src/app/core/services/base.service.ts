@@ -27,6 +27,12 @@ export abstract class BaseService<T> {
     });
   }
 
+  findOne(id: string): Observable<ApiResponse<T>> {
+    return this.http.get<ApiResponse<T>>(`${this.url}/${id}`, {
+      context: this.context,
+    });
+  }
+
   update(id: string, payload: Partial<T>): Observable<ApiResponse<T>> {
     return this.http.patch<ApiResponse<T>>(`${this.url}/${id}`, payload, {
       context: this.context,

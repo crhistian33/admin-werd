@@ -1,0 +1,43 @@
+<app-data-table
+  [data]="store.data()"
+  [totalItems]="store.totalItems()"
+  [first]="firstRowIndex()"
+  [config]="tableConfig"
+  [loading]="store.loadingState().initial"
+  [isUpdating]="store.loadingState().updating"
+  [isSaving]="store.isSaving()"
+  [activeFiltersCount]="store.activeFiltersCount()"
+  (onPageChange)="handlePagination($event)"
+  (searchChange)="handleSearch($event)"
+  (filterDrawer)="drawerVisible.set(true)"
+  (onClear)="handleClearFilters()"
+>
+  <ng-container tableDrawer>
+    <app-filter-dynamic
+      [(visible)]="drawerVisible"
+      [config]="filterFields()"
+      [initialValues]="store.filter()"
+      (filterChange)="store.setFilter($event)"
+      (filterClear)="handleClearFilters()"
+    />
+  </ng-container>
+  <ng-container TableTotals>
+    <div class="flex items-center gap-2">
+      <span class="hidden md:block font-semibold">Ingresos netos:</span>
+      <span
+        class="bg-sky-600 px-3 py-1 rounded-md text-white text-sm md:text-xl font-semibold"
+        >{{ store.totalActiveOrdersNet() }}</span
+      >
+    </div>
+  </ng-container>
+</app-data-table>
+
+<!-- 👇 Diálogo Dinámico de Acciones -->
+<app-order-actions-dialog
+  [(visible)]="actionDialogVisible"
+  [config]="currentActionConfig()"
+  [claims]="selectedOrder()?.claims ?? []"
+  [loading]="isActionLoading()"
+  (action)="onActionSubmit($event)"
+  (close)="currentActionConfig.set(null); currentActionType.set(null)"
+/>

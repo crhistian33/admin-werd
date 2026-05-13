@@ -16,6 +16,7 @@ import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -44,6 +45,8 @@ import { ShippingRatesComponent } from '@features/settings/shipping-zones/compon
 import { ShippingAreasComponent } from '@features/settings/shipping-zones/components/shipping-areas/shipping-areas.component';
 import { ProductsFeaturesComponent } from '@features/catalogs/products/components/products-features/products-features.component';
 import { ProductsSpecsComponent } from '@features/catalogs/products/components/products-specs/products-specs.component';
+import { OrderItemsSelectorComponent } from '@features/sales/orders/components/dialogs/order-items-selector/order-items-selector.component';
+import { OrderClaim } from '@features/sales/orders/models/order-claim.model';
 
 type RemovedImageMap = { [key: string]: string | string[] };
 
@@ -70,6 +73,7 @@ type RemovedImageMap = { [key: string]: string | string[] };
     ShippingAreasComponent,
     ProductsFeaturesComponent,
     ProductsSpecsComponent,
+    OrderItemsSelectorComponent,
   ],
   templateUrl: './form-dynamic.component.html',
   styleUrl: './form-dynamic.component.scss',
@@ -109,6 +113,7 @@ export class FormDynamicComponent {
 
   // ── Inputs ────────────────────────────────────────────────────────
   steps = input.required<FormStepConfig[]>();
+  claims = input<OrderClaim[]>([]); // ✅ Agregar input de claims
   readonly flatFields = computed(() => this.steps().flatMap((s) => s.fields));
   initialData = input<Record<string, any> | null>(null);
   loading = input<boolean>(false);
@@ -251,7 +256,10 @@ export class FormDynamicComponent {
               group.patchValue(item);
               return group;
             });
-            controls[f.key] = this.fb.array(formGroups, f.validators ?? []);
+            controls[f.key] = this.fb.array(
+              formGroups,
+              this._getInitialValidators(f, data),
+            );
           } else {
             const initialValue =
               f.type === 'file-image' || f.type === 'file-gallery'
@@ -259,9 +267,12 @@ export class FormDynamicComponent {
                   ? []
                   : null
                 : data
-                  ? (data[f.key] ?? null)
-                  : null;
-            controls[f.key] = [initialValue, f.validators ?? []];
+                  ? (data[f.key] ?? f.defaultValue ?? null)
+                  : (f.defaultValue ?? null);
+            controls[f.key] = [
+              initialValue,
+              this._getInitialValidators(f, data),
+            ];
           }
         });
 
@@ -318,6 +329,15 @@ export class FormDynamicComponent {
 
   // ── Helpers ───────────────────────────────────────────────────────
 
+  private _getInitialValidators(
+    field: FormFieldConfig,
+    data: any,
+  ): ValidatorFn[] {
+    if (!field.validators) return [];
+    if (Array.isArray(field.validators)) return field.validators;
+    return field.validators(data || {});
+  }
+
   private _applyVisibility(form: FormGroup, steps: FormStepConfig[]): void {
     const formValue = form.getRawValue();
 
@@ -326,20 +346,34 @@ export class FormDynamicComponent {
         const control = form.get(field.key);
         if (!control) return;
 
-        if (!field.visibleWhen) {
-          if (control.disabled) control.enable({ emitEvent: false });
-          return;
-        }
+        const isVisible = field.visibleWhen
+          ? field.visibleWhen(formValue)
+          : true;
 
-        const isVisible = field.visibleWhen(formValue);
-
-        if (isVisible) {
-          if (control.disabled) control.enable({ emitEvent: false });
-        } else {
+        if (!isVisible) {
           if (control.enabled) {
             control.disable({ emitEvent: false });
             control.setValue(null, { emitEvent: false });
           }
+        } else {
+          // Si es visible, evaluamos su estado de "disabled"
+          const isExplicitlyDisabled =
+            typeof field.disabled === 'function'
+              ? field.disabled(formValue)
+              : !!field.disabled;
+
+          if (isExplicitlyDisabled) {
+            if (control.enabled) control.disable({ emitEvent: false });
+          } else {
+            if (control.disabled) control.enable({ emitEvent: false });
+          }
+        }
+
+        // Aplicar validadores dinámicos si existen
+        if (typeof field.validators === 'function') {
+          const newValidators = field.validators(formValue);
+          control.setValidators(newValidators);
+          control.updateValueAndValidity({ emitEvent: false });
         }
       });
     });
@@ -625,7 +659,10 @@ export class FormDynamicComponent {
   // ── Validaciones ──────────────────────────────────────────────────
 
   isRequired(field: FormFieldConfig): boolean {
-    return field.validators?.includes(Validators.required) ?? false;
+    const validators = Array.isArray(field.validators)
+      ? field.validators
+      : (field.validators?.(this.form().getRawValue()) ?? []);
+    return validators.includes(Validators.required);
   }
 
   showError(key: string): boolean {

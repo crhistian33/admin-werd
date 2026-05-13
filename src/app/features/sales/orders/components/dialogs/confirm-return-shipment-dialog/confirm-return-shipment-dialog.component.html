@@ -1,0 +1,59 @@
+<p-dialog
+  [(visible)]="visible"
+  [header]="
+    claim()?.type === 'REFUND'
+      ? 'Registrar Envío de Devolución'
+      : 'Registrar Envío de Producto Defectuoso'
+  "
+  [modal]="true"
+  [style]="{ width: '650px' }"
+  [closable]="!loading()"
+  (onHide)="onCancel()"
+>
+  @if (claim(); as c) {
+    <!-- Info del reclamo -->
+    <div class="bg-surface-50 p-4 rounded-lg flex flex-col gap-2 mb-4">
+      <div class="flex justify-between items-center">
+        <span class="font-mono text-sm font-semibold">{{ c.claimNumber }}</span>
+        <p-tag
+          [value]="CLAIM_TYPE_LABELS[c.type]"
+          [severity]="getClaimTypeSeverity(c.type)"
+        />
+      </div>
+      <p class="text-sm text-surface-600">Pedido: {{ c.order?.orderNumber }}</p>
+      <p class="text-sm text-surface-600">
+        Cliente: {{ c.customer?.firstName }} {{ c.customer?.lastName }}
+      </p>
+    </div>
+
+    <!-- Indicación de quién paga el envío -->
+    @if (showVoucherField()) {
+      <div
+        class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 mb-4"
+      >
+        <i class="pi pi-info-circle mr-1"></i>
+        <strong>La tienda asume el costo del envío.</strong>
+        <p class="mt-1">
+          Ingresa el monto del comprobante para sumarlo al reembolso.
+        </p>
+      </div>
+    } @else {
+      <div
+        class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800 mb-4"
+      >
+        <i class="pi pi-info-circle mr-1"></i>
+        <strong>El cliente asume el costo del envío.</strong>
+        <p class="mt-1">No se reembolsará el costo de envío de retorno.</p>
+      </div>
+    }
+  }
+
+  <app-form-dynamic
+    [steps]="formConfig()"
+    [loading]="loading()"
+    [submitLabel]="'Registrar envío'"
+    [size]="'compact'"
+    (submitted)="onFormSubmit($event)"
+    (cancelled)="onCancel()"
+  />
+</p-dialog>

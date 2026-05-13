@@ -18,7 +18,9 @@ export type FieldType =
   | 'specs'
   | 'shipping-areas'
   | 'shipping-rates'
-  | 'date';
+  | 'order-items-selector'
+  | 'date'
+  | 'info';
 
 export interface SelectOption {
   label: string;
@@ -33,8 +35,8 @@ export interface FormFieldConfig {
   hint?: string;
   isArray?: boolean;
   template?: { [key: string]: any };
-  validators?: ValidatorFn[];
-  options?: SelectOption[] | ((formValue: any) => SelectOption[]);
+  validators?: ValidatorFn[] | ((formValue: any) => ValidatorFn[]);
+  options?: any[] | ((formValue: any) => any[]);
   accept?: string;
   maxFileSize?: number;
   cols?: 1 | 2 | 3 | 4;
@@ -60,6 +62,8 @@ export interface FormFieldConfig {
    * Recibe el valor actual del formulario y retorna true si debe mostrarse, false en caso contrario.
    */
   visibleWhen?: (formValue: Record<string, any>) => boolean;
+  defaultValue?: string | boolean | number;
+  disabled?: boolean | ((formValue: Record<string, any>) => boolean);
 }
 
 export interface FormStepConfig {

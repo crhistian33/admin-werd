@@ -1,0 +1,94 @@
+<div
+  class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+>
+  <!-- Contenido -->
+  <div class="p-6">
+    <div class="flex flex-col gap-3">
+      <!-- Subtotal Original -->
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-slate-500">Subtotal</span>
+        <span class="text-sm font-semibold text-slate-700">
+          {{ order().subtotal | currency: "S/ " : "symbol" : "1.2-2" }}
+        </span>
+      </div>
+
+      <!-- Ajustes por cancelaciones y devoluciones -->
+      @if (getAdjustmentsTotal() > 0) {
+        <div class="flex justify-between items-center text-red-500">
+          <span class="text-sm">Ajustes (Cancelaciones/Devoluciones)</span>
+          <span class="text-sm font-semibold">
+            -{{ getAdjustmentsTotal() | currency: "S/ " : "symbol" : "1.2-2" }}
+          </span>
+        </div>
+      }
+
+      <!-- Descuentos -->
+      @if (order().discountAmount > 0) {
+        <div class="flex justify-between items-center text-orange-500">
+          <span class="text-sm">Descuentos</span>
+          <span class="text-sm font-semibold">
+            -{{ order().discountAmount | currency: "S/ " : "symbol" : "1.2-2" }}
+          </span>
+        </div>
+      }
+
+      <!-- Cupón -->
+      @if (order().couponDiscount > 0) {
+        <div class="flex justify-between items-center text-orange-500">
+          <span class="text-sm flex items-center gap-2">
+            Cupón
+            @if (order().coupon; as coupon) {
+              <span
+                class="px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-mono font-semibold"
+              >
+                {{ coupon.code }}
+              </span>
+            }
+          </span>
+          <span class="text-sm font-semibold">
+            -{{ order().couponDiscount | currency: "S/ " : "symbol" : "1.2-2" }}
+          </span>
+        </div>
+      }
+
+      <!-- Envío -->
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-slate-500">Envío</span>
+        <span class="text-sm font-semibold text-slate-700">
+          {{ order().shippingAmount | currency: "S/ " : "symbol" : "1.2-2" }}
+        </span>
+      </div>
+
+      <!-- IGV -->
+      @if (order().taxAmount > 0) {
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-slate-500">IGV (18%)</span>
+          <span class="text-sm font-semibold text-slate-700">
+            {{ order().taxAmount | currency: "S/ " : "symbol" : "1.2-2" }}
+          </span>
+        </div>
+      }
+
+      <!-- Separador -->
+      <div class="border-t border-slate-200 my-2"></div>
+
+      <!-- Total Ajustado -->
+      <div
+        class="flex justify-between items-center bg-sky-700 text-white p-3 rounded-lg -mx-3 shadow-md"
+      >
+        <span class="text-sm font-semibold">Total</span>
+        <span class="text-xl font-bold">
+          {{ getAdjustedTotal() | currency: "S/ " : "symbol" : "1.2-2" }}
+        </span>
+      </div>
+
+      <!-- Total Original (si hay ajustes) -->
+      @if (getAdjustmentsTotal() > 0) {
+        <div class="text-center text-xs text-slate-400 mt-1">
+          Total original:
+          {{ order().total | currency: "S/ " : "symbol" : "1.2-2" }}
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '900px' }"
+  [closable]="true"
+  [dismissableMask]="true"
+  header="Evidencia"
+  (onHide)="onHide()"
+>
+  <div class="flex justify-center items-center bg-slate-300 rounded-lg p-4">
+    <img
+      [src]="src()"
+      class="max-w-full max-h-[90vh] object-contain rounded"
+      [alt]="alt()"
+    />
+  </div>
+</p-dialog>
