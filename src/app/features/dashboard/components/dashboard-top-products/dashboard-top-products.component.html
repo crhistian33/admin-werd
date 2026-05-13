@@ -1,0 +1,43 @@
+<div
+  class="bg-white rounded-xl border border-slate-200 overflow-hidden h-full flex flex-col"
+>
+  <h2
+    class="text-xs font-bold text-slate-500 border-b border-slate-200 uppercase tracking-wide px-4 py-3"
+  >
+    Top Productos vendidos
+  </h2>
+  <div class="flex-1 overflow-auto mt-3">
+    <p-table
+      [value]="products()"
+      styleClass="text-sm"
+      [scrollable]="true"
+      scrollHeight="flex"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-xs text-slate-500 font-semibold">#</th>
+          <th class="text-xs text-slate-500 font-semibold">Producto</th>
+          <th class="text-xs text-slate-500 font-semibold text-right">
+            Vendidos
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-product let-i="rowIndex">
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="text-slate-400 font-medium w-8">{{ i + 1 }}</td>
+          <td class="text-slate-700">{{ product.productName }}</td>
+          <td class="text-right font-semibold text-emerald-600">
+            {{ product.totalSold }}
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3" class="text-center text-slate-400 py-8">
+            Sin productos
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

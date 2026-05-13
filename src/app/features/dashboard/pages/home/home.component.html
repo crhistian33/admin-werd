@@ -1,1 +1,113 @@
-<h2>Home</h2>
+<!-- home.component.html -->
+<div class="bg-[#f8fafc] min-h-screen space-y-8">
+  <!-- BARRA DE CONTROL -->
+  <div
+    class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-white rounded-xl border border-slate-200"
+  >
+    <div class="flex flex-col items-end gap-2">
+      <!-- <div class="flex items-center gap-2">
+        <p-selectButton
+          [options]="periods"
+          [ngModel]="selectedDays"
+          optionLabel="label"
+          optionValue="days"
+          (onChange)="onPeriodChange($event)"
+        />
+        <p-button
+          icon="pi pi-refresh"
+          severity="secondary"
+          [text]="true"
+          [loading]="store.isLoading()"
+          (onClick)="store.refresh()"
+        />
+      </div> -->
+
+      <!-- Picker de rango personalizado -->
+      <div class="flex items-center gap-2 mt-1">
+        <p-datepicker
+          [(ngModel)]="customStart"
+          placeholder="Desde"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          class="text-sm"
+        />
+        <span class="text-slate-400 text-sm">→</span>
+        <p-datepicker
+          [(ngModel)]="customEnd"
+          placeholder="Hasta"
+          dateFormat="dd/mm/yy"
+          [minDate]="customStart ?? undefined"
+          [showIcon]="true"
+          class="text-sm"
+        />
+        <p-button
+          label="Aplicar"
+          severity="primary"
+          [loading]="store.isLoading()"
+          size="small"
+          [disabled]="!customStart"
+          (onClick)="applyCustomRange()"
+        />
+        <p-button
+          icon="pi pi-refresh"
+          severity="secondary"
+          [text]="true"
+          [loading]="store.isLoading()"
+          (onClick)="onReset()"
+          pTooltip="Restablecer datos"
+          tooltipPosition="top"
+        />
+      </div>
+      <!-- @if (showCustomRange) {
+        } -->
+    </div>
+    <div>
+      <p class="text-sm text-slate-500">
+        <span>Datos del</span>
+        <!-- <span class="font-medium text-sky-600">{{
+          selectedPeriod().text
+        }}</span> -->
+        <span class="font-semibold ml-2">{{ rangeLabel() }}</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <app-dashboard-kpi-cards [kpis]="store.kpis()" class="block w-full" />
+
+  <!-- ÓRDENES y ESTADOS -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+    <div class="lg:col-span-8 flex">
+      <app-dashboard-recent-orders
+        [orders]="store.recentOrders()"
+        class="w-full"
+      />
+    </div>
+    <div class="lg:col-span-4 flex">
+      <app-dashboard-orders-by-status
+        [data]="store.ordersByStatus()"
+        class="w-full"
+      />
+    </div>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+    <div class="flex w-full">
+      <app-dashboard-revenue-chart
+        [revenue]="store.revenueByDay()"
+        [refunds]="store.refundsVsSales()"
+        class="w-full block"
+      />
+    </div>
+    <div class="flex w-full">
+      <app-dashboard-top-products
+        [products]="store.topProducts()"
+        class="w-full block"
+      />
+    </div>
+  </div>
+
+  <!-- RECLAMOS -->
+  <app-dashboard-recent-claims [claims]="store.recentClaims()" class="w-full" />
+</div>

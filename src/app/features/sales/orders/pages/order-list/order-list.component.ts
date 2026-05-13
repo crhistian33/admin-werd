@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { TabsModule } from 'primeng/tabs';
 import { BadgeModule } from 'primeng/badge';
 import { LucideAngularModule } from 'lucide-angular';
@@ -20,6 +20,14 @@ import { OrderClaimsTableComponent } from '../../components/tables/order-claims-
   providers: [OrderStore],
   templateUrl: './order-list.component.html',
 })
-export class OrderListComponent {
+export class OrderListComponent implements OnInit {
   readonly store = inject(OrderStore);
+
+  readonly tab = input<string>();
+
+  readonly activeTab = signal<string>('0');
+
+  ngOnInit(): void {
+    this.activeTab.set(this.tab() ?? '0');
+  }
 }

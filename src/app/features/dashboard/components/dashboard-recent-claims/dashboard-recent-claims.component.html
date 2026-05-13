@@ -1,0 +1,53 @@
+<div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+  <div
+    class="flex justify-between items-center px-4 py-3 border-b border-slate-200"
+  >
+    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      Reclamos Recientes
+    </h2>
+    <p-button
+      label="Ver todos los reclamos"
+      icon="pi pi-external-link"
+      routerLink="/ventas/pedidos"
+      [queryParams]="{ tab: '1' }"
+      size="small"
+      severity="secondary"
+    />
+  </div>
+  <p-table [value]="claims()" class="text-sm mt-3" [scrollable]="true">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-xs text-slate-500 font-semibold">Nº Reclamo</th>
+        <th class="text-xs text-slate-500 font-semibold">Tipo</th>
+        <th class="text-xs text-slate-500 font-semibold">Cliente</th>
+        <th class="text-xs text-slate-500 font-semibold">Estado</th>
+        <th class="text-xs text-slate-500 font-semibold">Fecha</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-claim>
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="font-medium text-slate-800">{{ claim.claimNumber }}</td>
+        <td class="text-slate-500">
+          <p-tag
+            [value]="typeLabel(claim.type)"
+            [severity]="typeSeverity(claim.type)"
+          />
+        </td>
+        <td class="text-slate-600">{{ claim.customerName }}</td>
+        <td>
+          <p-tag [value]="claim.status" [severity]="severity(claim.status)" />
+        </td>
+        <td class="text-slate-400 text-xs">
+          {{ claim.createdAt | date: "dd/MM/yy HH:mm" }}
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center text-slate-400 py-8">
+          Sin reclamos recientes
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

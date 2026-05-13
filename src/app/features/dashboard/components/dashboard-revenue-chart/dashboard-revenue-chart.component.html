@@ -1,0 +1,25 @@
+<div class="bg-white rounded-2xl border border-slate-200 h-full flex flex-col">
+  <h2
+    class="text-xs font-bold text-slate-500 border-b border-slate-200 uppercase tracking-wide px-4 py-3"
+  >
+    Ingresos y ventas vs Reembolsos
+  </h2>
+
+  <!-- Eliminamos items-center y justify-center para que no colapse el ancho -->
+  <div class="flex-1 w-full p-4">
+    @if (revenue().length || refunds().length) {
+      <p-chart
+        type="line"
+        [data]="chartData()"
+        [options]="chartOptions"
+        class="w-full h-full max-h-72"
+      />
+    } @else {
+      <div
+        class="h-full flex items-center justify-center text-slate-400 text-sm italic"
+      >
+        Sin datos disponibles
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div
+  class="bg-white rounded-xl border border-slate-200 overflow-hidden h-full flex flex-col"
+>
+  <h2
+    class="text-xs font-bold text-slate-500 border-b border-slate-200 uppercase tracking-wide px-4 py-3"
+  >
+    Órdenes Recientes
+  </h2>
+  <div class="flex-1 overflow-auto mt-3">
+    <p-table
+      [value]="orders()"
+      styleClass="text-sm"
+      [scrollable]="true"
+      scrollHeight="flex"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-xs text-slate-500 font-semibold">Nº Orden</th>
+          <th class="text-xs text-slate-500 font-semibold">Cliente</th>
+          <th class="text-xs text-slate-500 font-semibold text-right">Total</th>
+          <th class="text-xs text-slate-500 font-semibold">Estado</th>
+          <th class="text-xs text-slate-500 font-semibold">Fecha</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-order>
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="font-medium text-slate-800">{{ order.orderNumber }}</td>
+          <td class="text-slate-600">{{ order.customerName }}</td>
+          <td class="text-right font-semibold text-slate-800">
+            {{ order.total | currency: "S/ " : "symbol" : "1.2-2" }}
+          </td>
+          <td>
+            <p-tag
+              [value]="label(order.status)"
+              [severity]="severity(order.status)"
+            />
+          </td>
+          <td class="text-slate-400 text-xs">
+            {{ order.placedAt | date: "dd/MM/yy HH:mm" }}
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center text-slate-400 py-8">
+            Sin órdenes recientes
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
