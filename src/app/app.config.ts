@@ -4,9 +4,11 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import {
+  PreloadAllModules,
   provideRouter,
   withComponentInputBinding,
   withInMemoryScrolling,
+  withPreloading,
   withViewTransitions,
 } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -95,6 +97,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withViewTransitions(),
+      withPreloading(PreloadAllModules),
       withComponentInputBinding(),
       withInMemoryScrolling({
         scrollPositionRestoration: 'top',

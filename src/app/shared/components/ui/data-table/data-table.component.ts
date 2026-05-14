@@ -108,6 +108,17 @@ export class DataTableComponent<T extends Record<string, any>> {
     return Array(Math.max(count, 1)).fill(0);
   }
 
+  isMobile = false;
+
+  ngOnInit() {
+    this.checkScreen();
+    window.addEventListener('resize', this.checkScreen.bind(this));
+  }
+
+  checkScreen() {
+    this.isMobile = window.innerWidth < 524; // sm breakpoint
+  }
+
   // ============================================================
   // COMPUTED
   // ============================================================

@@ -46,7 +46,7 @@
     <div class="flex items-center ml-auto gap-2">
       @if (config().bulkActions?.length && selectedRows().length) {
         <p-splitbutton
-          [label]="config().bulkActions![0].label"
+          [label]="isMobile ? '' : config().bulkActions![0].label"
           [icon]="config().bulkActions![0].icon ?? 'pi pi-tag'"
           [model]="bulkMenuItems()"
           severity="secondary"
@@ -58,7 +58,7 @@
       <ng-content select="[tableActions]" />
       @if (isTrashView()) {
         <p-button
-          label="Restaurar selección"
+          [label]="isMobile ? '' : 'Restaurar selección'"
           icon="pi pi-refresh"
           severity="success"
           [outlined]="true"
@@ -69,7 +69,7 @@
       }
       @if (config().showDeleteAll) {
         <p-button
-          label="Eliminar selección"
+          [label]="isMobile ? '' : 'Eliminar selección'"
           icon="pi pi-trash"
           severity="danger"
           [loading]="isSaving()"
@@ -78,7 +78,11 @@
         />
       }
       @if (config().showCreate) {
-        <p-button label="Nuevo" icon="pi pi-plus" routerLink="nuevo" />
+        <p-button
+          [label]="isMobile ? '' : 'Nuevo'"
+          icon="pi pi-plus"
+          routerLink="nuevo"
+        />
       }
     </div>
 
